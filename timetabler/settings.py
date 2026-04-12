@@ -140,47 +140,69 @@ REST_FRAMEWORK = {
 
 # DRF Spectacular (API docs)
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Timetable Management System API',
+    'TITLE': '📅 Timetable Management System',
     'DESCRIPTION': '''
-# Timetable Management System API
-
 ## Overview
-This API provides comprehensive timetable management for certificate and diploma programmes.
+A comprehensive API for managing academic timetables for certificate and diploma programmes.
 
 ## Features
-- Academic structure management (Years, Semesters, Departments, Programmes)
-- Resource management (Lecturers, Rooms, Intakes)
-- Automated timetable generation with OR-Tools + AI
-- Conflict detection and resolution
-- Export to PDF and Excel
-- Real-time WebSocket updates
+- 🏫 **Academic Structure** — Years, Semesters, Departments, Programmes
+- 👨‍🏫 **Resource Management** — Lecturers, Rooms, Intakes
+- 🤖 **AI-Powered Scheduling** — Automated generation with OR-Tools + AI
+- ⚠️ **Conflict Detection** — Automatic detection and resolution
+- 📄 **Export** — PDF and Excel reports
+- 🔴 **Real-time Updates** — WebSocket support
 
 ## Authentication
-Use session authentication. Login via `/admin/` first.
+1. Login via [/admin/](/admin/) with your credentials
+2. Session cookie is used automatically for all requests
+
+## Base URL
+`https://timetabler-cr5d.onrender.com/api/`
     ''',
     'VERSION': 'v1',
     'SERVE_INCLUDE_SCHEMA': False,
+    'CONTACT': {'email': 'admin@college.edu'},
+    'LICENSE': {'name': 'MIT License'},
+    'TAGS': [
+        {'name': 'academic-years', 'description': 'Manage academic years'},
+        {'name': 'semesters', 'description': 'Manage semesters (Jan-Apr, May-Aug, Sep-Dec)'},
+        {'name': 'departments', 'description': 'Manage academic departments'},
+        {'name': 'programmes', 'description': 'Manage Certificate and Diploma programmes'},
+        {'name': 'stages', 'description': 'Manage stages/years of study'},
+        {'name': 'units', 'description': 'Manage academic units/subjects'},
+        {'name': 'intakes', 'description': 'Manage student intake cohorts'},
+        {'name': 'lecturers', 'description': 'Manage teaching staff'},
+        {'name': 'rooms', 'description': 'Manage teaching venues'},
+        {'name': 'time-slots', 'description': 'View available time slots'},
+        {'name': 'timetable-entries', 'description': 'View and manage timetable entries'},
+        {'name': 'conflicts', 'description': 'Detect and resolve scheduling conflicts'},
+        {'name': 'timetable', 'description': 'Master and personal timetable views'},
+        {'name': 'schedule', 'description': 'Generate and publish schedules'},
+        {'name': 'export', 'description': 'Export timetables to PDF and Excel'},
+        {'name': 'dashboard', 'description': 'Statistics and analytics'},
+        {'name': 'websocket', 'description': 'Real-time WebSocket token'},
+    ],
     'SWAGGER_UI_SETTINGS': {
         'deepLinking': True,
         'persistAuthorization': True,
-        'displayOperationId': True,
+        'displayOperationId': False,
+        'defaultModelsExpandDepth': 1,
+        'defaultModelExpandDepth': 2,
+        'docExpansion': 'list',
+        'filter': True,
+        'showExtensions': True,
+        'showCommonExtensions': True,
+        'tryItOutEnabled': True,
     },
-    'TAGS': [
-        {'name': 'Academic Years', 'description': 'Manage academic years'},
-        {'name': 'Semesters', 'description': 'Manage semesters (Jan-Apr, May-Aug, Sep-Dec)'},
-        {'name': 'Departments', 'description': 'Manage academic departments'},
-        {'name': 'Programmes', 'description': 'Manage Certificate and Diploma programmes'},
-        {'name': 'Stages', 'description': 'Manage stages/semesters of study'},
-        {'name': 'Units', 'description': 'Manage academic units/subjects'},
-        {'name': 'Intakes', 'description': 'Manage student intake cohorts'},
-        {'name': 'Lecturers', 'description': 'Manage teaching staff'},
-        {'name': 'Rooms', 'description': 'Manage teaching venues'},
-        {'name': 'Timetable', 'description': 'View and manage timetables'},
-        {'name': 'Scheduling', 'description': 'Generate and publish schedules'},
-        {'name': 'Conflicts', 'description': 'Detect and resolve conflicts'},
-        {'name': 'Export', 'description': 'Export to PDF and Excel'},
-        {'name': 'Dashboard', 'description': 'Statistics and analytics'},
-    ],
+    'SWAGGER_UI_FAVICON_HREF': 'https://www.svgrepo.com/show/374049/django.svg',
+    'REDOC_UI_SETTINGS': {
+        'hideDownloadButton': False,
+        'expandResponses': '200,201',
+        'pathInMiddlePanel': True,
+    },
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
 }
 
 # CORS Settings

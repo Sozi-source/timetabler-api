@@ -18,26 +18,26 @@ router.register(r'timetable-entries', views.TimetableEntryViewSet, basename='tim
 router.register(r'conflicts', views.ConflictViewSet, basename='conflict')
 
 urlpatterns = [
-    # API endpoints
-    path('api/', include(router.urls)),
-    
+    # Router endpoints (CRUD)
+    path('', include(router.urls)),
+
     # Timetable views
-    path('api/timetable/master/', views.MasterTimetableView.as_view(), name='master-timetable'),
-    path('api/timetable/personal/', views.PersonalTimetableView.as_view(), name='personal-timetable'),
-    
-    # Scheduling endpoints
-    path('api/schedule/generate/', views.GenerateTimetableView.as_view(), name='schedule-generate'),
-    path('api/schedule/publish/', views.PublishTimetableView.as_view(), name='schedule-publish'),
-    
-    # Export endpoints
-    path('api/export/master-pdf/', views.ExportMasterPDFView.as_view(), name='export-master-pdf'),
-    path('api/export/personal-pdf/<uuid:lecturer_id>/', views.ExportPersonalPDFView.as_view(), name='export-personal-pdf'),
-    path('api/export/excel/', views.ExportExcelView.as_view(), name='export-excel'),
-    
-    # Dashboard endpoints
-    path('api/dashboard/stats/', views.DashboardStatsView.as_view(), name='dashboard-stats'),
-    path('api/dashboard/lecturer/', views.LecturerDashboardView.as_view(), name='lecturer-dashboard'),
-    
-    # WebSocket token
-    path('api/websocket/token/', views.WebSocketTokenView.as_view(), name='websocket-token'),
+    path('timetable/master/', views.MasterTimetableView.as_view(), name='master-timetable'),
+    path('timetable/personal/', views.PersonalTimetableView.as_view(), name='personal-timetable'),
+
+    # Scheduling
+    path('schedule/generate/', views.GenerateTimetableView.as_view(), name='schedule-generate'),
+    path('schedule/publish/', views.PublishTimetableView.as_view(), name='schedule-publish'),
+
+    # Export
+    path('export/master-pdf/', views.ExportMasterPDFView.as_view(), name='export-master-pdf'),
+    path('export/personal-pdf/<uuid:lecturer_id>/', views.ExportPersonalPDFView.as_view(), name='export-personal-pdf'),
+    path('export/excel/', views.ExportExcelView.as_view(), name='export-excel'),
+
+    # Dashboard
+    path('dashboard/stats/', views.DashboardStatsView.as_view(), name='dashboard-stats'),
+    path('dashboard/lecturer/', views.LecturerDashboardView.as_view(), name='lecturer-dashboard'),
+
+    # WebSocket
+    path('websocket/token/', views.WebSocketTokenView.as_view(), name='websocket-token'),
 ]

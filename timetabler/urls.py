@@ -9,7 +9,7 @@ urlpatterns = [
     path('', RedirectView.as_view(url='/swagger/'), name='root'),
 
     path('admin/', admin.site.urls),
-    path('api/', include('timetable.urls')),  # Your timetable app URLs
+    path('api/', include('timetable.urls')),
 
     # API Documentation
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -17,6 +17,4 @@ urlpatterns = [
     path('redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
