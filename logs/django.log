@@ -1,0 +1,383 @@
+INFO 2026-04-12 19:03:37,331 autoreload 6904 19416 Watching for file changes with StatReloader
+INFO 2026-04-12 19:23:01,653 autoreload 11012 9380 Watching for file changes with StatReloader
+WARNING 2026-04-12 19:23:16,246 log 11012 2264 Not Found: /
+WARNING 2026-04-12 19:23:16,250 basehttp 11012 2264 "GET / HTTP/1.1" 404 2681
+WARNING 2026-04-12 19:23:25,526 log 11012 2264 Not Found: /api/admin
+WARNING 2026-04-12 19:23:25,530 basehttp 11012 2264 "GET /api/admin HTTP/1.1" 404 4778
+INFO 2026-04-12 19:24:20,763 basehttp 11012 2264 "GET /admin/ HTTP/1.1" 302 0
+INFO 2026-04-12 19:24:21,047 basehttp 11012 2264 "GET /admin/login/?next=/admin/ HTTP/1.1" 200 4190
+INFO 2026-04-12 19:24:21,786 basehttp 11012 24176 "GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2929
+INFO 2026-04-12 19:24:21,834 basehttp 11012 2264 "GET /static/admin/css/base.css HTTP/1.1" 200 21310
+INFO 2026-04-12 19:24:21,838 basehttp 11012 13092 "GET /static/admin/css/login.css HTTP/1.1" 200 958
+INFO 2026-04-12 19:24:21,842 basehttp 11012 21280 "GET /static/admin/css/responsive.css HTTP/1.1" 200 18559
+INFO 2026-04-12 19:24:21,849 basehttp 11012 4636 "GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2694
+INFO 2026-04-12 19:24:21,887 basehttp 11012 12944 "GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+INFO 2026-04-12 19:24:21,915 basehttp 11012 24176 "GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+INFO 2026-04-12 19:24:32,261 basehttp 11012 24176 "POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+INFO 2026-04-12 19:24:32,355 basehttp 11012 24176 "GET /admin/ HTTP/1.1" 200 12125
+INFO 2026-04-12 19:24:32,453 basehttp 11012 24176 "GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+INFO 2026-04-12 19:24:32,529 basehttp 11012 12944 "GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+INFO 2026-04-12 19:24:32,529 basehttp 11012 24176 "GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+ERROR 2026-04-12 19:24:40,009 log 11012 24176 Internal Server Error: /admin/auth/user/add/
+Traceback (most recent call last):
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\contrib\admin\templatetags\base.py", line 45, in render
+    return super().render(context)
+           ~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\library.py", line 271, in render
+    new_context = context.new(_dict)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 265, in new
+    new_context = super().new(values)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 110, in new
+    new_context = copy(self)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\copy.py", line 82, in copy
+    return copier(x)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 158, in __copy__
+    duplicate = super().__copy__()
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 39, in __copy__
+    duplicate.dicts = self.dicts[:]
+    ^^^^^^^^^^^^^^^
+AttributeError: 'super' object has no attribute 'dicts' and no __dict__ for setting new attributes
+ERROR 2026-04-12 19:24:40,049 basehttp 11012 24176 "GET /admin/auth/user/add/ HTTP/1.1" 500 476473
+INFO 2026-04-12 19:37:32,277 autoreload 11012 9380 C:\Users\sozi\Desktop\BE\timetabler\timetable\permissions.py changed, reloading.
+INFO 2026-04-12 19:37:39,293 autoreload 6428 3592 Watching for file changes with StatReloader
+INFO 2026-04-12 19:38:03,899 autoreload 6428 3592 C:\Users\sozi\Desktop\BE\timetabler\timetable\serializers.py changed, reloading.
+INFO 2026-04-12 19:38:09,872 autoreload 11324 10532 Watching for file changes with StatReloader
+INFO 2026-04-12 19:38:21,054 autoreload 11324 10532 C:\Users\sozi\Desktop\BE\timetabler\timetable\views.py changed, reloading.
+INFO 2026-04-12 19:38:26,455 autoreload 8028 19020 Watching for file changes with StatReloader
+INFO 2026-04-12 19:39:36,227 autoreload 8028 19020 C:\Users\sozi\Desktop\BE\timetabler\timetable\models.py changed, reloading.
+INFO 2026-04-12 19:39:42,521 autoreload 3364 12172 Watching for file changes with StatReloader
+ERROR 2026-04-12 19:40:35,603 log 3364 13252 Internal Server Error: /admin/auth/user/add/
+Traceback (most recent call last):
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\contrib\admin\templatetags\base.py", line 45, in render
+    return super().render(context)
+           ~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\library.py", line 271, in render
+    new_context = context.new(_dict)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 265, in new
+    new_context = super().new(values)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 110, in new
+    new_context = copy(self)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\copy.py", line 82, in copy
+    return copier(x)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 158, in __copy__
+    duplicate = super().__copy__()
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 39, in __copy__
+    duplicate.dicts = self.dicts[:]
+    ^^^^^^^^^^^^^^^
+AttributeError: 'super' object has no attribute 'dicts' and no __dict__ for setting new attributes
+ERROR 2026-04-12 19:40:35,663 basehttp 3364 13252 "GET /admin/auth/user/add/ HTTP/1.1" 500 476610
+WARNING 2026-04-12 19:40:45,762 log 3364 13252 Not Found: /
+WARNING 2026-04-12 19:40:45,763 basehttp 3364 13252 "GET / HTTP/1.1" 404 2681
+INFO 2026-04-12 19:40:51,710 basehttp 3364 13252 "GET /admin/ HTTP/1.1" 200 12125
+ERROR 2026-04-12 19:40:54,575 log 3364 13252 Internal Server Error: /admin/auth/user/
+Traceback (most recent call last):
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\core\handlers\base.py", line 220, in _get_response
+    response = response.render()
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\response.py", line 92, in rendered_content
+    return template.render(context, self._request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\backends\django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 175, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 157, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 167, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\loader_tags.py", line 63, in render
+    result = block.nodelist.render(context)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 1005, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\base.py", line 966, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\contrib\admin\templatetags\base.py", line 45, in render
+    return super().render(context)
+           ~~~~~~~~~~~~~~^^^^^^^^^
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\library.py", line 271, in render
+    new_context = context.new(_dict)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 265, in new
+    new_context = super().new(values)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 110, in new
+    new_context = copy(self)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\copy.py", line 82, in copy
+    return copier(x)
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 158, in __copy__
+    duplicate = super().__copy__()
+  File "C:\Users\sozi\AppData\Local\Programs\Python\Python314\Lib\site-packages\django\template\context.py", line 39, in __copy__
+    duplicate.dicts = self.dicts[:]
+    ^^^^^^^^^^^^^^^
+AttributeError: 'super' object has no attribute 'dicts' and no __dict__ for setting new attributes
+ERROR 2026-04-12 19:40:54,592 basehttp 3364 13252 "GET /admin/auth/user/ HTTP/1.1" 500 467903
+INFO 2026-04-12 19:44:01,612 autoreload 1484 4840 Watching for file changes with StatReloader
+INFO 2026-04-12 19:46:24,399 autoreload 1484 4840 C:\Users\sozi\Desktop\BE\timetabler\timetable\admin.py changed, reloading.
+INFO 2026-04-12 19:47:10,583 autoreload 4824 7136 Watching for file changes with StatReloader
+INFO 2026-04-12 19:48:21,762 log 4824 18180 "GET /admin/auth/user/ HTTP/1.1" 200 18915
+INFO 2026-04-12 19:48:21,939 log 4824 11192 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:48:22,288 log 4824 16256 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9777
+INFO 2026-04-12 19:48:22,306 log 4824 18180 "GET /static/admin/css/changelists.css HTTP/1.1" 200 7498
+INFO 2026-04-12 19:48:22,359 log 4824 1372 "GET /static/admin/js/core.js HTTP/1.1" 200 6208
+INFO 2026-04-12 19:48:22,363 log 4824 3492 "GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+INFO 2026-04-12 19:48:22,378 log 4824 1496 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+INFO 2026-04-12 19:48:22,402 log 4824 16256 "GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+INFO 2026-04-12 19:48:22,405 log 4824 18180 "GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+INFO 2026-04-12 19:48:22,430 log 4824 1372 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+INFO 2026-04-12 19:48:22,465 log 4824 11192 "GET /static/admin/js/actions.js HTTP/1.1" 200 8076
+INFO 2026-04-12 19:48:22,517 log 4824 3492 "GET /static/admin/img/search.svg HTTP/1.1" 200 607
+INFO 2026-04-12 19:48:22,545 log 4824 1496 "GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 558
+INFO 2026-04-12 19:48:22,612 log 4824 1496 "GET /static/admin/js/filters.js HTTP/1.1" 200 978
+INFO 2026-04-12 19:48:22,663 log 4824 3492 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 593
+INFO 2026-04-12 19:48:22,664 log 4824 11192 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 928
+INFO 2026-04-12 19:48:22,670 log 4824 1372 "GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1761
+INFO 2026-04-12 19:48:27,769 log 4824 3492 "GET /admin/ HTTP/1.1" 200 16095
+INFO 2026-04-12 19:48:31,296 log 4824 3492 "GET /admin/timetable/academicyear/ HTTP/1.1" 200 16359
+INFO 2026-04-12 19:48:31,470 log 4824 3492 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:48:42,399 log 4824 3492 "GET /admin/ HTTP/1.1" 200 16095
+INFO 2026-04-12 19:48:44,274 log 4824 3492 "GET /admin/timetable/conflictlog/ HTTP/1.1" 200 17560
+INFO 2026-04-12 19:48:44,388 log 4824 3492 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:48:47,224 log 4824 3492 "GET /admin/ HTTP/1.1" 200 16095
+INFO 2026-04-12 19:48:49,087 log 4824 3492 "GET /admin/timetable/intakeunit/ HTTP/1.1" 200 16055
+INFO 2026-04-12 19:48:49,219 log 4824 3492 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:50:02,072 log 4824 3492 "GET /admin/ HTTP/1.1" 200 16095
+INFO 2026-04-12 19:50:04,747 log 4824 3492 "GET /admin/timetable/lecturer/ HTTP/1.1" 200 16481
+INFO 2026-04-12 19:50:04,932 log 4824 3492 "GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,933 log 4824 11192 "GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,935 log 4824 1496 "GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,942 log 4824 18180 "GET /static/admin/js/core.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,970 log 4824 1372 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:50:04,975 log 4824 16256 "GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,984 log 4824 3492 "GET /static/admin/js/actions.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,985 log 4824 11192 "GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,988 log 4824 1496 "GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:04,990 log 4824 18180 "GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:05,097 log 4824 1372 "GET /static/admin/img/search.svg HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:05,133 log 4824 18180 "GET /static/admin/js/filters.js HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:05,161 log 4824 1372 "GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:05,162 log 4824 1496 "GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+INFO 2026-04-12 19:50:07,569 log 4824 1496 "GET /admin/ HTTP/1.1" 200 16095
+INFO 2026-04-12 19:50:10,028 log 4824 1496 "GET /admin/timetable/room/ HTTP/1.1" 200 17455
+INFO 2026-04-12 19:50:10,215 log 4824 1496 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:50:13,868 log 4824 1496 "GET /admin/timetable/room/?room_type__exact=LECTURE HTTP/1.1" 200 17951
+INFO 2026-04-12 19:50:14,045 log 4824 1496 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 19:50:16,657 log 4824 1496 "GET /admin/timetable/room/?room_type__exact=TUTORIAL HTTP/1.1" 200 17964
+INFO 2026-04-12 19:50:16,861 log 4824 1496 "GET /admin/jsi18n/ HTTP/1.1" 200 3342
+INFO 2026-04-12 20:33:14,805 autoreload 19308 23704 Watching for file changes with StatReloader
+INFO 2026-04-12 20:33:25,787 log 19308 23100 "GET /admin/timetable/room/?room_type__exact=TUTORIAL HTTP/1.1" 200 17964
+INFO 2026-04-12 20:33:37,290 log 19308 23100 "GET /swagger HTTP/1.1" 301 0
+INFO 2026-04-12 20:33:37,327 log 19308 23100 "GET /swagger/ HTTP/1.1" 200 2406
+INFO 2026-04-12 20:33:37,952 log 19308 23100 "GET /static/drf-yasg/style.css HTTP/1.1" 200 1047
+INFO 2026-04-12 20:33:37,977 log 19308 23100 "GET /static/drf-yasg/swagger-ui-init.js HTTP/1.1" 200 14964
+INFO 2026-04-12 20:33:38,010 log 19308 22316 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-bundle.js HTTP/1.1" 200 1046583
+INFO 2026-04-12 20:33:38,058 log 19308 23228 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui.css HTTP/1.1" 200 145206
+INFO 2026-04-12 20:33:38,067 log 19308 14748 "GET /static/drf-yasg/insQ.min.js HTTP/1.1" 200 2093
+INFO 2026-04-12 20:33:38,072 log 19308 7424 "GET /static/drf-yasg/immutable.min.js HTTP/1.1" 200 56904
+INFO 2026-04-12 20:33:38,073 log 19308 21896 "GET /static/drf-yasg/swagger-ui-dist/swagger-ui-standalone-preset.js HTTP/1.1" 200 322863
+INFO 2026-04-12 20:33:39,767 log 19308 21896 "GET /static/drf-yasg/swagger-ui-dist/favicon-32x32.png HTTP/1.1" 200 628
+INFO 2026-04-12 20:33:39,909 log 19308 7424 "GET /swagger/?format=openapi HTTP/1.1" 200 68008
