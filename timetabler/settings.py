@@ -140,51 +140,10 @@ REST_FRAMEWORK = {
 
 # DRF Spectacular (API docs)
 SPECTACULAR_SETTINGS = {
-    'TITLE': '📅 Timetable Management System',
-    'DESCRIPTION': '''
-## Overview
-A comprehensive API for managing academic timetables for certificate and diploma programmes.
-
-## Features
-- 🏫 **Academic Structure** — Years, Semesters, Departments, Programmes
-- 👨‍🏫 **Resource Management** — Lecturers, Rooms, Intakes
-- 🤖 **AI-Powered Scheduling** — Automated generation with OR-Tools + AI
-- ⚠️ **Conflict Detection** — Automatic detection and resolution
-- 📄 **Export** — PDF and Excel reports
-- 🔴 **Real-time Updates** — WebSocket support
-
-## Authentication
-1. Login via [/admin/](/admin/) with your credentials
-2. Session cookie is used automatically for all requests
-
-## Base URL
-`https://timetabler-cr5d.onrender.com/api/`
-    ''',
+    'TITLE': 'Timetable Management System',
+    'DESCRIPTION': 'API for managing academic timetables with AI integration',
     'VERSION': 'v1',
     'SERVE_INCLUDE_SCHEMA': False,
-    'CONTACT': {'email': 'admin@college.edu'},
-    'LICENSE': {'name': 'MIT License'},
-    
-    'SWAGGER_UI_SETTINGS': {
-        'deepLinking': True,
-        'persistAuthorization': True,
-        'displayOperationId': False,
-        'defaultModelsExpandDepth': 1,
-        'defaultModelExpandDepth': 2,
-        'docExpansion': 'list',
-        'filter': True,
-        'showExtensions': True,
-        'showCommonExtensions': True,
-        'tryItOutEnabled': True,
-    },
-    'SWAGGER_UI_FAVICON_HREF': 'https://www.svgrepo.com/show/374049/django.svg',
-    'REDOC_UI_SETTINGS': {
-        'hideDownloadButton': False,
-        'expandResponses': '200,201',
-        'pathInMiddlePanel': True,
-    },
-    'COMPONENT_SPLIT_REQUEST': True,
-    'SORT_OPERATIONS': False,
 }
 
 # CORS Settings
