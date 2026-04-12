@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
 
 # Create router for ViewSets
@@ -18,8 +19,14 @@ router.register(r'timetable-entries', views.TimetableEntryViewSet, basename='tim
 router.register(r'conflicts', views.ConflictViewSet, basename='conflict')
 
 urlpatterns = [
+    
     # Router endpoints (CRUD)
     path('', include(router.urls)),
+
+    # Authentication
+    # Auth
+    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Timetable views
     path('timetable/master/', views.MasterTimetableView.as_view(), name='master-timetable'),
