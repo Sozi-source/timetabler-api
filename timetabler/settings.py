@@ -25,7 +25,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'import_export',
-    'drf_yasg',
+    'drf_spectacular',
     
     # Local app - your timetable app
     'timetable',
