@@ -10,17 +10,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# Dynamic ALLOWED_HOSTS for Render
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME', '')
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'timetabler-cr5d.onrender.com',
-    os.getenv('RENDER_EXTERNAL_HOSTNAME', ''),
 ]
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 CSRF_TRUSTED_ORIGINS = [
     'https://timetabler-cr5d.onrender.com',
-    f"https://{os.getenv('RENDER_EXTERNAL_HOSTNAME', '')}",
 ]
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 # Application definition
 INSTALLED_APPS = [
@@ -80,7 +84,7 @@ import dj_database_url
 DATABASE_URL = os.getenv('DATABASE_URL')
 if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600, ssl_require=True)
     }
 else:
     DATABASES = {
@@ -90,13 +94,22 @@ else:
         }
     }
 
-# Cache
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'unique-snowflake',
+# Cache - Use database cache for production, local memory for development
+if DATABASE_URL:
+    # Create cache table with: python manage.py createcachetable
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+            'LOCATION': 'django_cache_table',
+        }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'unique-snowflake',
+        }
+    }
 
 # REST Framework
 REST_FRAMEWORK = {
@@ -128,9 +141,46 @@ REST_FRAMEWORK = {
 # DRF Spectacular (API docs)
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Timetable Management System API',
-    'DESCRIPTION': 'API for managing academic timetables with AI integration',
+    'DESCRIPTION': '''
+# Timetable Management System API
+
+## Overview
+This API provides comprehensive timetable management for certificate and diploma programmes.
+
+## Features
+- Academic structure management (Years, Semesters, Departments, Programmes)
+- Resource management (Lecturers, Rooms, Intakes)
+- Automated timetable generation with OR-Tools + AI
+- Conflict detection and resolution
+- Export to PDF and Excel
+- Real-time WebSocket updates
+
+## Authentication
+Use session authentication. Login via `/admin/` first.
+    ''',
     'VERSION': 'v1',
     'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'TAGS': [
+        {'name': 'Academic Years', 'description': 'Manage academic years'},
+        {'name': 'Semesters', 'description': 'Manage semesters (Jan-Apr, May-Aug, Sep-Dec)'},
+        {'name': 'Departments', 'description': 'Manage academic departments'},
+        {'name': 'Programmes', 'description': 'Manage Certificate and Diploma programmes'},
+        {'name': 'Stages', 'description': 'Manage stages/semesters of study'},
+        {'name': 'Units', 'description': 'Manage academic units/subjects'},
+        {'name': 'Intakes', 'description': 'Manage student intake cohorts'},
+        {'name': 'Lecturers', 'description': 'Manage teaching staff'},
+        {'name': 'Rooms', 'description': 'Manage teaching venues'},
+        {'name': 'Timetable', 'description': 'View and manage timetables'},
+        {'name': 'Scheduling', 'description': 'Generate and publish schedules'},
+        {'name': 'Conflicts', 'description': 'Detect and resolve conflicts'},
+        {'name': 'Export', 'description': 'Export to PDF and Excel'},
+        {'name': 'Dashboard', 'description': 'Statistics and analytics'},
+    ],
 }
 
 # CORS Settings
@@ -140,6 +190,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://timetabler-cr5d.onrender.com',
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HTTP_OPTIONS = True
 
 # Static & Media Files
 STATIC_URL = '/static/'
@@ -151,12 +202,22 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Create directories
+os.makedirs(STATIC_ROOT, exist_ok=True)
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 os.makedirs(BASE_DIR / 'templates', exist_ok=True)
 
 # Email Settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production email (uncomment when ready):
+# if not DEBUG:
+#     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#     EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+#     EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
+#     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+#     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+#     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True') == 'True'
 
 # Logging
 LOGGING = {
@@ -192,6 +253,18 @@ LOGGING = {
         },
     },
 }
+
+# Security Settings for Production
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = 'DENY'
 
 # Custom Settings
 SEMESTER_MONTHS = {
