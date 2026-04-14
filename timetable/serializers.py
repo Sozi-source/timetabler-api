@@ -39,6 +39,8 @@ class SemesterSerializer(BaseModelSerializer):
     semester_type_display = serializers.CharField(source='get_semester_type_display', read_only=True)
     current_week = serializers.IntegerField(read_only=True)
     weeks_remaining = serializers.IntegerField(read_only=True)
+    add_drop_deadline = serializers.DateField(required=False, allow_null=True)
+    withdrawal_deadline = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
         model = Semester
