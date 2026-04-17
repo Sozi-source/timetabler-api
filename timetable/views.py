@@ -10,7 +10,6 @@ from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
-# FIX: timedelta was used in WebSocketTokenView but never imported
 from datetime import datetime, date, timedelta
 import json
 
@@ -99,18 +98,19 @@ class SemesterViewSet(viewsets.ModelViewSet):
 
         created_semesters = []
         for sem_type, dates in semesters_data.items():
+            start_date = date(academic_year.year, dates['start_month'], 1)
+            end_date = date(academic_year.year, dates['end_month'], 28)
+            # Registration deadline is 2 weeks (14 days) after start date
+            registration_deadline = start_date + timedelta(days=14)
+            
             semester, created = Semester.objects.get_or_create(
                 academic_year=academic_year,
                 semester_type=sem_type,
                 defaults={
                     'name': f"{academic_year.year} - {dict(Semester.SEMESTER_CHOICES)[sem_type]}",
-                    'start_date': date(academic_year.year, dates['start_month'], 1),
-                    'end_date': date(academic_year.year, dates['end_month'], 28),
-                    'registration_deadline': date(academic_year.year, dates['start_month'], 15),
-                    # FIX: end_month=4 has 30 days; 30 is fine for APR/JUN/SEP/NOV but
-                    # using 28 is a safe floor — administrators should adjust per year.
-                    'add_drop_deadline': date(academic_year.year, dates['start_month'], 21),
-                    'withdrawal_deadline': date(academic_year.year, dates['start_month'] + 1, 15),
+                    'start_date': start_date,
+                    'end_date': end_date,
+                    'registration_deadline': registration_deadline,
                     'teaching_weeks': 14,
                 },
             )
@@ -118,7 +118,6 @@ class SemesterViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(created_semesters, many=True)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
 
 class DepartmentViewSet(viewsets.ModelViewSet):
     """Manage departments."""
@@ -251,7 +250,11 @@ class ConflictViewSet(viewsets.ModelViewSet):
         conflict = self.get_object()
         resolution = request.data.get('resolution')
 
-        conflict.resolution_status = request.data.get('method', 'MANUAL')
+        # FIX: was assigning request.data.get('method', 'MANUAL') which reads
+        # from the wrong key and uses a value unlikely to match a model choice.
+        # Use 'RESOLVED' as the default status; callers may still override via
+        # 'resolution_status' in the request body.
+        conflict.resolution_status = request.data.get('resolution_status', 'RESOLVED')
         conflict.resolved_by = request.user
         conflict.resolved_at = timezone.now()
         conflict.proposed_solution = {'resolution': resolution}
@@ -418,7 +421,6 @@ class GenerateTimetableView(APIView):
 
         self._create_sample_timetable(semester)
 
-        # FIX: use explicit key deletion instead of cache.delete_pattern
         _clear_timetable_cache(semester_id=semester.id)
 
         return Response(
@@ -452,7 +454,6 @@ class GenerateTimetableView(APIView):
                     time_slot = random.choice(time_slots) if time_slots else None
 
                     if room and time_slot:
-                        # Use update_or_create to avoid unique-constraint errors on re-runs
                         TimetableEntry.objects.update_or_create(
                             semester=semester,
                             intake=intake,
@@ -484,7 +485,6 @@ class PublishTimetableView(APIView):
                 is_deleted=False,
             ).update(status='PUBLISHED', published_at=timezone.now())
 
-        # FIX: explicit cache key deletion
         _clear_timetable_cache(semester_id=semester.id)
 
         return Response({
@@ -581,7 +581,15 @@ class ExportPersonalPDFView(APIView):
 
     def get(self, request, lecturer_id):
         lecturer = get_object_or_404(Lecturer, id=lecturer_id)
-        semester = Semester.objects.filter(is_active=True).first()
+
+        # FIX: was ignoring semester_id query param entirely; now consistent
+        # with every other export view — prefer the explicit param, fall back
+        # to the active semester.
+        semester_id = request.query_params.get('semester_id')
+        if semester_id:
+            semester = get_object_or_404(Semester, id=semester_id)
+        else:
+            semester = Semester.objects.filter(is_active=True).first()
 
         if not semester:
             return Response({'error': 'No semester found'}, status=404)
@@ -717,7 +725,6 @@ class ExportExcelView(APIView):
                 )
                 ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
 
-        # Remove the default empty sheet created by openpyxl
         if 'Sheet' in wb.sheetnames:
             wb.remove(wb['Sheet'])
 
@@ -740,13 +747,22 @@ class DashboardStatsView(APIView):
     def get(self, request):
         semester = Semester.objects.filter(is_active=True).first()
 
+        unresolved_conflicts = ConflictLog.objects.filter(
+            resolution_status='UNRESOLVED',
+            is_deleted=False,
+        ).count()
+
+        # FIX: Department and Programme don't carry is_active; filter by
+        # is_deleted=False only, matching their model-level soft-delete pattern.
         stats = {
             'total_lecturers': Lecturer.objects.filter(is_active=True, is_deleted=False).count(),
             'total_rooms': Room.objects.filter(is_active=True, is_deleted=False).count(),
             'total_intakes': Intake.objects.filter(is_active=True, is_deleted=False).count(),
             'total_units': Unit.objects.filter(is_active=True, is_deleted=False).count(),
-            'total_departments': Department.objects.filter(is_active=True, is_deleted=False).count(),
-            'total_programmes': Programme.objects.filter(is_active=True, is_deleted=False).count(),
+            'total_departments': Department.objects.filter(is_deleted=False).count(),
+            'total_programmes': Programme.objects.filter(is_deleted=False).count(),
+            'unresolved_conflicts': unresolved_conflicts,
+            'timetable_entries': 0,
         }
 
         if semester:
@@ -755,6 +771,8 @@ class DashboardStatsView(APIView):
             ).count()
             total_slots_possible = 5 * 3 * semester.teaching_weeks
             utilization = (published_classes / total_slots_possible * 100) if total_slots_possible > 0 else 0
+
+            stats['timetable_entries'] = published_classes
 
             stats['current_semester'] = {
                 'id': str(semester.id),
@@ -885,7 +903,6 @@ class WebSocketTokenView(APIView):
         import jwt
         from django.conf import settings
 
-        # FIX: timedelta is now imported at the top of the file
         token = jwt.encode(
             {
                 'user_id': str(request.user.id),

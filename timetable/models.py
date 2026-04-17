@@ -88,8 +88,6 @@ class Semester(BaseModel):
     start_date = models.DateField()
     end_date = models.DateField()
     registration_deadline = models.DateField()
-    add_drop_deadline = models.DateField(null=True, blank=True)
-    withdrawal_deadline = models.DateField(null=True, blank=True)
     teaching_weeks = models.PositiveSmallIntegerField(default=14)
     exam_week_start = models.DateField(null=True, blank=True)
     exam_week_end = models.DateField(null=True, blank=True)
@@ -117,8 +115,9 @@ class Semester(BaseModel):
             Semester.objects.filter(is_active=True).update(is_active=False)
         if self.start_date >= self.end_date:
             raise ValidationError("End date must be after start date")
-        if self.registration_deadline > self.start_date:
-            raise ValidationError("Registration deadline must be before or on start date")
+        # Registration deadline must be after or on start date (changed from before/on)
+        if self.registration_deadline < self.start_date:
+            raise ValidationError("Registration deadline must be on or after start date")
         super().save(*args, **kwargs)
     
     @property
