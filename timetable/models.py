@@ -1,3 +1,4 @@
+from datetime import date, timedelta
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -293,13 +294,13 @@ class Intake(BaseModel):
     
     name = models.CharField(max_length=100)
     programme = models.ForeignKey(Programme, on_delete=models.CASCADE, related_name='intakes')
-    intake_year = models.IntegerField()  # e.g., 2025
+    intake_year = models.IntegerField()
     intake_semester = models.CharField(max_length=10, choices=SEMESTER_CHOICES)
-    enrollment_date = models.DateField(null=True, blank=True)  # Auto-calculated
+    enrollment_date = models.DateField(null=True, blank=True)
     student_count = models.PositiveIntegerField(default=0)
     male_count = models.PositiveIntegerField(default=0)
     female_count = models.PositiveIntegerField(default=0)
-    expected_completion = models.DateField(null=True, blank=True)  # Auto-calculated
+    expected_completion = models.DateField(null=True, blank=True)
     units = models.ManyToManyField(Unit, through='IntakeUnit', related_name='intakes')
     is_active = models.BooleanField(default=True)
     
@@ -309,6 +310,8 @@ class Intake(BaseModel):
             models.Index(fields=['programme', 'intake_year', 'intake_semester']),
             models.Index(fields=['is_active']),
         ]
+        # Add unique constraint to prevent duplicates
+        unique_together = ['programme', 'intake_year', 'intake_semester']  # Prevent same programme from having duplicate year/semester
     
     def save(self, *args, **kwargs):
         if not self.name:
@@ -322,27 +325,17 @@ class Intake(BaseModel):
             'SEP_DEC': {'month': 9, 'day': 15},
         }
         if self.intake_semester in semester_dates:
+            from datetime import date
             self.enrollment_date = date(self.intake_year, semester_dates[self.intake_semester]['month'], semester_dates[self.intake_semester]['day'])
             
             # Auto-calculate expected completion
             if self.programme and self.programme.duration_semesters:
+                from datetime import timedelta
                 months_to_add = self.programme.duration_semesters * 4
                 completion_date = self.enrollment_date + timedelta(days=months_to_add * 30)
                 self.expected_completion = completion_date
         
         super().save(*args, **kwargs)
-    
-    @property
-    def stage(self):
-        """Derive stage from intake progression"""
-        # This would calculate current stage based on enrollment date and current date
-        # For example, if enrolled Jan 2024, after 4 months they're in Year 1 Semester 2
-        pass
-    
-    @property
-    def academic_year(self):
-        """Derive academic year from intake year"""
-        return self.intake_year
     
     def __str__(self):
         return f"{self.programme.code} - {self.name}"
