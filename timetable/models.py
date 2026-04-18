@@ -282,44 +282,71 @@ class Unit(BaseModel):
     def prerequisite_list(self):
         return list(self.prerequisites.values_list('code', flat=True))
 
+# models.py
 class Intake(BaseModel):
     """Student cohort/group management"""
+    SEMESTER_CHOICES = [
+        ('JAN_APR', 'January - April (Spring)'),
+        ('MAY_AUG', 'May - August (Summer)'),
+        ('SEP_DEC', 'September - December (Fall)'),
+    ]
+    
     name = models.CharField(max_length=100)
     programme = models.ForeignKey(Programme, on_delete=models.CASCADE, related_name='intakes')
-    stage = models.ForeignKey(Stage, on_delete=models.CASCADE, related_name='intakes')
-    academic_year = models.ForeignKey(AcademicYear, on_delete=models.CASCADE)
-    enrollment_date = models.DateField()
+    intake_year = models.IntegerField()  # e.g., 2025
+    intake_semester = models.CharField(max_length=10, choices=SEMESTER_CHOICES)
+    enrollment_date = models.DateField(null=True, blank=True)  # Auto-calculated
     student_count = models.PositiveIntegerField(default=0)
     male_count = models.PositiveIntegerField(default=0)
     female_count = models.PositiveIntegerField(default=0)
-    expected_completion = models.DateField()
+    expected_completion = models.DateField(null=True, blank=True)  # Auto-calculated
     units = models.ManyToManyField(Unit, through='IntakeUnit', related_name='intakes')
     is_active = models.BooleanField(default=True)
     
     class Meta:
-        ordering = ['-academic_year', 'programme']
+        ordering = ['-intake_year', '-intake_semester', 'programme']
         indexes = [
-            models.Index(fields=['programme', 'stage', 'academic_year']),
+            models.Index(fields=['programme', 'intake_year', 'intake_semester']),
             models.Index(fields=['is_active']),
         ]
+    
+    def save(self, *args, **kwargs):
+        if not self.name:
+            semester_short = dict(self.SEMESTER_CHOICES).get(self.intake_semester, '').split()[0]
+            self.name = f"{self.programme.code} {semester_short} {self.intake_year}"
+        
+        # Auto-calculate enrollment date based on semester
+        semester_dates = {
+            'JAN_APR': {'month': 1, 'day': 15},
+            'MAY_AUG': {'month': 5, 'day': 15},
+            'SEP_DEC': {'month': 9, 'day': 15},
+        }
+        if self.intake_semester in semester_dates:
+            self.enrollment_date = date(self.intake_year, semester_dates[self.intake_semester]['month'], semester_dates[self.intake_semester]['day'])
+            
+            # Auto-calculate expected completion
+            if self.programme and self.programme.duration_semesters:
+                months_to_add = self.programme.duration_semesters * 4
+                completion_date = self.enrollment_date + timedelta(days=months_to_add * 30)
+                self.expected_completion = completion_date
+        
+        super().save(*args, **kwargs)
+    
+    @property
+    def stage(self):
+        """Derive stage from intake progression"""
+        # This would calculate current stage based on enrollment date and current date
+        # For example, if enrolled Jan 2024, after 4 months they're in Year 1 Semester 2
+        pass
+    
+    @property
+    def academic_year(self):
+        """Derive academic year from intake year"""
+        return self.intake_year
     
     def __str__(self):
         return f"{self.programme.code} - {self.name}"
     
-    def save(self, *args, **kwargs):
-        if not self.name:
-            self.name = f"{self.academic_year.year} {self.programme.code} Intake"
-        super().save(*args, **kwargs)
-    
-    @property
-    def gender_ratio(self):
-        if self.student_count > 0:
-            return {
-                'male_percentage': (self.male_count / self.student_count) * 100,
-                'female_percentage': (self.female_count / self.student_count) * 100
-            }
-        return {'male_percentage': 0, 'female_percentage': 0}
-
 class IntakeUnit(BaseModel):
     """Units assigned to intake for a specific semester"""
     intake = models.ForeignKey(Intake, on_delete=models.CASCADE)
