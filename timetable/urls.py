@@ -1,50 +1,65 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+﻿"""
+timetable/urls.py
+"""
+from django.urls import path
+from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 
-# Create router for ViewSets
-router = DefaultRouter()
-router.register(r'academic-years', views.AcademicYearViewSet, basename='academic-year')
-router.register(r'semesters', views.SemesterViewSet, basename='semester')
-router.register(r'departments', views.DepartmentViewSet, basename='department')
-router.register(r'programmes', views.ProgrammeViewSet, basename='programme')
-router.register(r'stages', views.StageViewSet, basename='stage')
-router.register(r'units', views.UnitViewSet, basename='unit')
-router.register(r'intakes', views.IntakeViewSet, basename='intake')
-router.register(r'lecturers', views.LecturerViewSet, basename='lecturer')
-router.register(r'rooms', views.RoomViewSet, basename='room')
-router.register(r'time-slots', views.TimeSlotViewSet, basename='time-slot')
-router.register(r'timetable-entries', views.TimetableEntryViewSet, basename='timetable-entry')
-router.register(r'conflicts', views.ConflictViewSet, basename='conflict')
-
 urlpatterns = [
+    # ── Auth ─────────────────────────────────────────────────────────────────
+    path("auth/login/",                 obtain_auth_token),
+    path("auth/me/",                    views.MeView.as_view()),
+
+    # ── Institution / Setup ──────────────────────────────────────────────────
+    path("institution/",                views.InstitutionView.as_view()),
+    path("departments/",                views.DepartmentListView.as_view()),
+    path("programmes/",                 views.ProgrammeListView.as_view()),
     
-    # Router endpoints (CRUD)
-    path('', include(router.urls)),
+    path("curriculum/",                views.CurriculumView.as_view()),
+    path('curriculum/<uuid:unit_id>/',          views.CurriculumUnitDetailView.as_view()),
+    path('curriculum/<uuid:unit_id>/trainers/', views.CurriculumUnitTrainersView.as_view()),
+    path("periods/",                    views.PeriodListView.as_view()),
+    path("rooms/",                      views.RoomListView.as_view()),
+    path("trainers/",                   views.TrainerListView.as_view()),
+    path("terms/",                      views.TermListView.as_view()),
 
-    # Authentication
-    # Auth
-    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # ── Trainer availability ─────────────────────────────────────────────────
+    path("trainers/<uuid:trainer_id>/availability/", views.TrainerAvailabilityView.as_view()),
 
-    # Timetable views
-    path('timetable/master/', views.MasterTimetableView.as_view(), name='master-timetable'),
-    path('timetable/personal/', views.PersonalTimetableView.as_view(), name='personal-timetable'),
+    # ── Cohorts & Progression ────────────────────────────────────────────────
+    path("cohorts/",                    views.CohortListView.as_view()),
+    path("cohorts/<uuid:cohort_id>/progress/",        views.CohortProgressView.as_view()),
+    path("cohorts/<uuid:cohort_id>/advance/",         views.AdvanceCohortView.as_view()),
+    path("cohorts/<uuid:cohort_id>/progress/update/", views.UpdateProgressView.as_view()),
 
-    # Scheduling
-    path('schedule/generate/', views.GenerateTimetableView.as_view(), name='schedule-generate'),
-    path('schedule/publish/', views.PublishTimetableView.as_view(), name='schedule-publish'),
+    # ── Constraints ──────────────────────────────────────────────────────────
+    path("constraints/",                views.ConstraintListView.as_view()),
+    path("constraints/<uuid:constraint_id>/", views.ConstraintDetailView.as_view()),
 
-    # Export
-    path('export/master-pdf/', views.ExportMasterPDFView.as_view(), name='export-master-pdf'),
-    path('export/personal-pdf/<uuid:lecturer_id>/', views.ExportPersonalPDFView.as_view(), name='export-personal-pdf'),
-    path('export/excel/', views.ExportExcelView.as_view(), name='export-excel'),
+    # ── Timetable generation ─────────────────────────────────────────────────
+    path("timetable/generate/",         views.GenerateView.as_view()),
+    path("timetable/publish/",          views.PublishView.as_view()),
+    path("timetable/drafts/",           views.DeleteDraftsView.as_view()),
 
-    # Dashboard
-    path('dashboard/stats/', views.DashboardStatsView.as_view(), name='dashboard-stats'),
-    path('dashboard/lecturer/', views.LecturerDashboardView.as_view(), name='lecturer-dashboard'),
+    # ── Timetable reading ────────────────────────────────────────────────────
+    path("timetable/master/",           views.MasterTimetableView.as_view()),
+    path("timetable/cohort/<uuid:cohort_id>/",   views.CohortTimetableView.as_view()),
+    path("timetable/trainer/<uuid:trainer_id>/", views.TrainerTimetableView.as_view()),
 
-    # WebSocket
-    path('websocket/token/', views.WebSocketTokenView.as_view(), name='websocket-token'),
+    # ── Individual entry edit ────────────────────────────────────────────────
+    path("timetable/entry/<uuid:entry_id>/", views.ScheduledUnitDetailView.as_view()),
+
+    # ── Conflicts ────────────────────────────────────────────────────────────
+    path("conflicts/",                  views.ConflictListView.as_view()),
+    path("conflicts/<uuid:conflict_id>/resolve/", views.ResolveConflictView.as_view()),
+
+    # ── Exports ──────────────────────────────────────────────────────────────
+    path("export/master/",              views.ExportMasterView.as_view()),
+    path("export/trainer/<uuid:trainer_id>/", views.ExportTrainerView.as_view()),
+    path("export/cohort/<uuid:cohort_id>/",   views.ExportCohortView.as_view()),
+
+    # ── Dashboards ───────────────────────────────────────────────────────────
+    path("dashboard/",                  views.DashboardView.as_view()),
+    path("dashboard/trainer/",          views.TrainerDashboardView.as_view()),
 ]
+

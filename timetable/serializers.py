@@ -1,637 +1,562 @@
-from rest_framework import serializers
+"""
+timetable/serializers.py
+========================
+DRF serializers for write operations (POST/PUT/PATCH).
+
+Read responses use plain dicts (see views.py helpers) for maximum control
+and performance. Serializers are used for:
+  - Input validation on write endpoints
+  - Nested reads where DRF depth makes things cleaner
+  - API schema generation (drf-spectacular / drf-yasg)
+
+Naming convention
+-----------------
+  <Model>Serializer      — full read/write serializer
+  <Model>WriteSerializer — write-only (validation + create/update)
+  <Model>ReadSerializer  — read-only (used for nested output)
+"""
+
 from django.contrib.auth.models import User
 from django.utils import timezone
+from rest_framework import serializers
+
 from .models import (
-    AcademicYear, Semester, Department, Programme, Stage, Unit,
-    Intake, IntakeUnit, Lecturer, LecturerPreferences, Room,
-    TimeSlot, TimetableEntry, ConflictLog, ScheduleAudit,
+    AuditLog, Cohort, Conflict, Constraint, CurriculumUnit,
+    Department, Institution, Period, Programme, ProgressRecord,
+    Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
 )
 
-# ============== Base Serializers ==============
 
-class BaseModelSerializer(serializers.ModelSerializer):
-    created_at_display = serializers.DateTimeField(
-        format="%Y-%m-%d %H:%M:%S", source='created_at', read_only=True
-    )
-    updated_at_display = serializers.DateTimeField(
-        format="%Y-%m-%d %H:%M:%S", source='updated_at', read_only=True
+# ─────────────────────────────────────────────────────────────────────────────
+# Shared field helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+class UUIDRelatedField(serializers.PrimaryKeyRelatedField):
+    """Return UUIDs as strings in serialized output."""
+    def to_representation(self, value):
+        return str(value.pk)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Institution
+# ─────────────────────────────────────────────────────────────────────────────
+
+class InstitutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = Institution
+        fields = [
+            "id", "name", "short_name", "country", "timezone",
+            "days_of_week", "allow_back_to_back", "max_periods_per_day",
+        ]
+        read_only_fields = ["id"]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Department
+# ─────────────────────────────────────────────────────────────────────────────
+
+class DepartmentSerializer(serializers.ModelSerializer):
+    institution_id = serializers.UUIDField(write_only=True)
+
+    class Meta:
+        model  = Department
+        fields = ["id", "code", "name", "hod", "email", "is_active", "institution_id"]
+        read_only_fields = ["id"]
+
+    def validate_institution_id(self, value):
+        if not Institution.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Institution not found.")
+        return value
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Programme
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ProgrammeReadSerializer(serializers.ModelSerializer):
+    department = serializers.StringRelatedField()
+    level      = serializers.CharField(source="get_level_display")
+
+    class Meta:
+        model  = Programme
+        fields = ["id", "code", "name", "level", "department", "total_terms", "sharing_group", "is_active"]
+
+
+class ProgrammeWriteSerializer(serializers.ModelSerializer):
+    department_id = serializers.UUIDField()
+
+    class Meta:
+        model  = Programme
+        fields = ["code", "name", "level", "department_id", "total_terms", "sharing_group", "is_active"]
+
+    def validate_department_id(self, value):
+        if not Department.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Active department not found.")
+        return value
+
+    def create(self, validated_data):
+        dept_id = validated_data.pop("department_id")
+        return Programme.objects.create(department_id=dept_id, **validated_data)
+
+    def update(self, instance, validated_data):
+        dept_id = validated_data.pop("department_id", None)
+        if dept_id:
+            instance.department_id = dept_id
+        return super().update(instance, validated_data)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CurriculumUnit
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CurriculumUnitReadSerializer(serializers.ModelSerializer):
+    unit_type          = serializers.CharField(source="get_unit_type_display")
+    programme_code     = serializers.CharField(source="programme.code", read_only=True)
+    qualified_trainers = serializers.SerializerMethodField()
+
+    class Meta:
+        model  = CurriculumUnit
+        fields = [
+            "id", "programme_code", "term_number", "position", "code",
+            "name", "unit_type", "credit_hours", "periods_per_week",
+            "is_active", "notes", "qualified_trainers",
+        ]
+
+    def get_qualified_trainers(self, obj):
+        return [
+            {"id": str(t.id), "name": t.short_name}
+            for t in obj.qualified_trainers.filter(is_active=True)
+        ]
+
+
+class CurriculumUnitWriteSerializer(serializers.ModelSerializer):
+    programme_id       = serializers.UUIDField()
+    qualified_trainers = serializers.ListField(
+        child=serializers.UUIDField(), required=False
     )
 
     class Meta:
-        abstract = True
+        model  = CurriculumUnit
+        fields = [
+            "programme_id", "term_number", "position", "code",
+            "name", "unit_type", "credit_hours", "periods_per_week",
+            "is_active", "notes", "qualified_trainers",
+        ]
+
+    def validate_programme_id(self, value):
+        if not Programme.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Active programme not found.")
+        return value
+
+    def validate_periods_per_week(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("periods_per_week must be between 1 and 5.")
+        return value
+
+    def _set_trainers(self, instance, trainer_ids):
+        if trainer_ids is not None:
+            trainers = Trainer.objects.filter(id__in=trainer_ids, is_active=True)
+            instance.qualified_trainers.set(trainers)
+
+    def create(self, validated_data):
+        trainer_ids = validated_data.pop("qualified_trainers", None)
+        prog_id     = validated_data.pop("programme_id")
+        instance    = CurriculumUnit.objects.create(programme_id=prog_id, **validated_data)
+        self._set_trainers(instance, trainer_ids)
+        return instance
+
+    def update(self, instance, validated_data):
+        trainer_ids = validated_data.pop("qualified_trainers", None)
+        prog_id     = validated_data.pop("programme_id", None)
+        if prog_id:
+            instance.programme_id = prog_id
+        instance = super().update(instance, validated_data)
+        self._set_trainers(instance, trainer_ids)
+        return instance
 
 
-# ============== Academic Structure Serializers ==============
+# ─────────────────────────────────────────────────────────────────────────────
+# Period
+# ─────────────────────────────────────────────────────────────────────────────
 
-class AcademicYearSerializer(BaseModelSerializer):
-    is_active_now = serializers.BooleanField(read_only=True)
-    duration_days = serializers.IntegerField(read_only=True)
+class PeriodSerializer(serializers.ModelSerializer):
+    duration_hours = serializers.FloatField(read_only=True)
 
     class Meta:
-        model = AcademicYear
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at', 'created_by', 'updated_by']
+        model  = Period
+        fields = ["id", "institution", "label", "start_time", "end_time", "order", "is_break", "duration_hours"]
+        read_only_fields = ["id", "duration_hours"]
+
+    def validate(self, data):
+        if data.get("start_time") and data.get("end_time"):
+            if data["start_time"] >= data["end_time"]:
+                raise serializers.ValidationError("end_time must be after start_time.")
+        return data
 
 
-class SemesterSerializer(BaseModelSerializer):
-    academic_year_name = serializers.CharField(source='academic_year.name', read_only=True)
-    academic_year_year = serializers.IntegerField(source='academic_year.year', read_only=True)
-    semester_type_display = serializers.CharField(source='get_semester_type_display', read_only=True)
-    current_week = serializers.IntegerField(read_only=True)
+# ─────────────────────────────────────────────────────────────────────────────
+# Room
+# ─────────────────────────────────────────────────────────────────────────────
+
+class RoomSerializer(serializers.ModelSerializer):
+    room_type_display = serializers.CharField(source="get_room_type_display", read_only=True)
+
+    class Meta:
+        model  = Room
+        fields = [
+            "id", "institution", "code", "name", "room_type", "room_type_display",
+            "capacity", "building", "floor", "is_active", "features",
+        ]
+        read_only_fields = ["id", "room_type_display"]
+
+    def validate_capacity(self, value):
+        if value < 1:
+            raise serializers.ValidationError("Room capacity must be at least 1.")
+        return value
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Term
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TermSerializer(serializers.ModelSerializer):
+    week_number    = serializers.IntegerField(read_only=True)
     weeks_remaining = serializers.IntegerField(read_only=True)
-    add_drop_deadline = serializers.DateField(required=False, allow_null=True)
-    withdrawal_deadline = serializers.DateField(required=False, allow_null=True)
 
     class Meta:
-        model = Semester
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at', 'semester_number']
+        model  = Term
+        fields = [
+            "id", "institution", "name", "start_date", "end_date",
+            "teaching_weeks", "is_current", "week_number", "weeks_remaining",
+        ]
+        read_only_fields = ["id", "week_number", "weeks_remaining"]
+
+    def validate(self, data):
+        start = data.get("start_date")
+        end   = data.get("end_date")
+        if start and end and start >= end:
+            raise serializers.ValidationError({"end_date": "end_date must be after start_date."})
+        return data
 
 
-class DepartmentSerializer(BaseModelSerializer):
-    class Meta:
-        model = Department
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+# ─────────────────────────────────────────────────────────────────────────────
+# Trainer
+# ─────────────────────────────────────────────────────────────────────────────
 
-
-class ProgrammeSerializer(BaseModelSerializer):
-    department_name = serializers.CharField(source='department.name', read_only=True)
-    department_code = serializers.CharField(source='department.code', read_only=True)
-    programme_type_display = serializers.CharField(source='get_programme_type_display', read_only=True)
-
-    class Meta:
-        model = Programme
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-
-class StageSerializer(BaseModelSerializer):
-    programme_name = serializers.CharField(source='programme.name', read_only=True)
-    programme_code = serializers.CharField(source='programme.code', read_only=True)
+class TrainerReadSerializer(serializers.ModelSerializer):
+    department        = serializers.StringRelatedField()
+    employment_type   = serializers.CharField(source="get_employment_type_display")
 
     class Meta:
-        model = Stage
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        model  = Trainer
+        fields = [
+            "id", "staff_id", "title", "first_name", "last_name", "email",
+            "phone", "department", "employment_type", "max_periods_per_week",
+            "available_days", "is_active",
+        ]
 
 
-class UnitSerializer(BaseModelSerializer):
-    stage_name = serializers.CharField(source='stage.name', read_only=True)
-    stage_semester_number = serializers.IntegerField(source='stage.semester_number', read_only=True)
-    programme_code = serializers.CharField(source='stage.programme.code', read_only=True)
-    unit_type_display = serializers.CharField(source='get_unit_type_display', read_only=True)
-    assessment_type_display = serializers.CharField(source='get_assessment_type_display', read_only=True)
-    prerequisites_list = serializers.SerializerMethodField()
-    corequisites_list = serializers.SerializerMethodField()
-    has_prerequisites = serializers.BooleanField(read_only=True)
+class TrainerWriteSerializer(serializers.ModelSerializer):
+    institution_id = serializers.UUIDField()
+    department_id  = serializers.UUIDField()
 
     class Meta:
-        model = Unit
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at', 'total_hours_per_week', 'slots_per_week']
+        model  = Trainer
+        fields = [
+            "institution_id", "department_id", "staff_id", "title",
+            "first_name", "last_name", "email", "phone", "employment_type",
+            "max_periods_per_week", "available_days", "is_active",
+        ]
 
-    def get_prerequisites_list(self, obj):
-        return [{'code': u.code, 'name': u.name, 'id': str(u.id)} for u in obj.prerequisites.all()]
+    def validate_department_id(self, value):
+        if not Department.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Active department not found.")
+        return value
 
-    def get_corequisites_list(self, obj):
-        return [{'code': u.code, 'name': u.name, 'id': str(u.id)} for u in obj.corequisites.all()]
+    def validate_max_periods_per_week(self, value):
+        if value < 1 or value > 80:
+            raise serializers.ValidationError("max_periods_per_week must be between 1 and 80.")
+        return value
 
-
-# ============== Intake and Student Management ==============
-
-class IntakeUnitSerializer(BaseModelSerializer):
-    unit_name = serializers.CharField(source='unit.name', read_only=True)
-    unit_code = serializers.CharField(source='unit.code', read_only=True)
-    unit_credit_hours = serializers.IntegerField(source='unit.credit_hours', read_only=True)
-    semester_name = serializers.CharField(source='semester.name', read_only=True)
-    semester_type = serializers.CharField(source='semester.semester_type', read_only=True)
-
-    class Meta:
-        model = IntakeUnit
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-
-class IntakeSerializer(BaseModelSerializer):
-    programme_name = serializers.CharField(source='programme.name', read_only=True)
-    programme_code = serializers.CharField(source='programme.code', read_only=True)
-    stage_name = serializers.CharField(source='stage.name', read_only=True)
-    academic_year_year = serializers.IntegerField(source='academic_year.year', read_only=True)
-    gender_ratio = serializers.DictField(read_only=True)
-    # FIX: correct related_name — IntakeUnit has no explicit related_name, so Django
-    # uses the default accessor 'intakeunit_set' on Intake. This is correct.
-    units_detail = IntakeUnitSerializer(source='intakeunit_set', many=True, read_only=True)
-
-    class Meta:
-        model = Intake
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-
-class IntakeDetailSerializer(IntakeSerializer):
-    """Detailed intake serializer with additional information."""
-    total_units = serializers.SerializerMethodField()
-    total_students = serializers.SerializerMethodField()
-    completion_percentage = serializers.SerializerMethodField()
-
-    class Meta(IntakeSerializer.Meta):
-        fields = '__all__'
-
-    def get_total_units(self, obj):
-        return obj.units.count()
-
-    def get_total_students(self, obj):
-        return obj.student_count
-
-    def get_completion_percentage(self, obj):
-        if obj.expected_completion and obj.enrollment_date:
-            total_days = (obj.expected_completion - obj.enrollment_date).days
-            elapsed_days = (timezone.now().date() - obj.enrollment_date).days
-            if total_days > 0:
-                return min(100, max(0, int((elapsed_days / total_days) * 100)))
-        return 0
-
-
-# ============== Lecturer Management ==============
-
-class LecturerPreferencesSerializer(BaseModelSerializer):
-    lecturer_name = serializers.CharField(source='lecturer.full_name', read_only=True)
-    semester_name = serializers.CharField(source='semester.name', read_only=True)
-
-    class Meta:
-        model = LecturerPreferences
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-
-class LecturerSerializer(BaseModelSerializer):
-    department_name = serializers.CharField(source='department.name', read_only=True)
-    department_code = serializers.CharField(source='department.code', read_only=True)
-    full_name = serializers.SerializerMethodField()
-    short_name = serializers.SerializerMethodField()
-    lecturer_type_display = serializers.CharField(source='get_lecturer_type_display', read_only=True)
-    title_display = serializers.CharField(source='get_title_display', read_only=True)
-    qualified_units_detail = UnitSerializer(source='qualified_units', many=True, read_only=True)
-    available_days_display = serializers.SerializerMethodField()
-    current_workload = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Lecturer
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at', 'user']
-
-    def get_full_name(self, obj):
-        return obj.full_name
-
-    def get_short_name(self, obj):
-        return obj.short_name
-
-    def get_available_days_display(self, obj):
-        if obj.lecturer_type == 'FT':
-            return "Monday - Friday"
-        return ", ".join([day.title() for day in obj.preferred_days])
-
-    def get_current_workload(self, obj):
-        semester = Semester.objects.filter(is_active=True).first()
-        if semester:
-            return obj.get_current_workload(semester)
-        return 0
-
-
-class LecturerDetailSerializer(LecturerSerializer):
-    """Detailed lecturer serializer with statistics."""
-    # FIX: related_name on LecturerPreferences.lecturer is 'preferences', not 'lecturerpreferences_set'
-    preferences = LecturerPreferencesSerializer(source='preferences', many=True, read_only=True)
-    total_qualified_units = serializers.SerializerMethodField()
-    availability_summary = serializers.SerializerMethodField()
-
-    class Meta(LecturerSerializer.Meta):
-        fields = '__all__'
-
-    def get_total_qualified_units(self, obj):
-        return obj.qualified_units.count()
-
-    def get_availability_summary(self, obj):
-        semester = Semester.objects.filter(is_active=True).first()
-        if not semester:
-            return {}
-
-        booked_slots = TimetableEntry.objects.filter(
-            semester=semester,
-            lecturer=obj,
-            status='PUBLISHED',
-            is_deleted=False
-        ).count()
-
-        return {
-            'total_booked_hours': booked_slots * 2,
-            'max_hours_per_week': obj.max_hours_per_week,
-            'remaining_hours': max(0, obj.max_hours_per_week - (booked_slots * 2)),
-            'available_days': obj.get_available_days(),
-            'utilization_percentage': (
-                (booked_slots * 2 / obj.max_hours_per_week * 100)
-                if obj.max_hours_per_week > 0 else 0
-            ),
-        }
-
-
-# ============== Room and Facility Management ==============
-
-class RoomSerializer(BaseModelSerializer):
-    room_type_display = serializers.CharField(source='get_room_type_display', read_only=True)
-    # FIX: utilization_rate is a @property, not a callable — use SerializerMethodField
-    utilization_rate = serializers.SerializerMethodField()
-    equipment_list = serializers.ListField(source='equipment', read_only=True)
-
-    class Meta:
-        model = Room
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-    def get_utilization_rate(self, obj):
-        # utilization_rate is a property that internally fetches the active semester
-        return obj.utilization_rate
-
-
-# FIX: TimeSlot does NOT extend BaseModel, so use plain ModelSerializer
-class TimeSlotSerializer(serializers.ModelSerializer):
-    display_name = serializers.CharField(source='get_slot_id_display', read_only=True)
-    duration_hours = serializers.SerializerMethodField()
-
-    class Meta:
-        model = TimeSlot
-        fields = '__all__'
-
-    def get_duration_hours(self, obj):
-        from datetime import datetime, date
-        delta = (
-            datetime.combine(date.today(), obj.end_time)
-            - datetime.combine(date.today(), obj.start_time)
+    def create(self, validated_data):
+        inst_id = validated_data.pop("institution_id")
+        dept_id = validated_data.pop("department_id")
+        return Trainer.objects.create(
+            institution_id=inst_id,
+            department_id=dept_id,
+            **validated_data
         )
-        return delta.seconds / 3600
+
+    def update(self, instance, validated_data):
+        inst_id = validated_data.pop("institution_id", None)
+        dept_id = validated_data.pop("department_id", None)
+        if inst_id:
+            instance.institution_id = inst_id
+        if dept_id:
+            instance.department_id = dept_id
+        return super().update(instance, validated_data)
 
 
-# ============== Timetable Management ==============
+# ─────────────────────────────────────────────────────────────────────────────
+# TrainerAvailability
+# ─────────────────────────────────────────────────────────────────────────────
 
-class TimetableEntrySerializer(BaseModelSerializer):
-    unit_name = serializers.CharField(source='unit.name', read_only=True)
-    unit_code = serializers.CharField(source='unit.code', read_only=True)
-    lecturer_name = serializers.SerializerMethodField()
-    lecturer_short_name = serializers.SerializerMethodField()
-    intake_name = serializers.CharField(source='intake.name', read_only=True)
-    intake_code = serializers.CharField(source='intake.programme.code', read_only=True)
-    room_name = serializers.CharField(source='room.name', read_only=True)
-    room_code = serializers.CharField(source='room.code', read_only=True)
-    time_display = serializers.CharField(source='time_slot.get_slot_id_display', read_only=True)
-    day_display = serializers.SerializerMethodField()
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    semester_name = serializers.CharField(source='semester.name', read_only=True)
-
-    class Meta:
-        model = TimetableEntry
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at', 'published_at', 'approved_at']
-
-    def get_lecturer_name(self, obj):
-        return obj.lecturer.full_name
-
-    def get_lecturer_short_name(self, obj):
-        return obj.lecturer.short_name
-
-    def get_day_display(self, obj):
-        return dict(obj._meta.get_field('day').choices).get(obj.day, obj.day)
-
-
-class TimetableEntryCreateSerializer(serializers.ModelSerializer):
-    """Serializer for creating timetable entries with validation."""
+class TrainerAvailabilitySerializer(serializers.ModelSerializer):
+    VALID_DAYS = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"}
 
     class Meta:
-        model = TimetableEntry
-        fields = '__all__'
+        model  = TrainerAvailability
+        fields = ["id", "trainer", "term", "day", "period", "is_available", "reason", "notes"]
+        read_only_fields = ["id"]
+
+    def validate_day(self, value):
+        if value.upper() not in self.VALID_DAYS:
+            raise serializers.ValidationError(f"Day must be one of: {', '.join(sorted(self.VALID_DAYS))}")
+        return value.upper()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cohort
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CohortReadSerializer(serializers.ModelSerializer):
+    programme    = serializers.StringRelatedField()
+    progress     = serializers.SerializerMethodField()
+
+    class Meta:
+        model  = Cohort
+        fields = [
+            "id", "name", "programme", "start_year", "start_month",
+            "current_term", "student_count", "is_active", "progress",
+        ]
+
+    def get_progress(self, obj):
+        return obj.progress_summary
+
+
+class CohortWriteSerializer(serializers.ModelSerializer):
+    programme_id = serializers.UUIDField()
+
+    class Meta:
+        model  = Cohort
+        fields = [
+            "programme_id", "name", "start_year", "start_month",
+            "current_term", "student_count", "is_active",
+        ]
+
+    def validate_programme_id(self, value):
+        if not Programme.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Active programme not found.")
+        return value
+
+    def validate_start_month(self, value):
+        if not 1 <= value <= 12:
+            raise serializers.ValidationError("start_month must be between 1 and 12.")
+        return value
 
     def validate(self, data):
-        # Validate that lecturer is qualified for the unit
-        if not data['lecturer'].qualified_units.filter(id=data['unit'].id).exists():
-            raise serializers.ValidationError(
-                f"Lecturer {data['lecturer'].full_name} is not qualified to teach {data['unit'].name}"
-            )
-
-        # Validate room capacity
-        if data['intake'].student_count > data['room'].capacity:
-            raise serializers.ValidationError(
-                f"Room capacity ({data['room'].capacity}) is less than intake size ({data['intake'].student_count})"
-            )
-
-        # Validate part-time lecturer availability
-        if data['lecturer'].lecturer_type == 'PT':
-            if data['day'] not in data['lecturer'].get_available_days():
+        prog_id = data.get("programme_id")
+        current = data.get("current_term", 1)
+        if prog_id:
+            prog = Programme.objects.filter(id=prog_id).first()
+            if prog and current > prog.total_terms:
                 raise serializers.ValidationError(
-                    f"Part-time lecturer not available on {data['day']}"
+                    {"current_term": f"current_term cannot exceed programme's total_terms ({prog.total_terms})."}
                 )
-
         return data
 
-
-class TimetableEntryUpdateSerializer(serializers.ModelSerializer):
-    """Serializer for updating timetable entries."""
-
-    class Meta:
-        model = TimetableEntry
-        fields = ['day', 'time_slot', 'room', 'status', 'week_number', 'notes']
-
-    def validate(self, data):
-        instance = self.instance
-        semester = instance.semester
-
-        # Check for conflicts when promoting to PUBLISHED
-        if data.get('status') == 'PUBLISHED' and instance.status != 'PUBLISHED':
-            day = data.get('day', instance.day)
-            time_slot = data.get('time_slot', instance.time_slot)
-            room = data.get('room', instance.room)
-            week_number = data.get('week_number', instance.week_number)
-
-            # Lecturer conflict
-            if TimetableEntry.objects.filter(
-                semester=semester,
-                lecturer=instance.lecturer,
-                day=day,
-                time_slot=time_slot,
-                week_number=week_number,
-                status='PUBLISHED',
-                is_deleted=False,
-            ).exclude(id=instance.id).exists():
-                raise serializers.ValidationError(
-                    f"Lecturer already has a class at {day} {time_slot.get_slot_id_display()} in week {week_number}"
-                )
-
-            # Intake conflict
-            if TimetableEntry.objects.filter(
-                semester=semester,
-                intake=instance.intake,
-                day=day,
-                time_slot=time_slot,
-                week_number=week_number,
-                status='PUBLISHED',
-                is_deleted=False,
-            ).exclude(id=instance.id).exists():
-                raise serializers.ValidationError(
-                    f"Intake already has a class at {day} {time_slot.get_slot_id_display()} in week {week_number}"
-                )
-
-            # Room conflict
-            if TimetableEntry.objects.filter(
-                semester=semester,
-                room=room,
-                day=day,
-                time_slot=time_slot,
-                week_number=week_number,
-                status='PUBLISHED',
-                is_deleted=False,
-            ).exclude(id=instance.id).exists():
-                raise serializers.ValidationError(
-                    f"Room already booked at {day} {time_slot.get_slot_id_display()} in week {week_number}"
-                )
-
-        return data
+    def create(self, validated_data):
+        prog_id = validated_data.pop("programme_id")
+        return Cohort.objects.create(programme_id=prog_id, **validated_data)
 
 
-# ============== Timetable Grid Serializers ==============
+# ─────────────────────────────────────────────────────────────────────────────
+# ProgressRecord
+# ─────────────────────────────────────────────────────────────────────────────
 
-class TimetableCellSerializer(serializers.Serializer):
-    """Serializer for a single timetable cell."""
-    id = serializers.UUIDField()
-    unit_code = serializers.CharField()
-    unit_name = serializers.CharField()
-    lecturer = serializers.CharField()
-    lecturer_id = serializers.UUIDField()
-    room = serializers.CharField()
-    room_code = serializers.CharField()
-    intake = serializers.CharField()
-    intake_id = serializers.UUIDField()
-
-
-class TimetableGridSerializer(serializers.Serializer):
-    """Serializer for master timetable grid."""
-    semester = serializers.CharField()
-    semester_id = serializers.UUIDField()
-    days = serializers.ListField(child=serializers.CharField())
-    slot_labels = serializers.DictField()
-    grid = serializers.DictField()
-    week_number = serializers.IntegerField()
-    total_weeks = serializers.IntegerField()
-
-
-class PersonalTimetableSerializer(serializers.Serializer):
-    """Serializer for personal lecturer timetable."""
-    lecturer_id = serializers.UUIDField()
-    lecturer_name = serializers.CharField()
-    lecturer_type = serializers.CharField()
-    available_days = serializers.ListField(child=serializers.CharField())
-    semester = serializers.CharField()
-    semester_id = serializers.UUIDField()
-    days = serializers.ListField(child=serializers.CharField())
-    slot_labels = serializers.DictField()
-    grid = serializers.DictField()
-    week_number = serializers.IntegerField()
-    total_weeks = serializers.IntegerField()
-    total_hours = serializers.IntegerField()
-    max_hours_per_week = serializers.IntegerField()
-    hours_remaining = serializers.IntegerField()
-    weekly_breakdown = serializers.DictField()
-
-
-# ============== Conflict and Audit Serializers ==============
-
-class ConflictLogSerializer(BaseModelSerializer):
-    conflict_type_display = serializers.CharField(source='get_conflict_type_display', read_only=True)
-    severity_display = serializers.CharField(source='get_severity_display', read_only=True)
-    resolution_status_display = serializers.CharField(source='get_resolution_status_display', read_only=True)
-    resolved_by_name = serializers.SerializerMethodField()
-    semester_name = serializers.CharField(source='semester.name', read_only=True)
-    affected_entry_detail = TimetableEntrySerializer(source='affected_entry', read_only=True)
-
-    class Meta:
-        model = ConflictLog
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at', 'updated_at']
-
-    def get_resolved_by_name(self, obj):
-        return obj.resolved_by.username if obj.resolved_by else None
-
-
-class ScheduleAuditSerializer(BaseModelSerializer):
-    action_display = serializers.CharField(source='get_action_display', read_only=True)
-    changed_by_name = serializers.SerializerMethodField()
-    timetable_entry_detail = TimetableEntrySerializer(source='timetable_entry', read_only=True)
-
-    class Meta:
-        model = ScheduleAudit
-        fields = '__all__'
-        read_only_fields = ['id', 'created_at']
-
-    def get_changed_by_name(self, obj):
-        return obj.changed_by.username if obj.changed_by else None
-
-
-# ============== Dashboard and Statistics Serializers ==============
-
-class DashboardStatsSerializer(serializers.Serializer):
-    """Serializer for dashboard statistics."""
-    total_lecturers = serializers.IntegerField()
-    total_rooms = serializers.IntegerField()
-    total_intakes = serializers.IntegerField()
-    total_units = serializers.IntegerField()
-    total_departments = serializers.IntegerField()
-    total_programmes = serializers.IntegerField()
-    current_semester = serializers.DictField(required=False)
-    lecturer_workload = serializers.ListField()
-    recent_activities = serializers.ListField()
-
-
-class SemesterStatisticsSerializer(serializers.Serializer):
-    """Serializer for semester statistics."""
-    total_classes = serializers.IntegerField()
-    published_classes = serializers.IntegerField()
-    draft_classes = serializers.IntegerField()
-    cancelled_classes = serializers.IntegerField()
-    lecturers_utilized = serializers.IntegerField()
-    rooms_utilized = serializers.IntegerField()
-    intakes_scheduled = serializers.IntegerField()
-    conflicts = serializers.IntegerField()
-    utilization_rate = serializers.FloatField()
-    current_week = serializers.IntegerField()
-    weeks_remaining = serializers.IntegerField()
-
-
-# ============== Request/Response Serializers ==============
-
-class GenerateTimetableRequestSerializer(serializers.Serializer):
-    """Serializer for timetable generation request."""
-    semester_id = serializers.UUIDField()
-    algorithm = serializers.ChoiceField(choices=['OR_TOOLS', 'AI', 'HYBRID'], default='HYBRID')
-    prioritize = serializers.ListField(child=serializers.CharField(), required=False)
-    max_iterations = serializers.IntegerField(default=1000, min_value=100, max_value=10000)
-
-
-class MoveSlotRequestSerializer(serializers.Serializer):
-    """Serializer for moving a timetable slot."""
-    new_day = serializers.ChoiceField(choices=['MON', 'TUE', 'WED', 'THU', 'FRI'])
-    new_time_slot_id = serializers.UUIDField()
-    new_room_id = serializers.UUIDField(required=False)
-    reason = serializers.CharField(required=False, allow_blank=True)
-
-
-class BulkImportLecturersSerializer(serializers.Serializer):
-    """Serializer for bulk lecturer import."""
-    lecturers = serializers.ListField(
-        child=serializers.DictField(),
-        help_text="List of lecturer objects to import",
-    )
-
-
-class BulkImportUnitsSerializer(serializers.Serializer):
-    """Serializer for bulk unit import."""
-    stage_id = serializers.UUIDField()
-    units = serializers.ListField(
-        child=serializers.DictField(),
-        help_text="List of unit objects to import",
-    )
-
-
-class AssignUnitsToIntakeSerializer(serializers.Serializer):
-    """Serializer for assigning units to intake."""
-    semester_id = serializers.UUIDField()
-    units = serializers.ListField(
-        child=serializers.DictField(),
-        help_text="List of unit assignments",
-    )
-
-
-# ============== User and Authentication Serializers ==============
-
-class UserSerializer(serializers.ModelSerializer):
-    """Serializer for Django User model."""
-    full_name = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'full_name', 'is_staff', 'is_active']
-        read_only_fields = ['id', 'is_staff', 'is_active']
-
-    def get_full_name(self, obj):
-        return f"{obj.first_name} {obj.last_name}".strip() or obj.username
-
-
-# FIX: UserProfileSerializer should not have model = User and try to serialize
-# lecturer_profile as if it's a User field. Use a plain Serializer instead.
-class UserProfileSerializer(serializers.Serializer):
-    """Serializer for user profile with lecturer details."""
-    user = UserSerializer(read_only=True)
-    # lecturer_profile is the related_name on Lecturer.user OneToOneField
-    lecturer_profile = LecturerSerializer(read_only=True)
-    is_staff = serializers.BooleanField(source='user.is_staff', read_only=True)
-    is_superuser = serializers.BooleanField(source='user.is_superuser', read_only=True)
-    date_joined = serializers.DateTimeField(source='user.date_joined', read_only=True)
-    last_login = serializers.DateTimeField(source='user.last_login', read_only=True)
-
-
-# ============== Export Serializers ==============
-
-class ExportFilterSerializer(serializers.Serializer):
-    """Serializer for export filters."""
-    semester_id = serializers.UUIDField(required=False)
-    week_number = serializers.IntegerField(required=False, min_value=1, max_value=16)
-    format = serializers.ChoiceField(choices=['PDF', 'EXCEL', 'CSV'], default='PDF')
-    include_headers = serializers.BooleanField(default=True)
-    orientation = serializers.ChoiceField(choices=['PORTRAIT', 'LANDSCAPE'], default='LANDSCAPE')
-
-
-class TimetableExportDataSerializer(serializers.Serializer):
-    """Serializer for timetable export data."""
-    semester_name = serializers.CharField()
-    semester_id = serializers.UUIDField()
-    export_date = serializers.DateTimeField()
-    week_number = serializers.IntegerField()
-    days = serializers.ListField(child=serializers.CharField())
-    time_slots = serializers.ListField()
-    data = serializers.DictField()
-    metadata = serializers.DictField(required=False)
-
-
-# ============== WebSocket Serializers ==============
-
-class WebSocketMessageSerializer(serializers.Serializer):
-    """Serializer for WebSocket messages."""
-    type = serializers.ChoiceField(choices=[
-        'ping', 'lock_request', 'release_lock', 'conflict_check',
-        'get_active_users', 'timetable_update',
+class ProgressRecordWriteSerializer(serializers.Serializer):
+    unit_id    = serializers.UUIDField()
+    status     = serializers.ChoiceField(choices=[
+        ProgressRecord.NOT_STARTED,
+        ProgressRecord.IN_PROGRESS,
+        ProgressRecord.COMPLETED,
+        ProgressRecord.DEFERRED,
     ])
-    data = serializers.DictField(required=False)
-    timestamp = serializers.DateTimeField(required=False)
+    score      = serializers.DecimalField(
+        max_digits=5, decimal_places=2, required=False, allow_null=True,
+        min_value=0, max_value=100,
+    )
+
+    def validate_unit_id(self, value):
+        if not CurriculumUnit.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("CurriculumUnit not found.")
+        return value
 
 
-class WebSocketLockRequestSerializer(serializers.Serializer):
-    """Serializer for lock request."""
-    slot_id = serializers.CharField()
-    day = serializers.ChoiceField(choices=['MON', 'TUE', 'WED', 'THU', 'FRI'])
-    time_slot_id = serializers.UUIDField()
-    week_number = serializers.IntegerField(min_value=1, max_value=16)
+# ─────────────────────────────────────────────────────────────────────────────
+# Constraint
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ConstraintSerializer(serializers.ModelSerializer):
+    class Meta:
+        model  = Constraint
+        fields = [
+            "id", "scope", "rule", "is_hard",
+            "curriculum_unit", "trainer", "room", "cohort",
+            "parameters", "is_active", "notes",
+        ]
+        read_only_fields = ["id"]
+
+    def validate(self, data):
+        # At least one entity reference is required
+        entity_fields = ["curriculum_unit", "trainer", "room", "cohort"]
+        if not any(data.get(f) for f in entity_fields):
+            raise serializers.ValidationError(
+                "At least one of curriculum_unit, trainer, room, or cohort must be set."
+            )
+
+        # Validate parameter keys per rule
+        rule   = data.get("rule")
+        params = data.get("parameters", {})
+        required_params = {
+            "PIN_DAY_PERIOD": ["day", "period_id"],
+            "PIN_DAY":        ["day"],
+            "PREFERRED_ROOM": ["room_id"],
+            "AVOID_DAY":      ["day"],
+            "AVOID_PERIOD":   ["period_id"],
+            "MAX_PER_DAY":    ["max"],
+        }
+        needed = required_params.get(rule, [])
+        missing = [k for k in needed if k not in params]
+        if missing:
+            raise serializers.ValidationError(
+                {"parameters": f"Rule '{rule}' requires parameter(s): {', '.join(missing)}"}
+            )
+        return data
 
 
-# ============== AI Chat Serializers ==============
+# ─────────────────────────────────────────────────────────────────────────────
+# ScheduledUnit
+# ─────────────────────────────────────────────────────────────────────────────
 
-class AIChatRequestSerializer(serializers.Serializer):
-    """Serializer for AI chat request."""
-    message = serializers.CharField(max_length=1000)
-    semester_id = serializers.UUIDField(required=False)
-    context = serializers.DictField(required=False)
+class ScheduledUnitReadSerializer(serializers.ModelSerializer):
+    unit_code    = serializers.CharField(source="curriculum_unit.code", read_only=True)
+    unit_name    = serializers.CharField(source="curriculum_unit.name", read_only=True)
+    cohort_name  = serializers.CharField(source="cohort.name", read_only=True)
+    trainer_name = serializers.CharField(source="trainer.short_name", read_only=True)
+    room_code    = serializers.CharField(source="room.code", read_only=True)
+    period_label = serializers.CharField(source="period.label", read_only=True)
+
+    class Meta:
+        model  = ScheduledUnit
+        fields = [
+            "id", "term", "cohort", "cohort_name", "curriculum_unit",
+            "unit_code", "unit_name", "trainer", "trainer_name",
+            "room", "room_code", "day", "period", "period_label",
+            "sequence", "is_combined", "combined_key", "status",
+            "published_at", "notes",
+        ]
+        read_only_fields = fields
 
 
-class AIChatResponseSerializer(serializers.Serializer):
-    """Serializer for AI chat response."""
-    success = serializers.BooleanField()
-    response = serializers.CharField()
-    suggested_actions = serializers.ListField(child=serializers.CharField(), required=False)
-    data = serializers.DictField(required=False)
-    error = serializers.CharField(required=False)
+class ScheduledUnitEditSerializer(serializers.ModelSerializer):
+    """Used for PUT on individual entries — partial reassignment only."""
+    trainer_id = serializers.UUIDField(required=False)
+    room_id    = serializers.UUIDField(required=False)
+    period_id  = serializers.UUIDField(required=False)
+    day        = serializers.CharField(required=False, max_length=3)
+    notes      = serializers.CharField(required=False, allow_blank=True)
+
+    class Meta:
+        model  = ScheduledUnit
+        fields = ["trainer_id", "room_id", "period_id", "day", "notes"]
+
+    VALID_DAYS = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"}
+
+    def validate_day(self, value):
+        if value.upper() not in self.VALID_DAYS:
+            raise serializers.ValidationError(f"Invalid day. Must be one of: {', '.join(sorted(self.VALID_DAYS))}")
+        return value.upper()
+
+    def validate_trainer_id(self, value):
+        if not Trainer.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Active trainer not found.")
+        return value
+
+    def validate_room_id(self, value):
+        if not Room.objects.filter(id=value, is_active=True).exists():
+            raise serializers.ValidationError("Active room not found.")
+        return value
+
+    def validate_period_id(self, value):
+        if not Period.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Period not found.")
+        return value
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Conflict
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ConflictReadSerializer(serializers.ModelSerializer):
+    conflict_type = serializers.CharField(source="get_conflict_type_display")
+    cohort_name   = serializers.CharField(source="cohort.name", read_only=True, allow_null=True)
+    trainer_name  = serializers.CharField(source="trainer.short_name", read_only=True, allow_null=True)
+    room_code     = serializers.CharField(source="room.code", read_only=True, allow_null=True)
+    unit_code     = serializers.CharField(source="curriculum_unit.code", read_only=True, allow_null=True)
+
+    class Meta:
+        model  = Conflict
+        fields = [
+            "id", "term", "conflict_type", "severity", "description",
+            "cohort", "cohort_name", "trainer", "trainer_name",
+            "room", "room_code", "curriculum_unit", "unit_code",
+            "resolution_status", "resolved_by", "resolved_at", "resolution_note",
+            "created_at",
+        ]
+        read_only_fields = fields
+
+
+class ConflictResolveSerializer(serializers.Serializer):
+    note   = serializers.CharField(allow_blank=True, default="")
+    method = serializers.ChoiceField(
+        choices=["RESOLVED", "OVERRIDDEN", "IGNORED"],
+        default="RESOLVED",
+    )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Timetable generation
+# ─────────────────────────────────────────────────────────────────────────────
+
+class GenerateSerializer(serializers.Serializer):
+    term_id = serializers.UUIDField(required=False, allow_null=True)
+
+    def validate_term_id(self, value):
+        if value and not Term.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Term not found.")
+        return value
+
+
+class PublishSerializer(serializers.Serializer):
+    term_id = serializers.UUIDField(required=False, allow_null=True)
+    force   = serializers.BooleanField(default=False)
+
+    def validate_term_id(self, value):
+        if value and not Term.objects.filter(id=value).exists():
+            raise serializers.ValidationError("Term not found.")
+        return value
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AuditLog (read-only)
+# ─────────────────────────────────────────────────────────────────────────────
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    action       = serializers.CharField(source="get_action_display")
+    performed_by = serializers.StringRelatedField()
+
+    class Meta:
+        model  = AuditLog
+        fields = ["id", "timestamp", "action", "performed_by", "term", "description", "payload"]
+        read_only_fields = fields
