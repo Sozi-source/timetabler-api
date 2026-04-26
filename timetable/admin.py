@@ -1,215 +1,344 @@
+﻿"""
+timetable/admin.py
+==================
+Django admin configuration for the timetable system.
+Provides rich admin interfaces with inline editing, filters, and search.
+"""
+
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import *
+from django.db.models import Count, Q
 
-class BaseAdmin(admin.ModelAdmin):
-    readonly_fields = ['id', 'created_at', 'updated_at', 'created_by', 'updated_by']
-    
-    def save_model(self, request, obj, form, change):
-        if not change:
-            obj.created_by = request.user
-        obj.updated_by = request.user
-        super().save_model(request, obj, form, change)
+from .models import (    AuditLog, CurriculumUnitTrainer, Cohort, Conflict, Constraint, CurriculumUnit,
+    Department, Institution, Period, Programme, ProgressRecord,
+    Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
+)
 
 
-@admin.register(AcademicYear)
-class AcademicYearAdmin(BaseAdmin):
-    list_display = ['year', 'name', 'start_date', 'end_date', 'is_current', 'is_active']
-    list_filter = ['is_current', 'is_active']
-    search_fields = ['year', 'name']
-    actions = ['set_as_current']
-    
-    def set_as_current(self, request, queryset):
-        queryset.update(is_current=True)
-        AcademicYear.objects.exclude(id__in=queryset.values_list('id', flat=True)).update(is_current=False)
-        self.message_user(request, "Selected academic year(s) set as current.")
-    set_as_current.short_description = "Set selected as current academic year"
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Inlines
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+class DepartmentInline(admin.TabularInline):
+    model = Department
+    extra = 0
+    fields = ("code", "name", "hod", "email", "is_active")
+    show_change_link = True
 
 
-@admin.register(Semester)
-class SemesterAdmin(BaseAdmin):
-    list_display = ['academic_year', 'semester_type', 'start_date', 'end_date', 'is_active', 'current_week_display']
-    list_filter = ['academic_year', 'semester_type', 'is_active']
-    search_fields = ['name']
-    date_hierarchy = 'start_date'
-    
-    def current_week_display(self, obj):
-        return obj.current_week
-    current_week_display.short_description = 'Current Week'
+class PeriodInline(admin.TabularInline):
+    model = Period
+    extra = 0
+    fields = ("order", "label", "start_time", "end_time", "is_break")
+    ordering = ("order",)
 
+
+class CurriculumUnitInline(admin.TabularInline):
+    model = CurriculumUnit
+    extra = 0
+    fields = ("term_number", "position", "code", "name", "unit_type", "credit_hours", "periods_per_week", "is_active")
+    ordering = ("term_number", "position")
+    show_change_link = True
+
+
+class CohortInline(admin.TabularInline):
+    model = Cohort
+    extra = 0
+    fields = ("name", "start_year", "start_month", "current_term", "student_count", "is_active")
+    show_change_link = True
+
+
+class TrainerAvailabilityInline(admin.TabularInline):
+    model = TrainerAvailability
+    extra = 0
+    fields = ("term", "day", "period", "is_available", "reason", "notes")
+    autocomplete_fields = ("period",)
+
+
+class ConstraintInline(admin.TabularInline):
+    model = Constraint
+    extra = 0
+    fields = ("scope", "rule", "is_hard", "parameters", "is_active", "notes")
+    fk_name = "curriculum_unit"
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Institution
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Institution)
+class InstitutionAdmin(admin.ModelAdmin):
+    list_display  = ("name", "short_name", "country", "timezone", "allow_back_to_back", "max_periods_per_day")
+    search_fields = ("name", "short_name")
+    inlines       = [DepartmentInline, PeriodInline]
+    fieldsets = (
+        ("Identity", {
+            "fields": ("name", "short_name", "country", "timezone"),
+        }),
+        ("Timetable Policy", {
+            "fields": ("days_of_week", "allow_back_to_back", "max_periods_per_day"),
+            "description": "Configure institution-wide timetabling rules.",
+        }),
+    )
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Department
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @admin.register(Department)
-class DepartmentAdmin(BaseAdmin):
-    list_display = ['code', 'name', 'hod_name', 'is_active']
-    list_filter = ['is_active']
-    search_fields = ['code', 'name', 'hod_name']
+class DepartmentAdmin(admin.ModelAdmin):
+    list_display  = ("code", "name", "institution", "hod", "email", "is_active")
+    list_filter   = ("institution", "is_active")
+    search_fields = ("code", "name", "hod")
+    list_select_related = ("institution",)
 
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Programme
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @admin.register(Programme)
-class ProgrammeAdmin(BaseAdmin):
-    list_display = ['code', 'name', 'programme_type', 'department', 'duration_semesters', 'is_active']
-    list_filter = ['programme_type', 'department', 'is_active']
-    search_fields = ['code', 'name']
+class ProgrammeAdmin(admin.ModelAdmin):
+    list_display  = ("code", "name", "level", "department", "total_terms", "sharing_group", "is_active")
+    list_filter   = ("level", "department", "is_active")
+    search_fields = ("code", "name", "sharing_group")
+    list_select_related = ("department",)
+    inlines       = [CurriculumUnitInline, CohortInline]
 
 
-@admin.register(Stage)
-class StageAdmin(BaseAdmin):
-    list_display = ['programme', 'semester_number', 'name', 'is_active']
-    list_filter = ['programme', 'is_active']
-    search_fields = ['name']
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# CurriculumUnit
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-
-@admin.register(Unit)
-class UnitAdmin(BaseAdmin):
-    list_display = ['code', 'name', 'stage', 'unit_type', 'credit_hours', 'slots_per_week', 'is_active']
-    list_filter = ['unit_type', 'stage', 'is_active']
-    search_fields = ['code', 'name']
-    filter_horizontal = ['prerequisites', 'corequisites']
-    
-    fieldsets = (
-        ('Basic Information', {
-            'fields': ('code', 'name', 'stage', 'unit_type', 'description')
-        }),
-        ('Hours and Credits', {
-            'fields': ('credit_hours', 'lecture_hours_per_week', 'tutorial_hours_per_week', 'practical_hours_per_week')
-        }),
-        ('Assessment', {
-            'fields': ('assessment_type', 'cat_weight', 'exam_weight', 'pass_mark')
-        }),
-        ('Prerequisites', {
-            'fields': ('prerequisites', 'corequisites')
-        }),
-        ('Status', {
-            'fields': ('is_active',)
-        })
-    )
-
-
-class IntakeUnitInline(admin.TabularInline):
-    """Inline editor for units assigned to an intake, replacing filter_horizontal."""
-    model = IntakeUnit
+class CurriculumUnitTrainerInline(admin.TabularInline):
+    model = CurriculumUnitTrainer
     extra = 1
-    fields = ['unit', 'semester', 'is_mandatory', 'is_elective_selected', 'exam_date', 'exam_venue']
-    autocomplete_fields = ['unit', 'semester']
+    autocomplete_fields = ['trainer']
 
-
-@admin.register(Intake)
-class IntakeAdmin(BaseAdmin):
-    list_display = ['name', 'programme', 'stage', 'academic_year', 'student_count', 'is_active']
-    list_filter = ['programme', 'stage', 'academic_year', 'is_active']
-    search_fields = ['name']
-    # 'units' has a through model (IntakeUnit) so filter_horizontal is not supported.
-    # Use the inline below to manage unit assignments instead.
-    inlines = [IntakeUnitInline]
-
-
-@admin.register(IntakeUnit)
-class IntakeUnitAdmin(BaseAdmin):
-    list_display = ['intake', 'unit', 'semester', 'is_mandatory']
-    list_filter = ['semester', 'is_mandatory']
-    search_fields = ['intake__name', 'unit__code']
-
-
-@admin.register(Lecturer)
-class LecturerAdmin(BaseAdmin):
-    list_display = ['staff_id', 'full_name_display', 'lecturer_type', 'department', 'max_hours_per_week', 'is_active']
-    list_filter = ['lecturer_type', 'department', 'is_active']
-    search_fields = ['staff_id', 'first_name', 'last_name', 'email']
-    filter_horizontal = ['qualified_units']
-    
+@admin.register(CurriculumUnit)
+class CurriculumUnitAdmin(admin.ModelAdmin):
+    list_display  = ("code", "name", "programme", "term_number", "unit_type", "credit_hours", "periods_per_week", "is_active")
+    list_filter   = ("unit_type", "is_active", "programme__department")
+    search_fields = ("code", "name")
+    list_select_related = ("programme",)
+    ordering      = ("programme", "term_number", "position")
+    inlines = [CurriculumUnitTrainerInline, ConstraintInline]
     fieldsets = (
-        ('Personal Information', {
-            'fields': ('staff_id', 'title', 'first_name', 'middle_name', 'last_name',
-                       'email', 'alternative_email', 'phone', 'alternative_phone')
+        ("Identity", {
+            "fields": ("programme", "term_number", "position", "code", "name", "unit_type", "is_active"),
         }),
-        ('Professional Information', {
-            'fields': ('lecturer_type', 'department', 'highest_qualification',
-                       'specialization', 'year_of_experience', 'bio')
+        ("Scheduling", {
+            "fields": ("credit_hours", "periods_per_week"),
         }),
-        ('Schedule Settings', {
-            'fields': ('max_hours_per_week', 'max_hours_per_day', 'preferred_days',
-                       'preferred_time_slots', 'unavailable_dates', 'unavailable_weeks')
+        ("Notes", {
+            "fields": ("notes",),
+            "classes": ("collapse",),
         }),
-        ('Qualifications', {
-            'fields': ('qualified_units',)
-        }),
-        ('Status', {
-            'fields': ('is_active', 'is_available_for_supervision')
-        })
     )
-    
-    def full_name_display(self, obj):
-        return obj.full_name
-    full_name_display.short_description = 'Name'
 
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Cohort
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Cohort)
+class CohortAdmin(admin.ModelAdmin):
+    list_display  = ("name", "programme", "start_year", "start_month", "current_term", "student_count", "is_active")
+    list_filter   = ("programme__department", "is_active", "start_year")
+    search_fields = ("name", "programme__code")
+    list_select_related = ("programme",)
+    actions       = ["advance_term_action"]
+
+    def advance_term_action(self, request, queryset):
+        updated = 0
+        for cohort in queryset:
+            if cohort.current_term < cohort.programme.total_terms:
+                cohort.advance_term()
+                updated += 1
+        self.message_user(request, f"Advanced {updated} cohort(s) to next term.")
+    advance_term_action.short_description = "Advance selected cohorts to next term"
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ProgressRecord
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(ProgressRecord)
+class ProgressRecordAdmin(admin.ModelAdmin):
+    list_display  = ("cohort", "curriculum_unit", "term", "status", "score", "started_at", "completed_at")
+    list_filter   = ("status", "term")
+    search_fields = ("cohort__name", "curriculum_unit__code")
+    list_select_related = ("cohort", "curriculum_unit", "term")
+    date_hierarchy = "created_at"
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Room
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @admin.register(Room)
-class RoomAdmin(BaseAdmin):
-    list_display = ['code', 'name', 'room_type', 'capacity', 'building', 'floor', 'has_projector', 'is_active']
-    list_filter = ['room_type', 'building', 'has_projector', 'has_aircon', 'is_active']
-    search_fields = ['code', 'name', 'building']
+class RoomAdmin(admin.ModelAdmin):
+    list_display  = ("code", "name", "institution", "room_type", "capacity", "building", "is_active")
+    list_filter   = ("institution", "room_type", "is_active")
+    search_fields = ("code", "name", "building")
+    list_select_related = ("institution",)
 
 
-@admin.register(TimeSlot)
-class TimeSlotAdmin(admin.ModelAdmin):
-    list_display = ['slot_id', 'start_time', 'end_time', 'order', 'is_evening']
-    list_editable = ['order']
-    ordering = ['order']
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Period
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Period)
+class PeriodAdmin(admin.ModelAdmin):
+    list_display  = ("label", "institution", "start_time", "end_time", "order", "is_break", "duration_hours")
+    list_filter   = ("institution", "is_break")
+    search_fields = ("label",)
+    ordering      = ("institution", "order")
 
 
-@admin.register(TimetableEntry)
-class TimetableEntryAdmin(BaseAdmin):
-    list_display = ['unit', 'lecturer', 'intake', 'room', 'day', 'time_slot', 'week_number', 'status', 'color_status']
-    list_filter = ['status', 'day', 'semester', 'week_number']
-    search_fields = ['unit__code', 'lecturer__first_name', 'lecturer__last_name', 'intake__name']
-    date_hierarchy = 'created_at'
-    readonly_fields = ['published_at', 'approved_at']
-    
-    def color_status(self, obj):
-        colors = {
-            'PUBLISHED': 'green',
-            'DRAFT': 'orange',
-            'PENDING': 'blue',
-            'CANCELLED': 'red',
-            'RESCHEDULED': 'purple',
-            'COMPLETED': 'gray'
-        }
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{}</span>',
-            colors.get(obj.status, 'black'),
-            obj.get_status_display()
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Term
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Term)
+class TermAdmin(admin.ModelAdmin):
+    list_display  = ("name", "institution", "start_date", "end_date", "teaching_weeks", "is_current", "week_number", "weeks_remaining")
+    list_filter   = ("institution", "is_current")
+    search_fields = ("name",)
+    list_select_related = ("institution",)
+    actions       = ["mark_current"]
+
+    def mark_current(self, request, queryset):
+        if queryset.count() != 1:
+            self.message_user(request, "Select exactly one term to mark as current.", level="error")
+            return
+        term = queryset.first()
+        term.is_current = True
+        term.save()
+        self.message_user(request, f"'{term.name}' is now the current term.")
+    mark_current.short_description = "Mark as current term"
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Trainer
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Trainer)
+class TrainerAdmin(admin.ModelAdmin):
+    list_display  = ("staff_id", "full_name", "department", "employment_type", "max_periods_per_week", "email", "is_active")
+    list_filter   = ("employment_type", "department", "is_active")
+    search_fields = ("staff_id", "first_name", "last_name", "email")
+    list_select_related = ("department", "institution")
+    filter_horizontal = ()
+    inlines       = [TrainerAvailabilityInline]
+    fieldsets = (
+        ("Identity", {
+            "fields": ("institution", "department", "staff_id", "title", "first_name", "last_name", "email", "phone"),
+        }),
+        ("Employment", {
+            "fields": ("employment_type", "max_periods_per_week", "available_days"),
+        }),
+        ("Account", {
+            "fields": ("user", "is_active"),
+        }),
+    )
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# TrainerAvailability
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(TrainerAvailability)
+class TrainerAvailabilityAdmin(admin.ModelAdmin):
+    list_display  = ("trainer", "term", "day", "period", "is_available", "reason")
+    list_filter   = ("term", "day", "is_available", "reason")
+    search_fields = ("trainer__last_name", "trainer__staff_id")
+    list_select_related = ("trainer", "term", "period")
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Constraint
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Constraint)
+class ConstraintAdmin(admin.ModelAdmin):
+    list_display  = ("scope", "rule", "is_hard", "curriculum_unit", "cohort", "trainer", "room", "is_active")
+    list_filter   = ("scope", "rule", "is_hard", "is_active")
+    search_fields = ("notes", "curriculum_unit__code", "trainer__last_name", "cohort__name")
+    list_select_related = ("curriculum_unit", "cohort", "trainer", "room")
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ScheduledUnit
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(ScheduledUnit)
+class ScheduledUnitAdmin(admin.ModelAdmin):
+    list_display  = ("curriculum_unit", "cohort", "trainer", "room", "day", "period", "status", "is_combined", "term")
+    list_filter   = ("status", "day", "term", "is_combined")
+    search_fields = ("curriculum_unit__code", "cohort__name", "trainer__last_name", "room__code")
+    list_select_related = ("curriculum_unit", "cohort", "trainer", "room", "period", "term")
+    readonly_fields = ("published_at", "combined_key")
+    date_hierarchy = "created_at"
+    actions       = ["publish_selected", "cancel_selected"]
+
+    def publish_selected(self, request, queryset):
+        count = queryset.filter(status="DRAFT").update(status="PUBLISHED")
+        self.message_user(request, f"Published {count} entries.")
+    publish_selected.short_description = "Publish selected draft entries"
+
+    def cancel_selected(self, request, queryset):
+        count = queryset.update(status="CANCELLED")
+        self.message_user(request, f"Cancelled {count} entries.")
+    cancel_selected.short_description = "Cancel selected entries"
+
+
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# Conflict
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(Conflict)
+class ConflictAdmin(admin.ModelAdmin):
+    list_display  = ("conflict_type", "severity", "term", "cohort", "trainer", "room", "resolution_status", "created_at")
+    list_filter   = ("conflict_type", "severity", "resolution_status", "term")
+    search_fields = ("description", "cohort__name", "trainer__last_name")
+    list_select_related = ("term", "cohort", "trainer", "room", "curriculum_unit")
+    readonly_fields = ("resolved_by", "resolved_at")
+    date_hierarchy = "created_at"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related(
+            "term", "cohort", "trainer", "room", "curriculum_unit", "resolved_by"
         )
-    color_status.short_description = 'Status'
 
 
-@admin.register(ConflictLog)
-class ConflictLogAdmin(BaseAdmin):
-    list_display = ['conflict_type', 'severity', 'description_short', 'resolution_status', 'created_at']
-    list_filter = ['conflict_type', 'severity', 'resolution_status', 'semester']
-    search_fields = ['description']
-    readonly_fields = ['created_at', 'updated_at']
-    
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# AuditLog  (read-only)
+# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display  = ("action", "performed_by", "term", "description_short", "timestamp")
+    list_filter   = ("action", "term")
+    search_fields = ("description", "performed_by__username")
+    readonly_fields = ("id", "timestamp", "action", "performed_by", "term", "description", "payload")
+    date_hierarchy = "timestamp"
+
     def description_short(self, obj):
-        return obj.description[:50] + '...' if len(obj.description) > 50 else obj.description
-    description_short.short_description = 'Description'
+        return obj.description[:80]
+    description_short.short_description = "Description"
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
-@admin.register(ScheduleAudit)
-class ScheduleAuditAdmin(admin.ModelAdmin):
-    list_display = ['timetable_entry', 'action', 'changed_by', 'created_at']
-    list_filter = ['action', 'created_at']
-    search_fields = ['timetable_entry__unit__code', 'changed_by__username']
-    readonly_fields = ['created_at']
 
 
-@admin.register(LecturerPreferences)
-class LecturerPreferencesAdmin(admin.ModelAdmin):
-    list_display = ['lecturer', 'semester', 'prefer_morning', 'prefer_afternoon', 'max_consecutive_hours']
-    list_filter = ['semester', 'prefer_morning', 'prefer_afternoon']
-    search_fields = ['lecturer__first_name', 'lecturer__last_name']
 
-
-# Custom Admin Site Configuration
-admin.site.site_header = "Timetable Management System"
-admin.site.site_title = "Timetable Admin"
-admin.site.index_title = "Welcome to Timetable Management System"
