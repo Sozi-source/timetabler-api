@@ -182,6 +182,7 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
     "http://localhost:3000,http://localhost:5173",
 ).split(",")
 
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 # Only expose these headers to the browser
