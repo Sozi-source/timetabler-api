@@ -211,7 +211,7 @@ class DepartmentListView(APIView):
         inst = _institution(request)
         depts = Department.objects.filter(institution=inst, is_active=True).order_by("name")
         return ok([
-            {"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod}
+            {"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active}
             for d in depts
         ])
 
@@ -226,7 +226,7 @@ class DepartmentListView(APIView):
                 name=data["name"],
                 hod=data.get("hod", ""),
             )
-            return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod}, 201)
+            return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active}, 201)
         except KeyError as e:
             return err(f"Missing field: {e}")
         except Exception as e:
@@ -1528,7 +1528,7 @@ class DepartmentDetailView(APIView):
 
     def get(self, request, pk):
         d = get_object_or_404(Department, id=pk)
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod})
+        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
 
     def put(self, request, pk):
         d = get_object_or_404(Department, id=pk)
@@ -1537,7 +1537,7 @@ class DepartmentDetailView(APIView):
             if field in data:
                 setattr(d, field, data[field])
         d.save()
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod})
+        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
 
     def delete(self, request, pk):
         d = get_object_or_404(Department, id=pk)
@@ -1726,7 +1726,7 @@ class DepartmentDetailView(APIView):
 
     def get(self, request, pk):
         d = get_object_or_404(Department, id=pk)
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod})
+        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
 
     def put(self, request, pk):
         d = get_object_or_404(Department, id=pk)
@@ -1734,7 +1734,7 @@ class DepartmentDetailView(APIView):
             if field in request.data:
                 setattr(d, field, request.data[field])
         d.save()
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod})
+        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
 
     def delete(self, request, pk):
         d = get_object_or_404(Department, id=pk)
