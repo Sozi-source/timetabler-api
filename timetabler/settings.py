@@ -1,9 +1,9 @@
-"""
+﻿"""
 timetabler/settings.py
 =======================
 Production-ready Django settings for the Timetabler project.
   - Framework : Django 6.0+
-  - Database  : PostgreSQL  →  tani-africa
+  - Database  : PostgreSQL  â†’  tani-africa
   - Auth      : Session + Token (DRF)
   - CORS      : django-cors-headers
   - API Docs  : drf-spectacular (Swagger / ReDoc)
@@ -18,13 +18,13 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# ─── Paths ────────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Paths â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(dotenv_path=BASE_DIR / ".env", override=True)
 
 
-# ─── Security ─────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Security â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
     "django-insecure-replace-this-with-a-real-secret-key-before-production",
@@ -48,7 +48,7 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS     = not DEBUG
 SECURE_HSTS_PRELOAD                = not DEBUG
 
 
-# ─── Installed Apps ───────────────────────────────────────────────────────────
+# â”€â”€â”€ Installed Apps â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 INSTALLED_APPS = [
     # Django built-ins
     "django.contrib.admin",
@@ -67,7 +67,7 @@ INSTALLED_APPS = [
 ]
 
 
-# ─── Middleware ───────────────────────────────────────────────────────────────
+# â”€â”€â”€ Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",            # Must be before CommonMiddleware
@@ -80,12 +80,12 @@ MIDDLEWARE = [
 ]
 
 
-# ─── URL & WSGI ───────────────────────────────────────────────────────────────
+# â”€â”€â”€ URL & WSGI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 ROOT_URLCONF    = "timetabler.urls"
 WSGI_APPLICATION = "timetabler.wsgi.application"
 
 
-# ─── Templates ────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Templates â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -103,30 +103,24 @@ TEMPLATES = [
 ]
 
 
-# ─── Database ─────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Database â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+import dj_database_url
 DATABASES = {
-    "default": {
-        "ENGINE":   "django.db.backends.postgresql",
-        "NAME":     os.environ.get("DB_NAME",     "tani-africa"),
-        "USER":     os.environ.get("DB_USER",     "postgres"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", ""),          # Never hardcode in prod
-        "HOST":     os.environ.get("DB_HOST",     "localhost"),
-        "PORT":     os.environ.get("DB_PORT",     "5432"),
-        "OPTIONS": {
-            "connect_timeout": 10,
-        },
-        "CONN_MAX_AGE": 60,
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=0,
+        ssl_require=True,
+    )
 }
 
 
-# ─── Default Primary Key ──────────────────────────────────────────────────────
+# â”€â”€â”€ Default Primary Key â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
-# ─── Django REST Framework ────────────────────────────────────────────────────
+# â”€â”€â”€ Django REST Framework â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 REST_FRAMEWORK = {
-    # ← FIX: DEFAULT_SCHEMA_CLASS is a top-level key, NOT inside authentication classes
+    # â† FIX: DEFAULT_SCHEMA_CLASS is a top-level key, NOT inside authentication classes
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -155,7 +149,7 @@ REST_FRAMEWORK = {
 }
 
 
-# ─── drf-spectacular (OpenAPI / Swagger) ──────────────────────────────────────
+# â”€â”€â”€ drf-spectacular (OpenAPI / Swagger) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 SPECTACULAR_SETTINGS = {
     "TITLE":       "Timetabler API",
     "DESCRIPTION": "Automated timetabling system for TVET colleges and polytechnics (Kenya).",
@@ -176,7 +170,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-# ─── CORS ─────────────────────────────────────────────────────────────────────
+# â”€â”€â”€ CORS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://localhost:5173",
@@ -189,7 +183,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_EXPOSE_HEADERS = ["Content-Type", "Authorization"]
 
 
-# ─── Password Validation ──────────────────────────────────────────────────────
+# â”€â”€â”€ Password Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -198,14 +192,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# ─── Internationalisation ─────────────────────────────────────────────────────
+# â”€â”€â”€ Internationalisation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 LANGUAGE_CODE = "en-us"
 TIME_ZONE     = "Africa/Nairobi"
 USE_I18N      = True
 USE_TZ        = True
 
 
-# ─── Static & Media Files ─────────────────────────────────────────────────────
+# â”€â”€â”€ Static & Media Files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 STATIC_URL  = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
@@ -213,7 +207,7 @@ MEDIA_URL   = "/media/"
 MEDIA_ROOT  = BASE_DIR / "mediafiles"
 
 
-# ─── Logging ──────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Logging â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,

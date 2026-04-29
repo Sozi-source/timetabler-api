@@ -47,3 +47,4 @@ django-import-export==4.0.0
 gunicorn==21.2.0
 
 openpyxl>=3.1.0
+dj-database-url
