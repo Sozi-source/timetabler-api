@@ -216,6 +216,22 @@ class DepartmentListView(APIView):
         ])
 
 
+    def post(self, request):
+        inst = _institution(request)
+        data = request.data
+        try:
+            d = Department.objects.create(
+                institution=inst,
+                code=data["code"],
+                name=data["name"],
+                hod=data.get("hod", ""),
+            )
+            return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod}, 201)
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), status_code=500)
+
 class ProgrammeListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -237,6 +253,24 @@ class ProgrammeListView(APIView):
             for p in qs.order_by("code")
         ])
 
+
+    def post(self, request):
+        data = request.data
+        try:
+            dept = get_object_or_404(Department, id=data["department_id"])
+            p = Programme.objects.create(
+                department=dept,
+                code=data["code"],
+                name=data["name"],
+                level=data.get("level", "CERT"),
+                total_terms=int(data.get("total_terms", 4)),
+                sharing_group=data.get("sharing_group", ""),
+            )
+            return ok({"id": str(p.id), "code": p.code, "name": p.name}, 201)
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), status_code=500)
 
 class CurriculumView(APIView):
     """
@@ -303,6 +337,25 @@ class RoomListView(APIView):
         ])
 
 
+    def post(self, request):
+        inst = _institution(request)
+        data = request.data
+        try:
+            r = Room.objects.create(
+                institution=inst,
+                code=data["code"],
+                name=data.get("name", data["code"]),
+                room_type=data.get("room_type", "CLASSROOM"),
+                capacity=int(data.get("capacity", 30)),
+                building=data.get("building", ""),
+                features=data.get("features", []),
+            )
+            return ok({"id": str(r.id), "code": r.code, "name": r.name}, 201)
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), status_code=500)
+
 class TrainerListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -319,6 +372,29 @@ class TrainerListView(APIView):
 
         return ok([_trainer_dict(t) for t in qs.order_by("last_name")])
 
+
+    def post(self, request):
+        inst = _institution(request)
+        data = request.data
+        try:
+            dept = get_object_or_404(Department, id=data["department_id"])
+            t = Trainer.objects.create(
+                institution=inst,
+                department=dept,
+                staff_id=data["staff_id"],
+                first_name=data["first_name"],
+                last_name=data["last_name"],
+                email=data["email"],
+                title=data.get("title", ""),
+                employment_type=data.get("employment_type", "FT"),
+                max_periods_per_week=int(data.get("max_periods_per_week", 20)),
+                available_days=data.get("available_days", []),
+            )
+            return ok(_trainer_dict(t), 201)
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), status_code=500)
 
 class TermListView(APIView):
     permission_classes = [IsAuthenticated]
