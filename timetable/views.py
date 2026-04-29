@@ -1445,8 +1445,7 @@ class CurriculumUnitTrainersView(APIView):
 # Detail views (GET / PUT / DELETE by ID)
 # -----------------------------------------------------------------------------
 
-class DepartmentListView_POST(APIView):
-    pass  # placeholder — POST handled below in DepartmentListView
+# (removed stale placeholder)
 
 class DepartmentDetailView(APIView):
     permission_classes = [IsAuthenticated]
