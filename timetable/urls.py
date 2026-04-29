@@ -13,21 +13,28 @@ urlpatterns = [
     # ── Institution / Setup ──────────────────────────────────────────────────
     path("institution/",                views.InstitutionView.as_view()),
     path("departments/",                views.DepartmentListView.as_view()),
+    path("departments/<uuid:pk>/",       views.DepartmentDetailView.as_view()),
     path("programmes/",                 views.ProgrammeListView.as_view()),
+    path("programmes/<uuid:pk>/",        views.ProgrammeDetailView.as_view()),
     
     path("curriculum/",                views.CurriculumView.as_view()),
     path('curriculum/<uuid:unit_id>/',          views.CurriculumUnitDetailView.as_view()),
     path('curriculum/<uuid:unit_id>/trainers/', views.CurriculumUnitTrainersView.as_view()),
     path("periods/",                    views.PeriodListView.as_view()),
+    path("periods/<uuid:pk>/",           views.PeriodDetailView.as_view()),
     path("rooms/",                      views.RoomListView.as_view()),
+    path("rooms/<uuid:pk>/",             views.RoomDetailView.as_view()),
     path("trainers/",                   views.TrainerListView.as_view()),
+    path("trainers/<uuid:pk>/",          views.TrainerDetailView.as_view()),
     path("terms/",                      views.TermListView.as_view()),
+    path("terms/<uuid:pk>/",             views.TermDetailView.as_view()),
 
     # ── Trainer availability ─────────────────────────────────────────────────
     path("trainers/<uuid:trainer_id>/availability/", views.TrainerAvailabilityView.as_view()),
 
     # ── Cohorts & Progression ────────────────────────────────────────────────
     path("cohorts/",                    views.CohortListView.as_view()),
+    path("cohorts/<uuid:pk>/",           views.CohortDetailView.as_view()),
     path("cohorts/<uuid:cohort_id>/progress/",        views.CohortProgressView.as_view()),
     path("cohorts/<uuid:cohort_id>/advance/",         views.AdvanceCohortView.as_view()),
     path("cohorts/<uuid:cohort_id>/progress/update/", views.UpdateProgressView.as_view()),
@@ -62,4 +69,7 @@ urlpatterns = [
     path("dashboard/",                  views.DashboardView.as_view()),
     path("dashboard/trainer/",          views.TrainerDashboardView.as_view()),
 ]
+
+
+
 
