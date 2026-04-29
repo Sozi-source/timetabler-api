@@ -1,4 +1,4 @@
-﻿from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 u, _ = User.objects.get_or_create(username='admin')
 u.set_password('admin123')
