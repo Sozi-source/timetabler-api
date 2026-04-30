@@ -21,7 +21,7 @@ urlpatterns = [
     path('curriculum/<uuid:unit_id>/',          views.CurriculumUnitDetailView.as_view()),
     path('curriculum/<uuid:unit_id>/trainers/', views.CurriculumUnitTrainersView.as_view()),
     path("periods/",                    views.PeriodListView.as_view()),
-    path("periods/<uuid:pk>/",           views.PeriodDetailView.as_view()),
+    path("periods/<int:pk>/",            views.PeriodDetailView.as_view()),
     path("rooms/",                      views.RoomListView.as_view()),
     path("rooms/<uuid:pk>/",             views.RoomDetailView.as_view()),
     path("trainers/",                   views.TrainerListView.as_view()),

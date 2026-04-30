@@ -118,13 +118,23 @@ def _institution(request) -> Institution | None:
 # Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬
 
 def _period_dict(p: Period) -> dict:
+    import datetime
+    def _duration(s, e):
+        try:
+            if isinstance(s, str): s = datetime.time.fromisoformat(s[:5])
+            if isinstance(e, str): e = datetime.time.fromisoformat(e[:5])
+            today = datetime.date.today()
+            return (datetime.datetime.combine(today, e) - datetime.datetime.combine(today, s)).seconds / 3600
+        except Exception:
+            return 0
     return {
         "id":       str(p.id),
         "label":    p.label,
         "start":    str(p.start_time),
         "end":      str(p.end_time),
         "order":    p.order,
-        "duration": p.duration_hours,
+        "is_break": p.is_break,
+        "duration": _duration(p.start_time, p.end_time),
     }
 
 
@@ -322,7 +332,7 @@ class PeriodListView(APIView):
                 label=data["label"],
                 start_time=data.get("start") or data.get("start_time"),
                 end_time=data.get("end") or data.get("end_time"),
-                order=int(data.get("order") or (Period.objects.filter(institution=inst).count() + 1)),
+                order=Period.objects.filter(institution=inst).count() + 1,
                 is_break=bool(data.get("is_break", False)),
             )
             return ok(_period_dict(period), 201)
