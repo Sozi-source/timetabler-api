@@ -328,6 +328,42 @@ class Cohort(TimeStampedModel):
         self.save(update_fields=["current_term", "updated_at"])
 
     @property
+    def computed_current_term(self) -> int:
+        """
+        Auto-calculate which term this cohort should be in based on their
+        start date. Assumes 3 terms per year, each 4 months long:
+          Term 1: Jan–Apr  (start_month 1)
+          Term 2: May–Aug  (start_month 5)
+          Term 3: Sep–Dec  (start_month 9)
+        Capped at programme.total_terms so it never exceeds the programme length.
+        """
+        today = date.today()
+        start = date(self.start_year, self.start_month, 1)
+        if today < start:
+            return 1
+        months_elapsed = (today.year - start.year) * 12 + (today.month - start.month)
+        term = (months_elapsed // 4) + 1
+        return max(1, min(term, self.programme.total_terms))
+
+    @property
+    def term_is_synced(self) -> bool:
+        """True if current_term matches what the calendar says it should be."""
+        return self.current_term == self.computed_current_term
+
+    def sync_current_term(self) -> bool:
+        """
+        Update current_term to match the computed calendar value.
+        Safe to call at any time — only saves if something changed.
+        Returns True if current_term was updated, False if already correct.
+        """
+        computed = self.computed_current_term
+        if computed != self.current_term:
+            self.current_term = computed
+            self.save(update_fields=["current_term", "updated_at"])
+            return True
+        return False
+
+    @property
     def progress_summary(self) -> dict:
         total     = CurriculumUnit.objects.filter(
             programme=self.programme, is_active=True

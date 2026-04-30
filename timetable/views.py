@@ -449,16 +449,19 @@ class CohortListView(APIView):
         if prog_id:
             qs = qs.filter(programme_id=prog_id)
         return ok([
-            {
-                "id":           str(c.id),
-                "name":         c.name,
-                "programme":    c.programme.name,
-                "programme_id": str(c.programme_id),
-                "current_term": c.current_term,
-                "student_count": c.student_count,
-                "start_year":   c.start_year,
-                "start_month":  c.start_month,
-                "progress":     c.progress_summary,
+             {
+                "id":                    str(c.id),
+                "name":                  c.name,
+                "programme":             c.programme.name,
+                "programme_id":          str(c.programme_id),
+                "current_term":          c.current_term,
+                "computed_current_term": c.computed_current_term,
+                "term_is_synced":        c.term_is_synced,
+                "student_count":         c.student_count,
+                "start_year":            c.start_year,
+                "start_month":           c.start_month,
+                "is_active":             c.is_active,
+                "progress":              c.progress_summary,
             }
             for c in qs.order_by("-start_year", "programme")
         ])
@@ -518,16 +521,33 @@ class CohortProgressView(APIView):
                 "is_current_term": u.term_number == cohort.current_term,
             })
 
-        return ok({
-            "cohort_id":    str(cohort.id),
-            "cohort_name":  cohort.name,
-            "programme":    cohort.programme.name,
-            "current_term": cohort.current_term,
-            "total_terms":  cohort.programme.total_terms,
-            "summary":      cohort.progress_summary,
-            "terms":        units_by_term,
-        })
+        ct = cohort.current_term
 
+        covered  = {
+            tn: units for tn, units in units_by_term.items() if tn < ct
+        }
+        current  = {
+            tn: units for tn, units in units_by_term.items() if tn == ct
+        }
+        upcoming = {
+            tn: units for tn, units in units_by_term.items() if tn == ct + 1
+        }
+
+        # REPLACE WITH:
+        return ok({
+            "cohort_id":             str(cohort.id),
+            "cohort_name":           cohort.name,
+            "programme":             cohort.programme.name,
+            "current_term":          cohort.current_term,
+            "computed_current_term": cohort.computed_current_term,
+            "term_is_synced":        cohort.term_is_synced,
+            "total_terms":           cohort.programme.total_terms,
+            "summary":               cohort.progress_summary,
+            "terms":                 units_by_term,
+            "covered":               covered,
+            "current":               current,
+            "upcoming":              upcoming,
+        })
 
 class AdvanceCohortView(APIView):
     """POST /api/cohorts/<id>/advance/ Ã¢â‚¬â€ move cohort to next term."""
