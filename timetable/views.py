@@ -313,6 +313,24 @@ class PeriodListView(APIView):
         periods = Period.objects.filter(institution=inst).order_by("order")
         return ok([_period_dict(p) for p in periods])
 
+    def post(self, request):
+        inst = _institution(request)
+        data = request.data
+        try:
+            period = Period.objects.create(
+                institution=inst,
+                label=data["label"],
+                start_time=data.get("start") or data.get("start_time"),
+                end_time=data.get("end") or data.get("end_time"),
+                order=int(data.get("order") or (Period.objects.filter(institution=inst).count() + 1)),
+                is_break=bool(data.get("is_break", False)),
+            )
+            return ok(_period_dict(period), 201)
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), traceback.format_exc(), 500)
+
 
 class RoomListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1094,7 +1112,7 @@ class ConflictListView(APIView):
                 "cohort":       c.cohort.name if c.cohort_id else None,
                 "trainer":      c.trainer.short_name if c.trainer_id else None,
                 "room":         c.room.code if c.room_id else None,
-                "status":       c.resolution_status,
+                "resolution_status": c.resolution_status,
                 "created_at":   c.created_at.strftime("%Y-%m-%d %H:%M"),
             }
             for c in qs
