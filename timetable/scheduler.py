@@ -44,6 +44,15 @@ BUG 2: Constraints (PIN_DAY_PERIOD) not respected
   - Added get_pinned_day() for PIN_DAY rule support.
   - _place_single now filters candidate days using PIN_DAY constraints too.
   - Constraint POST in views.py must pass "unit_id" key (see views.py fix).
+
+PERF (2026-05-01)
+-----------------
+  - All ScheduledUnit DB writes are now deferred and flushed as a single
+    bulk_create(update_conflicts=True) call at the end of run().
+    This eliminates N+1 round-trips to the remote DB (was ~25 individual
+    update_or_create calls × ~4 s latency = 100 s wasted).
+  - _sort_by_difficulty uses prefetched qualified_trainers (no extra queries).
+  - Conflict rows are also bulk_created in one call.
 """
 
 from __future__ import annotations
@@ -258,18 +267,13 @@ class ConstraintIndex:
         """
         Return (day, period_id) if a hard PIN_DAY_PERIOD constraint exists
         for this unit OR cohort.
-
-        FIX: previously only checked indexed constraints. Now also checks
-        the unit-level constraints directly (belt-and-suspenders).
         """
-        # Check unit constraints first (most specific)
         for c in self._by_unit.get(unit_id, []):
             if c.rule == "PIN_DAY_PERIOD" and c.is_hard:
                 day = c.parameters.get("day")
                 period_id = c.parameters.get("period_id")
                 if day and period_id:
                     return day, str(period_id)
-        # Then cohort-level pins
         for c in self._by_cohort.get(cohort_id, []):
             if c.rule == "PIN_DAY_PERIOD" and c.is_hard:
                 day = c.parameters.get("day")
@@ -280,8 +284,7 @@ class ConstraintIndex:
 
     def get_pinned_day(self, unit_id: str, cohort_id: str) -> Optional[str]:
         """
-        Return the required day if a hard PIN_DAY constraint exists
-        (unit must be on this day, any period).
+        Return the required day if a hard PIN_DAY constraint exists.
         """
         for c in self._by_unit.get(unit_id, []):
             if c.rule == "PIN_DAY" and c.is_hard:
@@ -311,7 +314,6 @@ class ConstraintIndex:
         return days
 
     def get_avoided_periods(self, unit_id: str, cohort_id: str) -> set[str]:
-        """Return set of period_ids that should be avoided for this unit/cohort."""
         period_ids: set[str] = set()
         for c in list(self._by_unit.get(unit_id, [])) + list(self._by_cohort.get(cohort_id, [])):
             if c.rule == "AVOID_PERIOD":
@@ -329,8 +331,9 @@ class Placer:
     """
     Attempts to place a single (cohort, curriculum_unit) onto the timetable.
 
-    Returns PlacementResult(success=True) and writes ScheduledUnit rows on
-    success. Does NOT commit – caller wraps in atomic block.
+    PERF: _write() no longer touches the DB — it appends a ScheduledUnit
+    instance to self._pending (a list owned by TimetableEngine.run()).
+    All pending rows are flushed in a single bulk_create at the end of run().
     """
 
     def __init__(
@@ -342,6 +345,7 @@ class Placer:
         periods:    list[Period],
         rooms:      list[Room],
         pass_cfg:   dict,
+        pending:    list,          # shared list owned by TimetableEngine.run()
     ):
         self.term     = term
         self.grid     = grid
@@ -350,6 +354,7 @@ class Placer:
         self.periods  = periods
         self.rooms    = rooms
         self.cfg      = pass_cfg
+        self._pending = pending    # ← write here instead of DB
 
     # -- Main entry point ---------------------------------------------------
 
@@ -397,7 +402,6 @@ class Placer:
             if not candidate_days:
                 candidate_days = self.days[:]
 
-        # Filter periods to exclude avoided ones (soft in RELAXED/EMERGENCY pass)
         skip_soft = self.cfg.get("skip_soft", False)
         if skip_soft or not avoided_periods:
             candidate_periods = self.periods
@@ -617,7 +621,7 @@ class Placer:
                 return room
         return None
 
-    # -- Write --------------------------------------------------------------
+    # -- Write (in-memory only — no DB hit) ---------------------------------
 
     def _write(
         self,
@@ -628,20 +632,30 @@ class Placer:
         day:      str,
         period:   Period,
         sequence: int,
+        is_combined:  bool = False,
+        combined_key: str  = "",
     ) -> ScheduledUnit:
-        entry, _ = ScheduledUnit.objects.update_or_create(
+        """
+        PERF: Build the ScheduledUnit in memory and append to _pending.
+        The grid is updated immediately so subsequent placements see this slot
+        as occupied. The actual INSERT happens once at the end of run().
+        """
+        entry = ScheduledUnit(
+            id=uuid.uuid4(),
             term=self.term,
             cohort=cohort,
             curriculum_unit=unit,
             period=period,
-            defaults={
-                "trainer":  trainer,
-                "room":     room,
-                "day":      day,
-                "sequence": sequence,
-                "status":   "DRAFT",
-            },
+            trainer=trainer,
+            room=room,
+            day=day,
+            sequence=sequence,
+            status="DRAFT",
+            is_combined=is_combined,
+            combined_key=combined_key,
         )
+        self._pending.append(entry)
+
         key = SlotKey(day, str(period.id))
         self.grid.mark(str(trainer.id), str(cohort.id), str(room.id), key)
         return entry
@@ -698,6 +712,10 @@ class TimetableEngine:
         if delete_existing_drafts:
             ScheduledUnit.objects.filter(term=self.term, status="DRAFT").delete()
 
+        # PERF: shared in-memory buffer — all Placer._write() calls and
+        # _try_place_combined() calls append here; one bulk_create at the end.
+        pending: list[ScheduledUnit] = []
+
         # 2. Load reference data
         days    = list(self.institution.days_of_week)
         periods = list(Period.objects.filter(institution=self.institution, is_break=False).order_by("order"))
@@ -707,9 +725,6 @@ class TimetableEngine:
             return GenerationResult(term=self.term)
 
         # 3. Build work queue: {cohort_id → (Cohort, [CurriculumUnit])}
-        #
-        # FIX: we load ALL active cohorts under this institution (not just those
-        # with matching term — cohort.current_term selects which units to schedule).
         cohorts = list(
             Cohort.objects.filter(
                 programme__department__institution=self.institution,
@@ -717,7 +732,6 @@ class TimetableEngine:
             ).select_related("programme")
         )
 
-        # work_queue maps cohort_id → (cohort, list-of-units)
         work_queue: dict[str, tuple[Cohort, list[CurriculumUnit]]] = {}
         all_unit_ids    = []
         all_cohort_ids  = []
@@ -728,10 +742,8 @@ class TimetableEngine:
                     programme=cohort.programme,
                     term_number=cohort.current_term,
                     is_active=True,
-                ).prefetch_related("qualified_trainers")
+                ).prefetch_related("qualified_trainers", "unit_trainers__trainer")
             )
-            # Include cohort in queue even if some units have no trainers —
-            # we want to log conflicts for those rather than silently skip them.
             if units:
                 work_queue[str(cohort.id)] = (cohort, units)
                 all_unit_ids.extend(str(u.id) for u in units)
@@ -748,26 +760,20 @@ class TimetableEngine:
         # 4. Build occupancy grid (single DB query)
         grid = OccupancyGrid.build(self.term)
 
-        # 5. Build constraint index
+        # 5. Build constraint index (single DB query batch)
         cindex = ConstraintIndex(self.term, all_unit_ids, all_cohort_ids, all_trainer_ids)
 
         result = GenerationResult(term=self.term, total_required=total_required)
 
         # 6. Schedule combined/shared units first
-        #    This mutates work_queue (removes combined units from individual queues).
         combined_placed = self._schedule_combined(
-            work_queue, grid, cindex, days, periods, rooms
+            work_queue, grid, cindex, days, periods, rooms, pending
         )
         result.combined_placed = combined_placed
 
-        # 7. Sort work queue AFTER combined scheduling so mutations are reflected.
-        #
-        # FIX: previously sorted before combined scheduling ran, meaning the
-        # unit lists could be empty (combined units removed) and cohorts would
-        # appear to have nothing to schedule.
+        # 7. Sort work queue AFTER combined scheduling
         sorted_queue = self._sort_by_difficulty(work_queue, cindex)
 
-        # FIX: filter out cohorts with empty unit lists now (combined took them all)
         remaining = [
             (cid, list(units))
             for cid, units in sorted_queue
@@ -776,14 +782,15 @@ class TimetableEngine:
 
         # 8. Multi-pass scheduling
         placed_keys: set[str] = set()
-        no_trainer_units = []   # collected across passes for conflict logging
+        no_trainer_units = []
 
         for pass_cfg in _PASS_CONFIGS:
             if not remaining:
                 break
 
             next_remaining = []
-            placer = Placer(self.term, grid, cindex, days, periods, rooms, pass_cfg)
+            # Pass the shared pending buffer into every Placer
+            placer = Placer(self.term, grid, cindex, days, periods, rooms, pass_cfg, pending)
 
             for cohort_id, unit_list in remaining:
                 cohort, _ = work_queue[cohort_id]
@@ -794,16 +801,14 @@ class TimetableEngine:
                     if key in placed_keys:
                         continue
 
-                    # Skip outsourced units — no trainer assignment needed
                     if getattr(unit, 'is_outsourced', False):
-                        placed_keys.add(key)   # mark as handled
+                        placed_keys.add(key)
                         continue
 
-                    qualified = list(unit.qualified_trainers.filter(is_active=True))
+                    # Use prefetched queryset — no extra DB hit
+                    qualified = [t for t in unit.qualified_trainers.all() if t.is_active]
 
                     if not qualified:
-                        # FIX: log conflict instead of silently dropping
-                        # Only log once (on first pass)
                         if pass_cfg["name"] == "STRICT":
                             no_trainer_units.append((cohort, unit))
                         still_unplaced.append(unit)
@@ -827,10 +832,22 @@ class TimetableEngine:
 
             remaining = next_remaining
 
-        # 9. Log unresolved failures as Conflicts
+        # 9. PERF: flush all placements in a single bulk_create
+        #    update_conflicts=True acts like update_or_create but in one round-trip.
+        if pending:
+            ScheduledUnit.objects.bulk_create(
+                pending,
+                update_conflicts=True,
+                unique_fields=["term", "cohort", "curriculum_unit", "period"],
+                update_fields=[
+                    "trainer", "room", "day", "sequence", "status",
+                    "is_combined", "combined_key",
+                ],
+            )
+
+        # 10. Log unresolved failures as Conflicts (also bulk)
         conflicts_to_create = []
 
-        # Units that had no trainer assigned
         for cohort, unit in no_trainer_units:
             key = f"{cohort.id}_{unit.id}"
             if key not in placed_keys:
@@ -851,7 +868,6 @@ class TimetableEngine:
                     )
                 )
 
-        # Units that had trainers but couldn't be placed
         for cohort_id, unit_list in remaining:
             cohort, _ = work_queue[cohort_id]
             for unit in unit_list:
@@ -882,7 +898,7 @@ class TimetableEngine:
     # -- Combined / shared class scheduling ---------------------------------
 
     def _schedule_combined(
-        self, work_queue, grid, cindex, days, periods, rooms
+        self, work_queue, grid, cindex, days, periods, rooms, pending: list
     ) -> int:
         from .models import Programme
         groups = set(
@@ -933,8 +949,10 @@ class TimetableEngine:
                 cohorts_in_combined = [work_queue[cid][0] for cid in cohort_unit_map.keys()]
                 combined_students = sum(c.student_count for c in cohorts_in_combined)
 
-                source_unit = max(cohort_unit_map.values(),
-                                  key=lambda u: u.qualified_trainers.count())
+                source_unit = max(
+                    cohort_unit_map.values(),
+                    key=lambda u: u.qualified_trainers.count()
+                )
                 trainer_id_sets = [
                     set(u.qualified_trainers.filter(is_active=True).values_list("id", flat=True))
                     for u in cohort_unit_map.values()
@@ -957,7 +975,8 @@ class TimetableEngine:
                 ok = self._try_place_combined(
                     source_unit, cohorts_in_combined, qualified, big_rooms,
                     days, periods, grid, cindex, cfg, combined_key,
-                    all_units=all_units_in_combined
+                    all_units=all_units_in_combined,
+                    pending=pending,
                 )
                 if ok:
                     placed_combined_keys.add(combined_key)
@@ -970,7 +989,7 @@ class TimetableEngine:
 
     def _try_place_combined(
         self, unit, cohorts, trainers, rooms, days, periods, grid, cindex, cfg,
-        combined_key, all_units=None
+        combined_key, all_units=None, pending=None
     ) -> bool:
         cohort_unit_map = {}
         if all_units:
@@ -979,6 +998,9 @@ class TimetableEngine:
         else:
             for c in cohorts:
                 cohort_unit_map[str(c.id)] = unit
+
+        if pending is None:
+            pending = []
 
         for day in days:
             for period in periods:
@@ -996,30 +1018,31 @@ class TimetableEngine:
                 if room is None:
                     continue
 
+                # Update grid in-memory for all cohorts in this combined session
                 grid.mark(str(trainer.id), str(cohorts[0].id), str(room.id), key)
                 for _c in cohorts[1:]:
                     grid._cohort[str(_c.id)].add(key)
                     grid._cohort_day_count[str(_c.id)][key.day] += 1
-                for _c in cohorts[1:]:
-                    grid._trainer[str(trainer.id)].add(key)
+                    # trainer already marked above; mark room for subsequent lookups
+                    grid._room[str(room.id)].add(key)
 
+                # PERF: append to pending instead of update_or_create per cohort
                 for cohort in cohorts:
                     cohort_unit = cohort_unit_map[str(cohort.id)]
-                    ScheduledUnit.objects.update_or_create(
+                    pending.append(ScheduledUnit(
+                        id=uuid.uuid4(),
                         term=self.term,
                         cohort=cohort,
                         curriculum_unit=cohort_unit,
                         period=period,
-                        defaults={
-                            "trainer":      trainer,
-                            "room":         room,
-                            "day":          day,
-                            "sequence":     0,
-                            "status":       "DRAFT",
-                            "is_combined":  True,
-                            "combined_key": combined_key,
-                        },
-                    )
+                        trainer=trainer,
+                        room=room,
+                        day=day,
+                        sequence=0,
+                        status="DRAFT",
+                        is_combined=True,
+                        combined_key=combined_key,
+                    ))
                 return True
         return False
 
@@ -1030,30 +1053,26 @@ class TimetableEngine:
     ) -> list[tuple[str, list[CurriculumUnit]]]:
         """
         Sort cohort-unit pairs so the most constrained are scheduled first.
-
-        FIX: now accepts cindex so it can check constraints without extra
-        DB queries. Also now snapshots unit lists at sort time (after combined
-        scheduling has removed shared units).
+        Uses prefetched qualified_trainers — no extra DB queries.
         """
         def difficulty(item):
             cohort_id, (cohort, units) = item
             if not units:
-                return (0, 0, 99)  # empty — put at end
+                return (0, 0, 99)
             pin_count = sum(
                 1 for u in units
                 if cindex.get_pin(str(u.id), cohort_id) is not None
                    or cindex.get_pinned_day(str(u.id), cohort_id) is not None
             )
             double_count = sum(1 for u in units if u.periods_per_week >= 2)
+            # Use prefetched cache — len(list(...)) hits no DB
             avg_trainers = (
-                sum(u.qualified_trainers.count() for u in units) / len(units)
+                sum(len(list(u.qualified_trainers.all())) for u in units) / len(units)
             )
             return (-pin_count, -double_count, avg_trainers)
 
         items = list(work_queue.items())
         items.sort(key=difficulty)
-        # Return (cohort_id, units_snapshot) — snapshot the list so later
-        # mutations to work_queue don't affect the loop.
         return [(cid, list(units)) for cid, (cohort, units) in items]
 
     def _has_pin(self, unit_id: str, cohort_id: str) -> bool:

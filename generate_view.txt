@@ -1,0 +1,29 @@
+class GenerateView(APIView):
+    """
+    POST /api/timetable/generate/
+    Body: { "term_id": "..." }
+
+    Clears DRAFT entries, runs the engine, returns summary.
+    Does NOT publish.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        term = _term_from_request(request)
+        if not term:
+            return err("Provide term_id or set a current term")
+
+        try:
+            engine = TimetableEngine(term)
+            result = engine.run(delete_existing_drafts=True)
+        except Exception as e:
+            return err("Generation failed", traceback.format_exc(), 500)
+
+        AuditLog.objects.create(
+            action="GENERATE",
+            performed_by=request.user,
+            term=term,
+            description=f"Timetable generated for {term.name}",
+            payload=result.summary(),
+        )
+        return ok(result.summary(), 202)

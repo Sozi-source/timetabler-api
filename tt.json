@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "data": {
+    "trainer": "Mrs Maureen Ayuma",
+    "trainer_id": "84f74b43-ced7-4d37-b711-f5740f3d1d11",
+    "staff_id": "ICM-010",
+    "department": "Human Nutrition and Dietetics",
+    "employment_type": "Full-time",
+    "max_periods_per_week": 20,
+    "term": "SEM 1",
+    "term_id": "2cf9912b-b640-40b2-be29-f5989810af4f",
+    "days": [
+      "MON",
+      "TUE",
+      "WED",
+      "THU",
+      "FRI"
+    ],
+    "periods": [
+      {
+        "id": "21",
+        "label": "Morning Session",
+        "start": "08:00:00",
+        "end": "10:00:00",
+        "order": 1,
+        "is_break": false,
+        "duration": 2.0
+      },
+      {
+        "id": "23",
+        "label": "Mid-Morning",
+        "start": "10:30:00",
+        "end": "12:30:00",
+        "order": 3,
+        "is_break": false,
+        "duration": 2.0
+      },
+      {
+        "id": "25",
+        "label": "Afternoon Session",
+        "start": "14:00:00",
+        "end": "16:00:00",
+        "order": 5,
+        "is_break": false,
+        "duration": 2.0
+      }
+    ],
+    "grid": {
+      "MON": {
+        "21": null,
+        "23": null,
+        "25": null
+      },
+      "TUE": {
+        "21": null,
+        "23": null,
+        "25": null
+      },
+      "WED": {
+        "21": null,
+        "23": null,
+        "25": null
+      },
+      "THU": {
+        "21": null,
+        "23": null,
+        "25": null
+      },
+      "FRI": {
+        "21": null,
+        "23": null,
+        "25": null
+      }
+    },
+    "periods_this_week": 0,
+    "capacity_remaining": 20
+  }
+}

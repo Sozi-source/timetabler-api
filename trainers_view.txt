@@ -1,0 +1,32 @@
+30 objects imported automatically (use -v 2 for details).
+
+class CurriculumUnitTrainersView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, unit_id):
+        u = get_object_or_404(CurriculumUnit, id=unit_id)
+        return ok([{'id': str(ut.trainer.id), 'name': ut.trainer.short_name, 'trainer_type': ut.trainer_type, 'label': ut.label} for ut in u.unit_trainers.select_related('trainer').all()])
+
+    def post(self, request, unit_id):
+        u = get_object_or_404(CurriculumUnit, id=unit_id)
+        trainer_id = request.data.get('trainer_id')
+        ttype = request.data.get('trainer_type', 'INTERNAL')
+        label = request.data.get('label', '')
+        if not trainer_id:
+            return err('trainer_id required')
+        trainer = get_object_or_404(Trainer, id=trainer_id)
+        ut, created = CurriculumUnitTrainer.objects.get_or_create(curriculum_unit=u, trainer=trainer, defaults={'trainer_type': ttype, 'label': label})
+        if not created:
+            ut.trainer_type = ttype
+            ut.label = label
+            ut.save()
+        return ok({'id': str(trainer.id), 'name': trainer.short_name, 'trainer_type': ut.trainer_type, 'label': ut.label})
+
+    def delete(self, request, unit_id):
+        u = get_object_or_404(CurriculumUnit, id=unit_id)
+        trainer_id = request.data.get('trainer_id')
+        if not trainer_id:
+            return err('trainer_id required')
+        CurriculumUnitTrainer.objects.filter(curriculum_unit=u, trainer_id=trainer_id).delete()
+        return ok({'deleted': True})
+

@@ -1,0 +1,383 @@
+class TimetableEngine:
+    """
+    Main entry point.
+
+        engine = TimetableEngine(term)
+        result = engine.run()
+    """
+
+    def __init__(self, term: Term):
+        self.term = term
+        self.institution = term.institution
+
+    @transaction.atomic
+    def run(self, delete_existing_drafts: bool = True) -> GenerationResult:
+        # 1. Clear previous DRAFT entries
+        if delete_existing_drafts:
+            ScheduledUnit.objects.filter(term=self.term, status="DRAFT").delete()
+
+        # 2. Load reference data
+        days    = list(self.institution.days_of_week)
+        periods = list(Period.objects.filter(institution=self.institution, is_break=False).order_by("order"))
+        rooms   = list(Room.objects.filter(institution=self.institution, is_active=True).order_by("capacity"))
+
+        if not periods:
+            return GenerationResult(term=self.term)
+
+        # 3. Build work queue: {cohort_id → (Cohort, [CurriculumUnit])}
+        #
+        # FIX: we load ALL active cohorts under this institution (not just those
+        # with matching term — cohort.current_term selects which units to schedule).
+        cohorts = list(
+            Cohort.objects.filter(
+                programme__department__institution=self.institution,
+                is_active=True,
+            ).select_related("programme")
+        )
+
+        # work_queue maps cohort_id → (cohort, list-of-units)
+        work_queue: dict[str, tuple[Cohort, list[CurriculumUnit]]] = {}
+        all_unit_ids    = []
+        all_cohort_ids  = []
+
+        for cohort in cohorts:
+            units = list(
+                CurriculumUnit.objects.filter(
+                    programme=cohort.programme,
+                    term_number=cohort.current_term,
+                    is_active=True,
+                ).prefetch_related("qualified_trainers")
+            )
+            # Include cohort in queue even if some units have no trainers —
+            # we want to log conflicts for those rather than silently skip them.
+            if units:
+                work_queue[str(cohort.id)] = (cohort, units)
+                all_unit_ids.extend(str(u.id) for u in units)
+                all_cohort_ids.append(str(cohort.id))
+
+        all_trainer_ids = [
+            str(t) for t in Trainer.objects.filter(
+                institution=self.institution, is_active=True
+            ).values_list("id", flat=True)
+        ]
+
+        total_required = sum(len(v[1]) for v in work_queue.values())
+
+        # 4. Build occupancy grid (single DB query)
+        grid = OccupancyGrid.build(self.term)
+
+        # 5. Build constraint index
+        cindex = ConstraintIndex(self.term, all_unit_ids, all_cohort_ids, all_trainer_ids)
+
+        result = GenerationResult(term=self.term, total_required=total_required)
+
+        # 6. Schedule combined/shared units first
+        #    This mutates work_queue (removes combined units from individual queues).
+        combined_placed = self._schedule_combined(
+            work_queue, grid, cindex, days, periods, rooms
+        )
+        result.combined_placed = combined_placed
+
+        # 7. Sort work queue AFTER combined scheduling so mutations are reflected.
+        #
+        # FIX: previously sorted before combined scheduling ran, meaning the
+        # unit lists could be empty (combined units removed) and cohorts would
+        # appear to have nothing to schedule.
+        sorted_queue = self._sort_by_difficulty(work_queue, cindex)
+
+        # FIX: filter out cohorts with empty unit lists now (combined took them all)
+        remaining = [
+            (cid, list(units))
+            for cid, units in sorted_queue
+            if units
+        ]
+
+        # 8. Multi-pass scheduling
+        placed_keys: set[str] = set()
+        no_trainer_units = []   # collected across passes for conflict logging
+
+        for pass_cfg in _PASS_CONFIGS:
+            if not remaining:
+                break
+
+            next_remaining = []
+            placer = Placer(self.term, grid, cindex, days, periods, rooms, pass_cfg)
+
+            for cohort_id, unit_list in remaining:
+                cohort, _ = work_queue[cohort_id]
+                still_unplaced = []
+
+                for unit in unit_list:
+                    key = f"{cohort_id}_{unit.id}"
+                    if key in placed_keys:
+                        continue
+
+                    # Skip outsourced units — no trainer assignment needed
+                    if getattr(unit, 'is_outsourced', False):
+                        placed_keys.add(key)   # mark as handled
+                        continue
+
+                    qualified = list(unit.qualified_trainers.filter(is_active=True))
+
+                    if not qualified:
+                        # FIX: log conflict instead of silently dropping
+                        # Only log once (on first pass)
+                        if pass_cfg["name"] == "STRICT":
+                            no_trainer_units.append((cohort, unit))
+                        still_unplaced.append(unit)
+                        continue
+
+                    pr = placer.place(cohort, unit, qualified)
+                    if pr.success:
+                        placed_keys.add(key)
+                        result.placed += 1
+                        if pass_cfg["name"] == "EMERGENCY":
+                            result.emergency_placements.append({
+                                "cohort": cohort.name,
+                                "unit":   unit.code,
+                                "pass":   pass_cfg["name"],
+                            })
+                    else:
+                        still_unplaced.append(unit)
+
+                if still_unplaced:
+                    next_remaining.append((cohort_id, still_unplaced))
+
+            remaining = next_remaining
+
+        # 9. Log unresolved failures as Conflicts
+        conflicts_to_create = []
+
+        # Units that had no trainer assigned
+        for cohort, unit in no_trainer_units:
+            key = f"{cohort.id}_{unit.id}"
+            if key not in placed_keys:
+                result.unresolved.append({
+                    "cohort": cohort.name,
+                    "unit":   unit.code,
+                    "reason": "No qualified trainer assigned to this unit",
+                })
+                conflicts_to_create.append(
+                    Conflict(
+                        term=self.term,
+                        conflict_type="NO_TRAINER",
+                        severity="HIGH",
+                        description=f"[NO TRAINER] {unit.code} for {cohort.name} — assign a qualified trainer",
+                        curriculum_unit=unit,
+                        cohort=cohort,
+                        resolution_status="PENDING",
+                    )
+                )
+
+        # Units that had trainers but couldn't be placed
+        for cohort_id, unit_list in remaining:
+            cohort, _ = work_queue[cohort_id]
+            for unit in unit_list:
+                key = f"{cohort_id}_{unit.id}"
+                if key not in placed_keys:
+                    result.unresolved.append({
+                        "cohort": cohort.name,
+                        "unit":   unit.code,
+                        "reason": "Could not place after all passes",
+                    })
+                    conflicts_to_create.append(
+                        Conflict(
+                            term=self.term,
+                            conflict_type="NO_ROOM",
+                            severity="HIGH",
+                            description=f"[UNPLACED] {unit.code} for {cohort.name}",
+                            curriculum_unit=unit,
+                            cohort=cohort,
+                            resolution_status="PENDING",
+                        )
+                    )
+
+        if conflicts_to_create:
+            Conflict.objects.bulk_create(conflicts_to_create, ignore_conflicts=True)
+
+        return result
+
+    # -- Combined / shared class scheduling ---------------------------------
+
+    def _schedule_combined(
+        self, work_queue, grid, cindex, days, periods, rooms
+    ) -> int:
+        from .models import Programme
+        groups = set(
+            Programme.objects.filter(
+                department__institution=self.institution,
+                is_active=True,
+            ).exclude(sharing_group="").values_list("sharing_group", flat=True)
+        )
+
+        placed = 0
+        placed_combined_keys: set[str] = set()
+
+        for group in groups:
+            progs = list(
+                Programme.objects.filter(sharing_group=group, is_active=True)
+            )
+            prog_ids = {str(p.id) for p in progs}
+
+            group_cohort_ids = [
+                cid for cid, (cohort, _) in work_queue.items()
+                if str(cohort.programme_id) in prog_ids
+            ]
+            if len(group_cohort_ids) < 2:
+                continue
+
+            name_to_cohort_units: dict[str, dict] = defaultdict(dict)
+            for cid in group_cohort_ids:
+                _, units = work_queue[cid]
+                for u in units:
+                    if not getattr(u, 'is_outsourced', False):
+                        name_to_cohort_units[u.name.strip()][cid] = u
+
+            shared_names = {
+                name: cu_map for name, cu_map in name_to_cohort_units.items()
+                if len(cu_map) >= 2
+            }
+
+            if not shared_names:
+                continue
+
+            cfg = {"name": "COMBINED", "allow_overlap": False, "max_attempts": 80, "skip_soft": False}
+
+            for unit_name, cohort_unit_map in shared_names.items():
+                combined_key = f"{group}_{unit_name}"
+                if combined_key in placed_combined_keys:
+                    continue
+
+                cohorts_in_combined = [work_queue[cid][0] for cid in cohort_unit_map.keys()]
+                combined_students = sum(c.student_count for c in cohorts_in_combined)
+
+                source_unit = max(cohort_unit_map.values(),
+                                  key=lambda u: u.qualified_trainers.count())
+                trainer_id_sets = [
+                    set(u.qualified_trainers.filter(is_active=True).values_list("id", flat=True))
+                    for u in cohort_unit_map.values()
+                ]
+                common_ids = set.intersection(*trainer_id_sets) if trainer_id_sets else set()
+                if not common_ids:
+                    common_ids = set(
+                        source_unit.qualified_trainers.filter(is_active=True).values_list("id", flat=True)
+                    )
+                from timetable.models import Trainer as _T
+                qualified = list(_T.objects.filter(id__in=common_ids, is_active=True))
+                if not qualified:
+                    continue
+
+                big_rooms = [r for r in rooms if r.capacity >= combined_students]
+                if not big_rooms:
+                    big_rooms = sorted(rooms, key=lambda r: -r.capacity)[:1]
+
+                all_units_in_combined = list(cohort_unit_map.values())
+                ok = self._try_place_combined(
+                    source_unit, cohorts_in_combined, qualified, big_rooms,
+                    days, periods, grid, cindex, cfg, combined_key,
+                    all_units=all_units_in_combined
+                )
+                if ok:
+                    placed_combined_keys.add(combined_key)
+                    for cid, unit in cohort_unit_map.items():
+                        cohort_obj, units = work_queue[cid]
+                        work_queue[cid] = (cohort_obj, [u for u in units if u.id != unit.id])
+                    placed += 1
+
+        return placed
+
+    def _try_place_combined(
+        self, unit, cohorts, trainers, rooms, days, periods, grid, cindex, cfg,
+        combined_key, all_units=None
+    ) -> bool:
+        cohort_unit_map = {}
+        if all_units:
+            for c, u in zip(cohorts, all_units):
+                cohort_unit_map[str(c.id)] = u
+        else:
+            for c in cohorts:
+                cohort_unit_map[str(c.id)] = unit
+
+        for day in days:
+            for period in periods:
+                key = SlotKey(day, str(period.id))
+                if any(grid.cohort_busy(str(c.id), key) for c in cohorts):
+                    continue
+                trainer = None
+                for t in trainers:
+                    if not grid.trainer_busy(str(t.id), key) and not cindex.trainer_blocked(str(t.id), key):
+                        trainer = t
+                        break
+                if trainer is None:
+                    continue
+                room = next((r for r in rooms if not grid.room_busy(str(r.id), key)), None)
+                if room is None:
+                    continue
+
+                grid.mark(str(trainer.id), str(cohorts[0].id), str(room.id), key)
+                for _c in cohorts[1:]:
+                    grid._cohort[str(_c.id)].add(key)
+                    grid._cohort_day_count[str(_c.id)][key.day] += 1
+                for _c in cohorts[1:]:
+                    grid._trainer[str(trainer.id)].add(key)
+
+                for cohort in cohorts:
+                    cohort_unit = cohort_unit_map[str(cohort.id)]
+                    ScheduledUnit.objects.update_or_create(
+                        term=self.term,
+                        cohort=cohort,
+                        curriculum_unit=cohort_unit,
+                        period=period,
+                        defaults={
+                            "trainer":      trainer,
+                            "room":         room,
+                            "day":          day,
+                            "sequence":     0,
+                            "status":       "DRAFT",
+                            "is_combined":  True,
+                            "combined_key": combined_key,
+                        },
+                    )
+                return True
+        return False
+
+    # -- Difficulty sort ----------------------------------------------------
+
+    def _sort_by_difficulty(
+        self, work_queue: dict, cindex: ConstraintIndex
+    ) -> list[tuple[str, list[CurriculumUnit]]]:
+        """
+        Sort cohort-unit pairs so the most constrained are scheduled first.
+
+        FIX: now accepts cindex so it can check constraints without extra
+        DB queries. Also now snapshots unit lists at sort time (after combined
+        scheduling has removed shared units).
+        """
+        def difficulty(item):
+            cohort_id, (cohort, units) = item
+            if not units:
+                return (0, 0, 99)  # empty — put at end
+            pin_count = sum(
+                1 for u in units
+                if cindex.get_pin(str(u.id), cohort_id) is not None
+                   or cindex.get_pinned_day(str(u.id), cohort_id) is not None
+            )
+            double_count = sum(1 for u in units if u.periods_per_week >= 2)
+            avg_trainers = (
+                sum(u.qualified_trainers.count() for u in units) / len(units)
+            )
+            return (-pin_count, -double_count, avg_trainers)
+
+        items = list(work_queue.items())
+        items.sort(key=difficulty)
+        # Return (cohort_id, units_snapshot) — snapshot the list so later
+        # mutations to work_queue don't affect the loop.
+        return [(cid, list(units)) for cid, (cohort, units) in items]
+
+    def _has_pin(self, unit_id: str, cohort_id: str) -> bool:
+        return Constraint.objects.filter(
+            curriculum_unit_id=unit_id,
+            rule="PIN_DAY_PERIOD",
+            is_hard=True,
+            is_active=True,
+        ).exists()
