@@ -1,18 +1,18 @@
 # Timetabler Project — Context Document
 > **Purpose:** Paste this entire file at the start of every new Claude chat to restore full project context instantly.
-> **Last updated:** 2026-04-26
+> **Last updated:** 2026-05-01
 
 ---
 
 ## ⚠️ IMPORTANT INSTRUCTION FOR CLAUDE (READ FIRST)
 You are continuing development of the Timetabler system. At the end of every chat session where changes are made, **update this context document** to reflect:
-- Any new files created or modified (update the file structure and status table)
+- Any new files created or modified
 - Any bugs fixed and what caused them
 - Any new decisions made about architecture or data models
 - Progress on frontend, tests, or deployment
 - Any new known issues discovered
 
-Always ask the user to paste the updated context at the start of the next chat. The goal is seamless continuity across sessions, especially as frontend development begins.
+Always ask the user to paste the updated context at the start of the next chat.
 
 ---
 
@@ -26,15 +26,15 @@ Building a **constraint-based academic timetabling system** as a Django REST API
 
 ## 2. Tech Stack
 
-| Layer       | Technology                                                    |
-|-------------|---------------------------------------------------------------|
-| Language    | Python 3.14 (Windows, path: C:\Users\sozi\AppData\Local\Programs\Python\Python314) |
-| Framework   | Django 4.2+ with Django REST Framework                        |
-| Database    | PostgreSQL — hosted on Render (see Section 13)                |
-| Auth        | Session + Token authentication (DRF)                         |
-| CORS        | django-cors-headers                                           |
-| OS / Shell  | Windows 11, PowerShell                                        |
-| Deployment  | Not yet decided                                               |
+| Layer       | Technology |
+|-------------|------------|
+| Language    | Python 3.14 (Windows, C:\Users\sozi\AppData\Local\Programs\Python\Python314) |
+| Framework   | Django 6.0.4 with Django REST Framework |
+| Database    | PostgreSQL — hosted on Render (free tier — suspends after inactivity) |
+| Auth        | Token authentication (DRF) |
+| CORS        | django-cors-headers |
+| OS / Shell  | Windows 11, PowerShell |
+| AI          | Groq API (Llama 3.3 70B) via proxy view |
 
 ---
 
@@ -43,48 +43,57 @@ Building a **constraint-based academic timetabling system** as a Django REST API
 ```
 C:\users\sozi\Desktop\2026-projects\Timetable\timetabler\
 ├── timetabler/
-│   ├── settings.py                     # ✅ DONE
-│   ├── urls.py                         # ✅ DONE
-│   └── wsgi.py
+│   ├── settings.py                     ✅ DONE — DB keepalives + retry middleware added
+│   ├── urls.py                         ✅ DONE
+│   ├── wsgi.py
+│   └── db_retry_middleware.py          ✅ NEW — auto-retry DB connection on timeout
 ├── timetable/
-│   ├── models.py                       # ✅ DONE — see Section 4 for latest changes
-│   ├── admin.py                        # ✅ DONE — CurriculumUnitTrainerInline added
-│   ├── views.py                        # ✅ DONE — new endpoints added
-│   ├── urls.py                         # ✅ DONE — new routes added
-│   ├── scheduler.py                    # ✅ DONE
-│   ├── signals.py                      # ✅ DONE
-│   ├── migrations/
-│   │   ├── 0001_initial.py             # ✅ DONE
-│   │   └── 0002_add_curriculum_unit_trainer_through.py  # ✅ DONE
-│   └── management/commands/seed_timetable.py
+│   ├── models.py                       ✅ DONE
+│   ├── admin.py                        ✅ DONE
+│   ├── views.py                        ✅ DONE
+│   ├── urls.py                         ✅ DONE
+│   ├── scheduler.py                    ✅ DONE
+│   ├── ai_views.py                     ✅ DONE — FIXED institution lookup
+│   ├── signals.py                      ✅ DONE
+│   └── migrations/
+│       ├── 0001_initial.py             ✅ DONE
+│       └── 0002_add_curriculum_unit_trainer_through.py ✅ DONE
 ```
 
 ---
 
 ## 4. Data Model Summary
 
-### Core Models — latest additions
-
 ```
-CurriculumUnit
-  ├── qualified_trainers  M2M → Trainer  (through=CurriculumUnitTrainer)
-  └── is_outsourced       BooleanField(default=False)  ← NEW
+Institution
+  └── departments → Department → programmes → Programme
+                                               └── curriculum_units → CurriculumUnit
+                                                     ├── qualified_trainers M2M → Trainer
+                                                     │     (through=CurriculumUnitTrainer)
+                                                     └── is_outsourced: bool
 
-CurriculumUnitTrainer  (through model)  ← NEW
-  ├── curriculum_unit  FK → CurriculumUnit
-  ├── trainer          FK → Trainer
-  ├── trainer_type     CharField  INTERNAL | OUTSOURCED
-  └── label            CharField (blank=True) — e.g. "HOD Physics dept"
+CurriculumUnitTrainer (through model)
+  ├── curriculum_unit FK → CurriculumUnit
+  ├── trainer         FK → Trainer
+  ├── trainer_type    INTERNAL | OUTSOURCED
+  └── label           optional string
+
+Cohort
+  ├── programme FK → Programme
+  ├── current_term: int
+  └── is_active: bool
+
+Term → ScheduledUnit → Conflict, Constraint
 ```
 
 ### Key Design Decisions
-1. **Template-first** — ScheduledUnit is a weekly recurring template.
-2. **No Stage model** — `CurriculumUnit.term_number` replaces Stage.
-3. **UUID PKs** everywhere.
-4. **is_outsourced** on CurriculumUnit — marks units taught by external trainers with no specific trainer assigned.
-5. **CurriculumUnitTrainer through model** — allows labelling each trainer assignment as INTERNAL or OUTSOURCED with an optional custom label.
-6. **OccupancyGrid** — in-memory O(1) availability tracker.
-7. **Multi-pass scheduler**: STRICT → RELAXED → EMERGENCY.
+1. Template-first — ScheduledUnit is a weekly recurring template
+2. No Stage model — `CurriculumUnit.term_number` replaces Stage
+3. UUID PKs everywhere
+4. `is_outsourced` on CurriculumUnit — scheduler skips these entirely
+5. `CurriculumUnitTrainer` through model — INTERNAL/OUTSOURCED labelling
+6. OccupancyGrid — in-memory O(1) availability tracker
+7. Multi-pass scheduler: STRICT → RELAXED → EMERGENCY
 
 ---
 
@@ -93,110 +102,230 @@ CurriculumUnitTrainer  (through model)  ← NEW
 All routes under `/api/` prefix.
 
 ```
-GET  /api/curriculum/?programme=<id>&term_number=<n>
-GET  /api/curriculum/<id>/                           ← NEW (unit detail)
-PUT  /api/curriculum/<id>/                           ← NEW (update unit fields incl. is_outsourced)
-GET  /api/curriculum/<id>/trainers/                  ← NEW (list assigned trainers)
-POST /api/curriculum/<id>/trainers/                  ← NEW (assign trainer)
-DEL  /api/curriculum/<id>/trainers/                  ← NEW (remove trainer, pass trainer_id in body)
+POST /api/auth/login/                          { username, password } → { token }
+GET  /api/auth/me/
 
-... (all previous endpoints unchanged)
-```
+GET  /api/institution/
+GET  /api/departments/
+GET  /api/programmes/
+GET  /api/curriculum/?programme=<uuid>&term_number=<n>
+GET  /api/curriculum/<uuid>/
+PUT  /api/curriculum/<uuid>/
+GET  /api/curriculum/<uuid>/trainers/
+POST /api/curriculum/<uuid>/trainers/          { trainer_id }
+DEL  /api/curriculum/<uuid>/trainers/          { trainer_id }
 
-### Trainer assignment POST body:
-```json
-{ "trainer_id": "<uuid>", "trainer_type": "INTERNAL|OUTSOURCED", "label": "optional label" }
-```
-
-### Trainer assignment response:
-```json
-{ "id": "<uuid>", "name": "short_name", "trainer_type": "INTERNAL", "label": "" }
-```
-
-### Curriculum unit response now includes:
-```json
-{
-  "is_outsourced": false,
-  "qualified_trainers": [
-    { "id": "<uuid>", "name": "short_name", "trainer_type": "INTERNAL", "label": "" }
-  ]
-}
-```
-
----
-
-## 6. Constraints
-
-Supported rules: `PIN_DAY_PERIOD`, `PIN_DAY`, `PREFERRED_ROOM`, `AVOID_DAY`, `AVOID_PERIOD`, `BACK_TO_BACK`, `MAX_PER_DAY`
-
-Constraint creation (simplified UI — unit + day + period only):
-```json
+GET  /api/trainers/
+GET  /api/rooms/
+GET  /api/periods/
+GET  /api/terms/
+GET  /api/cohorts/
+GET  /api/cohorts/<uuid>/
+GET  /api/constraints/
 POST /api/constraints/
-{
-  "name": "Anatomy — Monday morning",
-  "scope": "UNIT",
-  "rule": "PIN_DAY_PERIOD",
-  "is_hard": true,
-  "is_active": true,
-  "curriculum_unit": "<uuid>",
-  "parameters": { "day": "MON", "period_id": "<uuid>" }
-}
+GET  /api/conflicts/?term=<uuid>
+POST /api/conflicts/<uuid>/resolve/
+
+POST /api/timetable/generate/                  { term_id }
+POST /api/timetable/publish/                   { term_id, force? }
+DELETE /api/timetable/drafts/                  { term_id }
+GET  /api/timetable/master/?term=<uuid>&status=DRAFT|PUBLISHED
+GET  /api/timetable/cohort/<uuid>/
+GET  /api/timetable/trainer/<uuid>/
+
+POST /api/ai/chat/                             { messages, term_id }
+
+GET  /api/dashboard/
+GET  /api/export/master/
+GET  /api/export/cohort/<uuid>/
+GET  /api/export/trainer/<uuid>/
 ```
 
 ---
 
-## 7. Bugs Fixed (Session: 2026-04-26)
+## 6. Cohort API Response Shape (confirmed)
+
+```json
+{
+  "id": "uuid",
+  "name": "CND JAN 26",
+  "programme": "CERTIFICATE IN NUTRITION AND DIETETICS",
+  "programme_id": "uuid",
+  "current_term": 1,
+  "computed_current_term": 2,
+  "term_is_synced": false,
+  "student_count": 0,
+  "start_year": 2026,
+  "start_month": 1,
+  "is_active": true
+}
+```
+⚠️ `programme` = name string. `programme_id` = UUID. Always use `programme_id` for filtering.
+
+---
+
+## 7. Timetable Grid Response Shape (confirmed)
+
+```json
+{
+  "ok": true,
+  "data": {
+    "term": "SEM 1",
+    "term_id": "uuid",
+    "status": "DRAFT",
+    "days": ["MON","TUE","WED","THU","FRI"],
+    "periods": [{ "id": "21", "label": "Morning Session", "start": "08:00:00", "order": 1 }],
+    "teaching_weeks": 16,
+    "total_entries": 25,
+    "grid": {
+      "MON": {
+        "21": [
+          {
+            "id": "uuid",
+            "unit_code": "CND1101",
+            "unit_name": "Communication Skills",
+            "cohort": "CND JAN 26",
+            "cohort_id": "uuid",
+            "trainer": "Mrs Ayuma",
+            "trainer_id": "uuid",
+            "room": "HND 3",
+            "room_id": "uuid",
+            "day": "MON",
+            "period_label": "Morning Session"
+          }
+        ]
+      }
+    }
+  }
+}
+```
+⚠️ `cohort` = name string. `cohort_id` = UUID. Frontend must use `cohort_id` for comparisons.
+
+---
+
+## 8. Scheduler Behaviour (confirmed from TimetableEngine source)
+
+1. Loads all active cohorts (`programme__department__institution`, `is_active=True`)
+2. Per cohort: fetches `CurriculumUnit` filtered by `programme` + `current_term` + `is_active=True`
+3. **Outsourced units** (`is_outsourced=True`) → skipped, marked handled, never scheduled
+4. Units with no qualified trainer → `NO_TRAINER` conflict (HIGH severity), not scheduled
+5. Shared units (same name, programmes in same `sharing_group`) → combined scheduling
+6. Multi-pass: STRICT → RELAXED → EMERGENCY
+7. Unplaced units → `NO_ROOM` conflict (HIGH severity)
+
+**Units on Offer page writes to `qualified_trainers` M2M via `CurriculumUnitTrainer`. Same data the scheduler reads. No separate "units on offer" model.**
+
+---
+
+## 9. AI Chat (ai_views.py)
+
+**Endpoint:** `POST /api/ai/chat/`
+**Body:** `{ messages: [{role, content}], term_id }`
+**Model:** Groq Llama 3.3 70B (`llama-3.3-70b-versatile`)
+
+System prompt is built dynamically with live timetable state:
+- Pending conflicts with descriptions
+- Available trainers + workload
+- Available rooms + capacity
+- Available periods
+
+Supports structured action blocks in response:
+- `REGENERATE` — re-run scheduler
+- `MARK_RESOLVED` — resolve a conflict by ID
+- `REASSIGN_TRAINER` — guide coordinator to fix manually
+
+**Bug fixed (2026-05-01):** Institution lookup used `departments__users=request.user` which doesn't exist on Institution model. Fixed to `Institution.objects.first()`.
+
+---
+
+## 10. Database Settings (settings.py)
+
+### Production branch (Render — uses DATABASE_URL env var)
+```python
+DATABASES = {"default": dj_database_url.config(default=_db_url, conn_max_age=60, ssl_require=True)}
+DATABASES['default'].setdefault('OPTIONS', {}).update({
+    'connect_timeout': 10,
+    'keepalives': 1,
+    'keepalives_idle': 30,
+    'keepalives_interval': 10,
+    'keepalives_count': 5,
+})
+```
+
+### Local branch (uses DB_NAME, DB_USER etc env vars)
+```python
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME", "tani-africa"),
+        "USER": os.environ.get("DB_USER", "postgres"),
+        "PASSWORD": os.environ.get("DB_PASSWORD", ""),
+        "HOST": os.environ.get("DB_HOST", "localhost"),
+        "PORT": os.environ.get("DB_PORT", "5432"),
+        "OPTIONS": {"connect_timeout": 10},
+        "CONN_MAX_AGE": 60,
+    }
+}
+```
+
+### DB Retry Middleware (timetabler/db_retry_middleware.py)
+Auto-retries failed DB connections up to 3 times with exponential backoff (1s, 2s).
+Added to top of MIDDLEWARE list in settings.py.
+
+---
+
+## 11. Environment Variables
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| DATABASE_URL | Render env + .env | Render PostgreSQL connection string |
+| GROQ_API_KEY | Render env + .env | ⚠️ ROTATE — was exposed in chat session |
+| DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT | .env | Local dev only |
+
+---
+
+## 12. Known Issues (as of 2026-05-01)
+
+| Issue | Severity | Notes |
+|-------|----------|-------|
+| 60 NO_ROOM conflicts | HIGH | Units have trainers but no room slot found. Check room count/capacity. |
+| Render DB sleep | MEDIUM | Free tier suspends after inactivity. Retry middleware helps but first request slow. Set up UptimeRobot. |
+| Groq API key exposed | HIGH | Rotate at console.groq.com immediately |
+| Token may expire | LOW | `611ba54aa78eb3dd57e0a7a9d2861f41553f8e12` used in shell commands — re-login if 401 |
+
+---
+
+## 13. Bugs Fixed (2026-05-01)
 
 | Bug | Cause | Fix |
 |-----|-------|-----|
-| `qualified_trainers` M2M couldn't be altered | Django can't alter M2M to add through= in one step | Migration: RemoveField + AddField instead of AlterField |
-| Admin error on `CurriculumUnitAdmin` | `filter_horizontal` and `fieldsets` can't include M2M with through model | Removed from fieldsets, added `CurriculumUnitTrainerInline` instead |
-| `CurriculumUnitTrainer` NameError in views | Import not added to views.py | Added to models import line |
-| `curriculum/` list route disappeared | URL regex replaced instead of appended | Re-added `path("curriculum/", views.CurriculumView.as_view())` |
-| `is_outsourced` added to wrong model | Regex matched `Constraint` model instead of `CurriculumUnit` | Removed duplicate from Constraint model |
+| AI chat 500 error | `departments__users` relation doesn't exist on Institution | Changed to `Institution.objects.first()` in ai_views.py |
+| DB timeout 500s | Render free tier suspends DB | Added keepalives to settings + DBRetryMiddleware |
+| Timetable cohort count showing 1 | Frontend used `e.cohort.id` but API returns cohort as string + separate `cohort_id` | Fixed to use `cohort_id` field throughout timetable page |
+| Units on Offer 404s | Frontend used `/api/curriculum-units/` (wrong) and `cohort.programme` (name not UUID) | Fixed to `/api/curriculum/` with `cohort.programme_id` |
+| Trainer dropdown empty | API returns `full_name`/`short_name` not `name` | Fixed trainer interface in units-on-offer page |
+| Trainer assign failed | POST body used `trainer_ids` (plural) | Fixed to `trainer_id` (singular) |
 
 ---
 
-## 8. Current Status
+## 14. GitHub Repos
 
-| Component          | Status         | Notes |
-|--------------------|---------------|-------|
-| models.py          | ✅ Complete    | CurriculumUnitTrainer through model + is_outsourced added |
-| admin.py           | ✅ Complete    | CurriculumUnitTrainerInline added |
-| views.py           | ✅ Complete    | CurriculumUnitDetailView + CurriculumUnitTrainersView added |
-| urls.py            | ✅ Complete    | curriculum/<id>/ and curriculum/<id>/trainers/ routes added |
-| migrations         | ✅ Complete    | 0002_add_curriculum_unit_trainer_through applied |
-| Frontend           | ✅ In progress | See frontend context |
+- Backend: `github.com:Sozi-source/timetabler-api.git` (branch: main)
+- Frontend: `github.com:Sozi-source/timetabler.git` (branch: main)
+
+Last backend push: `e78fa41` — "fix: AI chat institution lookup, DB keepalives, retry middleware, scheduler fixes"
+Last frontend push: `d7b2931` — "fix: timetable cohort count, cohort filter, units-on-offer page"
 
 ---
 
-## 9. Environment & Database
+## 15. Next Steps
 
-### Database (Render PostgreSQL)
-- Host: dpg-d743sghr0fns73c1q1k0-a.oregon-postgres.render.com
-- Name: tani_africa_db
-- User: tani_africa_db_user
-
-### PowerShell Tips
-```powershell
-# Patch files safely
-(Get-Content $f -Raw) -replace 'old', 'new' | Set-Content $f -Encoding UTF8
-
-# Append to file
-(Get-Content $f -Raw) + $newContent | Set-Content $f -Encoding UTF8
-
-# Check specific lines
-Get-Content $f | Select-Object -Skip 108 -First 15
-```
-
----
-
-## 10. Known Issues / Watch Points
-
-1. `views.py` uses `permission_classes = [IsAuthenticated]` globally — tighten per view later.
-2. `scheduler.py` — qualified_trainers now uses through model; scheduler reads `.qualified_trainers.all()` which still works transparently.
-3. Units marked `is_outsourced=True` have no trainer assigned — scheduler should handle gracefully (skip trainer assignment for outsourced units). **Not yet implemented in scheduler.**
-4. Downloads folder unreliable on this machine — always use inline PowerShell patches instead.
+1. **Rotate Groq API key** — exposed in chat, do this first
+2. **Fix 60 NO_ROOM conflicts** — check rooms configured, capacity, scheduler room logic
+3. **Add GROQ_API_KEY to Render** environment variables
+4. **Set up UptimeRobot** — ping `/api/terms/` every 5 min to prevent DB sleep
+5. **Verify sub-timetable pages** — cohort and trainer views
+6. **Excel bulk trainer upload** — POST /api/curriculum/trainers/bulk/
 
 ---
 
