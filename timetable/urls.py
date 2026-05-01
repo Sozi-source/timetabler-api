@@ -1,11 +1,16 @@
 ﻿"""
 timetable/urls.py
 """
+from . import ai_views
 from django.urls import path
 from rest_framework.authtoken.views import obtain_auth_token
 from . import views
 
 urlpatterns = [
+
+    #AI Views
+    path("ai/chat/", ai_views.AIChatView.as_view()),
+
     # ── Auth ─────────────────────────────────────────────────────────────────
     path("auth/login/",                 obtain_auth_token),
     path("auth/me/",                    views.MeView.as_view()),
