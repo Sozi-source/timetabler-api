@@ -1011,7 +1011,7 @@ class TrainerTimetableView(APIView):
         days    = list(inst.days_of_week)
 
         entries = (
-            ScheduledUnit.objects.filter(term=term, trainer=trainer, status="PUBLISHED")
+            ScheduledUnit.objects.filter(term=term, trainer=trainer, status=request.query_params.get("status", "DRAFT"))
             .select_related("curriculum_unit", "cohort", "room", "period")
             .order_by("day", "period__order")
         )
@@ -1441,7 +1441,7 @@ class TrainerDashboardView(APIView):
         days    = list(inst.days_of_week)
 
         entries = list(
-            ScheduledUnit.objects.filter(term=term, trainer=trainer, status="PUBLISHED")
+            ScheduledUnit.objects.filter(term=term, trainer=trainer, status=request.query_params.get("status", "DRAFT"))
             .select_related("curriculum_unit", "cohort", "room", "period")
             .order_by("day", "period__order")
         )
