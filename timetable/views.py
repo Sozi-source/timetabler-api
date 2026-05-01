@@ -779,6 +779,7 @@ class GenerateView(APIView):
             return err("Provide term_id or set a current term")
 
         try:
+            Conflict.objects.filter(term=term).delete()
             engine = TimetableEngine(term)
             result = engine.run(delete_existing_drafts=True)
         except Exception as e:
