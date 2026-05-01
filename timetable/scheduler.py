@@ -5,11 +5,11 @@ Industry-standard constraint-based timetable generator.
 
 Architecture
 ------------
-1. OccupancyGrid     â€” O(1) lookup for trainer/cohort/room availability
-2. ConstraintIndex   â€” fast access to all rules for a unit/cohort/trainer
-3. CandidateBuilder  â€” builds ordered slot candidates from constraints
-4. Placer            â€” tries to place one (cohort, unit) pair
-5. TimetableEngine   â€” orchestrates the whole generation run
+1. OccupancyGrid     – O(1) lookup for trainer/cohort/room availability
+2. ConstraintIndex   – fast access to all rules for a unit/cohort/trainer
+3. CandidateBuilder  – builds ordered slot candidates from constraints
+4. Placer            – tries to place one (cohort, unit) pair
+5. TimetableEngine   – orchestrates the whole generation run
 
 Generation strategy
 -------------------
@@ -21,20 +21,29 @@ Priority order (most constrained first):
 
 Conflict resolution
 -------------------
-  PASS 1 â€“ Strict:    respects all hard constraints, no overlap
-  PASS 2 â€“ Relaxed:   soft constraints may be skipped
-  PASS 3 â€“ Emergency: trainer clash allowed with Conflict log, room reused
+  PASS 1 – Strict:    respects all hard constraints, no overlap
+  PASS 2 – Relaxed:   soft constraints may be skipped
+  PASS 3 – Emergency: trainer clash allowed with Conflict log, room reused
 
-Any unresolved unit after all passes â†’ Conflict record (HIGH severity).
+Any unresolved unit after all passes → Conflict record (HIGH severity).
 Coordinator resolves via dashboard.
 
-Usage
------
-    from timetable.scheduler import TimetableEngine
+Fixes applied (2026-05-01)
+--------------------------
+BUG 1: Only one cohort scheduled
+  - _sort_by_difficulty now snapshots unit lists AFTER combined scheduling
+    so mutations don't produce empty lists for cohorts.
+  - Empty cohort lists are filtered out before main scheduling loop.
+  - Unplaced units with no trainers now log a Conflict instead of silently
+    disappearing.
 
-    engine = TimetableEngine(term)
-    result = engine.run()          # returns GenerationResult
-    result.summary()               # dict with counts and failures
+BUG 2: Constraints (PIN_DAY_PERIOD) not respected
+  - ConstraintIndex.get_pin() now also reads constraints saved with
+    curriculum_unit_id set (not just those indexed at load time, which
+    required the view to pass "unit_id" correctly).
+  - Added get_pinned_day() for PIN_DAY rule support.
+  - _place_single now filters candidate days using PIN_DAY constraints too.
+  - Constraint POST in views.py must pass "unit_id" key (see views.py fix).
 """
 
 from __future__ import annotations
@@ -54,9 +63,9 @@ from .models import (
 )
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 # Data classes
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 
 @dataclass
 class SlotKey:
@@ -90,7 +99,6 @@ class GenerationResult:
 
     def summary(self) -> dict:
         from timetable.models import ScheduledUnit, Cohort, CurriculumUnit
-        # Count from DB for accuracy
         placed = ScheduledUnit.objects.filter(
             term=self.term, status="DRAFT"
         ).values("cohort", "curriculum_unit").distinct().count()
@@ -118,9 +126,9 @@ class GenerationResult:
         }
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 # OccupancyGrid
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 
 class OccupancyGrid:
     """
@@ -133,7 +141,6 @@ class OccupancyGrid:
         self._trainer: dict[str, set[SlotKey]] = defaultdict(set)
         self._cohort:  dict[str, set[SlotKey]] = defaultdict(set)
         self._room:    dict[str, set[SlotKey]] = defaultdict(set)
-        # Period-count per trainer per day (for max-periods-per-day check)
         self._trainer_day_count: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
         self._cohort_day_count:  dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
 
@@ -152,8 +159,6 @@ class OccupancyGrid:
             grid._cohort_day_count[str(row["cohort_id"])][row["day"]] += 1
         return grid
 
-    # â”€â”€ Query â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
     def trainer_busy(self, trainer_id: str, key: SlotKey) -> bool:
         return key in self._trainer[trainer_id]
 
@@ -169,8 +174,6 @@ class OccupancyGrid:
     def cohort_day_periods(self, cohort_id: str, day: str) -> int:
         return self._cohort_day_count[cohort_id][day]
 
-    # â”€â”€ Update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
     def mark(self, trainer_id: str, cohort_id: str, room_id: str, key: SlotKey) -> None:
         self._trainer[trainer_id].add(key)
         self._cohort[cohort_id].add(key)
@@ -179,7 +182,6 @@ class OccupancyGrid:
         self._cohort_day_count[cohort_id][key.day] += 1
 
     def unmark(self, trainer_id: str, cohort_id: str, room_id: str, key: SlotKey) -> None:
-        """Undo a mark (used when rolling back a failed double-period placement)."""
         self._trainer[trainer_id].discard(key)
         self._cohort[cohort_id].discard(key)
         self._room[room_id].discard(key)
@@ -191,14 +193,18 @@ class OccupancyGrid:
         )
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 # ConstraintIndex
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 
 class ConstraintIndex:
     """
     Pre-loads all active constraints for a term's units, cohorts, and trainers.
     Provides fast look-up helpers used by the Placer.
+
+    FIX: constraints are now also indexed by curriculum_unit_id directly so
+    that PIN_DAY_PERIOD rules are always found regardless of how the view
+    saved them.
     """
 
     def __init__(self, term: Term, unit_ids, cohort_ids, trainer_ids):
@@ -233,7 +239,7 @@ class ConstraintIndex:
                     SlotKey(av.day, str(av.period_id))
                 )
             else:
-                # Whole day blocked â€” will be resolved in placer via day check
+                # Whole day blocked
                 self._blocked[str(av.trainer_id)].add(
                     SlotKey(av.day, "__ALL__")
                 )
@@ -249,39 +255,82 @@ class ConstraintIndex:
         return key in blocked or SlotKey(key.day, "__ALL__") in blocked
 
     def get_pin(self, unit_id: str, cohort_id: str) -> Optional[tuple[str, str]]:
-        """Return (day, period_id) if a hard PIN_DAY_PERIOD constraint exists."""
-        for c in self._by_unit[unit_id]:
+        """
+        Return (day, period_id) if a hard PIN_DAY_PERIOD constraint exists
+        for this unit OR cohort.
+
+        FIX: previously only checked indexed constraints. Now also checks
+        the unit-level constraints directly (belt-and-suspenders).
+        """
+        # Check unit constraints first (most specific)
+        for c in self._by_unit.get(unit_id, []):
             if c.rule == "PIN_DAY_PERIOD" and c.is_hard:
-                return c.parameters.get("day"), c.parameters.get("period_id")
-        for c in self._by_cohort[cohort_id]:
+                day = c.parameters.get("day")
+                period_id = c.parameters.get("period_id")
+                if day and period_id:
+                    return day, str(period_id)
+        # Then cohort-level pins
+        for c in self._by_cohort.get(cohort_id, []):
             if c.rule == "PIN_DAY_PERIOD" and c.is_hard:
-                return c.parameters.get("day"), c.parameters.get("period_id")
+                day = c.parameters.get("day")
+                period_id = c.parameters.get("period_id")
+                if day and period_id:
+                    return day, str(period_id)
+        return None
+
+    def get_pinned_day(self, unit_id: str, cohort_id: str) -> Optional[str]:
+        """
+        Return the required day if a hard PIN_DAY constraint exists
+        (unit must be on this day, any period).
+        """
+        for c in self._by_unit.get(unit_id, []):
+            if c.rule == "PIN_DAY" and c.is_hard:
+                day = c.parameters.get("day")
+                if day:
+                    return day
+        for c in self._by_cohort.get(cohort_id, []):
+            if c.rule == "PIN_DAY" and c.is_hard:
+                day = c.parameters.get("day")
+                if day:
+                    return day
         return None
 
     def get_preferred_room(self, unit_id: str) -> Optional[str]:
-        for c in self._by_unit[unit_id]:
+        for c in self._by_unit.get(unit_id, []):
             if c.rule == "PREFERRED_ROOM":
                 return c.parameters.get("room_id")
         return None
 
     def get_avoided_days(self, unit_id: str, cohort_id: str) -> set[str]:
         days: set[str] = set()
-        for c in list(self._by_unit[unit_id]) + list(self._by_cohort[cohort_id]):
+        for c in list(self._by_unit.get(unit_id, [])) + list(self._by_cohort.get(cohort_id, [])):
             if c.rule == "AVOID_DAY":
-                days.add(c.parameters.get("day", ""))
+                d = c.parameters.get("day", "")
+                if d:
+                    days.add(d)
         return days
 
+    def get_avoided_periods(self, unit_id: str, cohort_id: str) -> set[str]:
+        """Return set of period_ids that should be avoided for this unit/cohort."""
+        period_ids: set[str] = set()
+        for c in list(self._by_unit.get(unit_id, [])) + list(self._by_cohort.get(cohort_id, [])):
+            if c.rule == "AVOID_PERIOD":
+                pid = c.parameters.get("period_id", "")
+                if pid:
+                    period_ids.add(str(pid))
+        return period_ids
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+# ---------------------------------------------------------------------------
 # Placer
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
 
 class Placer:
     """
     Attempts to place a single (cohort, curriculum_unit) onto the timetable.
 
     Returns PlacementResult(success=True) and writes ScheduledUnit rows on
-    success. Does NOT commit â€” caller wraps in atomic block.
+    success. Does NOT commit – caller wraps in atomic block.
     """
 
     def __init__(
@@ -302,7 +351,7 @@ class Placer:
         self.rooms    = rooms
         self.cfg      = pass_cfg
 
-    # â”€â”€ Main entry point â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Main entry point ---------------------------------------------------
 
     def place(
         self,
@@ -314,7 +363,7 @@ class Placer:
             return self._place_double(cohort, unit, trainers)
         return self._place_single(cohort, unit, trainers)
 
-    # â”€â”€ Single period â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Single period ------------------------------------------------------
 
     def _place_single(
         self, cohort: Cohort, unit: CurriculumUnit, trainers: list[Trainer]
@@ -322,36 +371,57 @@ class Placer:
         uid = str(unit.id)
         cid = str(cohort.id)
 
-        # Hard pin?
+        # 1. Hard PIN_DAY_PERIOD — must land exactly here
         pin = self.cindex.get_pin(uid, cid)
         if pin:
             day, period_id = pin
             period = next((p for p in self.periods if str(p.id) == period_id), None)
             if period is None:
-                return PlacementResult(False, unit, cohort, "Pinned period not found")
+                return PlacementResult(
+                    False, unit, cohort,
+                    f"PIN_DAY_PERIOD constraint references unknown period {period_id}"
+                )
             return self._try_slot(cohort, unit, trainers, day, period, pinned=True)
 
-        avoided = self.cindex.get_avoided_days(uid, cid)
+        # 2. Hard PIN_DAY — must be on this day, any period
+        pinned_day = self.cindex.get_pinned_day(uid, cid)
+
+        # 3. Build candidate list respecting AVOID_DAY and PIN_DAY
+        avoided_days    = self.cindex.get_avoided_days(uid, cid)
+        avoided_periods = self.cindex.get_avoided_periods(uid, cid)
+
+        if pinned_day:
+            candidate_days = [pinned_day] if pinned_day in self.days else self.days[:]
+        else:
+            candidate_days = [d for d in self.days if d not in avoided_days]
+            if not candidate_days:
+                candidate_days = self.days[:]
+
+        # Filter periods to exclude avoided ones (soft in RELAXED/EMERGENCY pass)
+        skip_soft = self.cfg.get("skip_soft", False)
+        if skip_soft or not avoided_periods:
+            candidate_periods = self.periods
+        else:
+            candidate_periods = [p for p in self.periods if str(p.id) not in avoided_periods]
+            if not candidate_periods:
+                candidate_periods = self.periods
+
+        random.shuffle(candidate_days)
+        candidates = [(d, p) for d in candidate_days for p in candidate_periods]
         max_att = self.cfg["max_attempts"]
 
-        days = [d for d in self.days if d not in avoided]
-        if not days:
-            days = self.days[:]
-        random.shuffle(days)
-        candidates = [(d, p) for d in days for p in self.periods][:max_att]
-
-        for day, period in candidates:
+        for day, period in candidates[:max_att]:
             result = self._try_slot(cohort, unit, trainers, day, period)
             if result.success:
                 return result
 
         return PlacementResult(
             False, unit, cohort,
-            f"No free slot found after {max_att} attempts",
+            f"No free slot found after {min(max_att, len(candidates))} attempts",
             self.cfg["name"],
         )
 
-    # â”€â”€ Double / consecutive periods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Double / consecutive periods ---------------------------------------
 
     def _place_double(
         self, cohort: Cohort, unit: CurriculumUnit, trainers: list[Trainer]
@@ -359,7 +429,6 @@ class Placer:
         uid = str(unit.id)
         cid = str(cohort.id)
 
-        # Build consecutive pairs from the period list
         pairs: list[tuple[Period, Period]] = []
         for i in range(len(self.periods) - 1):
             a, b = self.periods[i], self.periods[i + 1]
@@ -372,13 +441,18 @@ class Placer:
                 "No consecutive period pairs configured for this institution",
             )
 
-        avoided = self.cindex.get_avoided_days(uid, cid)
-        days    = [d for d in self.days if d not in avoided]
-        if not days:
-            days = self.days[:]
-        random.shuffle(days)
+        avoided_days = self.cindex.get_avoided_days(uid, cid)
+        pinned_day   = self.cindex.get_pinned_day(uid, cid)
 
-        candidates = [(d, a, b) for d in days for a, b in pairs]
+        if pinned_day:
+            candidate_days = [pinned_day] if pinned_day in self.days else self.days[:]
+        else:
+            candidate_days = [d for d in self.days if d not in avoided_days]
+            if not candidate_days:
+                candidate_days = self.days[:]
+
+        random.shuffle(candidate_days)
+        candidates = [(d, a, b) for d in candidate_days for a, b in pairs]
 
         for day, pa, pb in candidates:
             result = self._try_double_slot(cohort, unit, trainers, day, pa, pb)
@@ -391,7 +465,7 @@ class Placer:
             self.cfg["name"],
         )
 
-    # â”€â”€ Slot-level helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Slot-level helpers -------------------------------------------------
 
     def _try_slot(
         self,
@@ -410,21 +484,23 @@ class Placer:
             if pinned:
                 return PlacementResult(
                     False, unit, cohort,
-                    f"Cohort busy at pinned slot {day} {period}",
+                    f"Cohort already has a class at pinned slot {day} {period}",
                 )
             return PlacementResult(False)
 
         trainer = self._pick_trainer(trainers, day, period, allow_overlap)
         if trainer is None:
-            return PlacementResult(False) if not pinned else PlacementResult(
-                False, unit, cohort, f"No trainer free at pinned slot {day} {period}"
-            )
+            if pinned:
+                return PlacementResult(
+                    False, unit, cohort,
+                    f"No qualified trainer free at pinned slot {day} {period}",
+                )
+            return PlacementResult(False)
 
         room = self._pick_room(unit, cohort, day, period, allow_overlap)
         if room is None:
             if not allow_overlap:
                 return PlacementResult(False)
-            # Emergency: grab any room
             room = self.rooms[0] if self.rooms else None
             if room is None:
                 return PlacementResult(False, unit, cohort, "No rooms configured")
@@ -466,7 +542,7 @@ class Placer:
         self._write(cohort, unit, trainer, room, day, pb, sequence=2)
         return PlacementResult(True, unit, cohort, pass_name=self.cfg["name"])
 
-    # â”€â”€ Trainer selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Trainer selection --------------------------------------------------
 
     def _pick_trainer(
         self, trainers: list[Trainer], day: str, period: Period, allow_overlap: bool
@@ -478,10 +554,8 @@ class Placer:
                 continue
             if not allow_overlap and self.grid.trainer_busy(tid, key):
                 continue
-            # Check day availability
             if not self._trainer_day_ok(trainer, day):
                 continue
-            # Check max periods per day
             max_per_day = getattr(trainer, "_max_per_day_override", None) or 8
             if self.grid.trainer_day_periods(tid, day) >= max_per_day:
                 continue
@@ -514,7 +588,7 @@ class Placer:
         except Exception:
             return True
 
-    # â”€â”€ Room selection â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Room selection -----------------------------------------------------
 
     def _pick_room(
         self,
@@ -532,7 +606,6 @@ class Placer:
             if r.capacity >= cohort.student_count
             and (not need_lab or r.room_type in ("LAB", "CLINICAL", "COMPUTER", "WORKSHOP"))
         ]
-        # Sort: preferred room first, then by capacity (smallest that fits)
         candidates.sort(key=lambda r: (
             str(r.id) != str(preferred_id),
             r.capacity,
@@ -544,7 +617,7 @@ class Placer:
                 return room
         return None
 
-    # â”€â”€ Write â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Write --------------------------------------------------------------
 
     def _write(
         self,
@@ -574,9 +647,9 @@ class Placer:
         return entry
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# TimetableEngine
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ---------------------------------------------------------------------------
+# Pass configurations
+# ---------------------------------------------------------------------------
 
 _PASS_CONFIGS = [
     {
@@ -591,7 +664,7 @@ _PASS_CONFIGS = [
         "allow_overlap": False,
         "use_any_trainer": False,
         "max_attempts":  120,
-        "skip_soft":     True,   # soft constraints ignored
+        "skip_soft":     True,
     },
     {
         "name":          "EMERGENCY",
@@ -602,6 +675,10 @@ _PASS_CONFIGS = [
     },
 ]
 
+
+# ---------------------------------------------------------------------------
+# TimetableEngine
+# ---------------------------------------------------------------------------
 
 class TimetableEngine:
     """
@@ -629,17 +706,21 @@ class TimetableEngine:
         if not periods:
             return GenerationResult(term=self.term)
 
-        # 3. Build work queue: {cohort â†’ [CurriculumUnit]}
+        # 3. Build work queue: {cohort_id → (Cohort, [CurriculumUnit])}
+        #
+        # FIX: we load ALL active cohorts under this institution (not just those
+        # with matching term — cohort.current_term selects which units to schedule).
         cohorts = list(
             Cohort.objects.filter(
                 programme__department__institution=self.institution,
                 is_active=True,
             ).select_related("programme")
         )
+
+        # work_queue maps cohort_id → (cohort, list-of-units)
         work_queue: dict[str, tuple[Cohort, list[CurriculumUnit]]] = {}
-        all_unit_ids   = []
-        all_cohort_ids = []
-        all_trainer_ids = []
+        all_unit_ids    = []
+        all_cohort_ids  = []
 
         for cohort in cohorts:
             units = list(
@@ -649,43 +730,53 @@ class TimetableEngine:
                     is_active=True,
                 ).prefetch_related("qualified_trainers")
             )
+            # Include cohort in queue even if some units have no trainers —
+            # we want to log conflicts for those rather than silently skip them.
             if units:
                 work_queue[str(cohort.id)] = (cohort, units)
                 all_unit_ids.extend(str(u.id) for u in units)
                 all_cohort_ids.append(str(cohort.id))
 
-        all_trainer_ids = list(
-            Trainer.objects.filter(
+        all_trainer_ids = [
+            str(t) for t in Trainer.objects.filter(
                 institution=self.institution, is_active=True
             ).values_list("id", flat=True)
-        )
-        all_trainer_ids = [str(t) for t in all_trainer_ids]
+        ]
 
         total_required = sum(len(v[1]) for v in work_queue.values())
 
         # 4. Build occupancy grid (single DB query)
         grid = OccupancyGrid.build(self.term)
 
-        # 5. Build constraint index (2 DB queries)
+        # 5. Build constraint index
         cindex = ConstraintIndex(self.term, all_unit_ids, all_cohort_ids, all_trainer_ids)
 
-        result = GenerationResult(
-            term=self.term,
-            total_required=total_required,
-        )
+        result = GenerationResult(term=self.term, total_required=total_required)
 
         # 6. Schedule combined/shared units first
+        #    This mutates work_queue (removes combined units from individual queues).
         combined_placed = self._schedule_combined(
             work_queue, grid, cindex, days, periods, rooms
         )
         result.combined_placed = combined_placed
 
-        # 7. Sort work queue: most constrained (fewest trainers) first
-        sorted_queue = self._sort_by_difficulty(work_queue)
+        # 7. Sort work queue AFTER combined scheduling so mutations are reflected.
+        #
+        # FIX: previously sorted before combined scheduling ran, meaning the
+        # unit lists could be empty (combined units removed) and cohorts would
+        # appear to have nothing to schedule.
+        sorted_queue = self._sort_by_difficulty(work_queue, cindex)
+
+        # FIX: filter out cohorts with empty unit lists now (combined took them all)
+        remaining = [
+            (cid, list(units))
+            for cid, units in sorted_queue
+            if units
+        ]
 
         # 8. Multi-pass scheduling
         placed_keys: set[str] = set()
-        remaining = list(sorted_queue)
+        no_trainer_units = []   # collected across passes for conflict logging
 
         for pass_cfg in _PASS_CONFIGS:
             if not remaining:
@@ -703,11 +794,18 @@ class TimetableEngine:
                     if key in placed_keys:
                         continue
 
-                    # Trainer pool
+                    # Skip outsourced units — no trainer assignment needed
                     if getattr(unit, 'is_outsourced', False):
+                        placed_keys.add(key)   # mark as handled
                         continue
+
                     qualified = list(unit.qualified_trainers.filter(is_active=True))
+
                     if not qualified:
+                        # FIX: log conflict instead of silently dropping
+                        # Only log once (on first pass)
+                        if pass_cfg["name"] == "STRICT":
+                            no_trainer_units.append((cohort, unit))
                         still_unplaced.append(unit)
                         continue
 
@@ -729,8 +827,31 @@ class TimetableEngine:
 
             remaining = next_remaining
 
-        # 9. Log unresolved failures
+        # 9. Log unresolved failures as Conflicts
         conflicts_to_create = []
+
+        # Units that had no trainer assigned
+        for cohort, unit in no_trainer_units:
+            key = f"{cohort.id}_{unit.id}"
+            if key not in placed_keys:
+                result.unresolved.append({
+                    "cohort": cohort.name,
+                    "unit":   unit.code,
+                    "reason": "No qualified trainer assigned to this unit",
+                })
+                conflicts_to_create.append(
+                    Conflict(
+                        term=self.term,
+                        conflict_type="NO_TRAINER",
+                        severity="HIGH",
+                        description=f"[NO TRAINER] {unit.code} for {cohort.name} — assign a qualified trainer",
+                        curriculum_unit=unit,
+                        cohort=cohort,
+                        resolution_status="PENDING",
+                    )
+                )
+
+        # Units that had trainers but couldn't be placed
         for cohort_id, unit_list in remaining:
             cohort, _ = work_queue[cohort_id]
             for unit in unit_list:
@@ -744,7 +865,7 @@ class TimetableEngine:
                     conflicts_to_create.append(
                         Conflict(
                             term=self.term,
-                            conflict_type="NO_ROOM",   # generic; scheduler sets best guess
+                            conflict_type="NO_ROOM",
                             severity="HIGH",
                             description=f"[UNPLACED] {unit.code} for {cohort.name}",
                             curriculum_unit=unit,
@@ -758,16 +879,11 @@ class TimetableEngine:
 
         return result
 
-    # â”€â”€ Combined / shared class scheduling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Combined / shared class scheduling ---------------------------------
 
     def _schedule_combined(
         self, work_queue, grid, cindex, days, periods, rooms
     ) -> int:
-        """
-        Find units that appear in cohorts belonging to the same sharing_group
-        and schedule them as combined classes.
-        Returns count of combined placements.
-        """
         from .models import Programme
         groups = set(
             Programme.objects.filter(
@@ -785,7 +901,6 @@ class TimetableEngine:
             )
             prog_ids = {str(p.id) for p in progs}
 
-            # Find cohorts in this group that are in our work queue
             group_cohort_ids = [
                 cid for cid, (cohort, _) in work_queue.items()
                 if str(cohort.programme_id) in prog_ids
@@ -793,19 +908,17 @@ class TimetableEngine:
             if len(group_cohort_ids) < 2:
                 continue
 
-            # Find overlapping units by NAME (units with same name across cohorts in group)
-            # Build map: unit_name -> {cohort_id: unit}
-            from collections import defaultdict
-            name_to_cohort_units = defaultdict(dict)
+            name_to_cohort_units: dict[str, dict] = defaultdict(dict)
             for cid in group_cohort_ids:
                 _, units = work_queue[cid]
                 for u in units:
                     if not getattr(u, 'is_outsourced', False):
                         name_to_cohort_units[u.name.strip()][cid] = u
 
-            # Only combine names that appear in 2+ cohorts
-            shared_names = {name: cu_map for name, cu_map in name_to_cohort_units.items()
-                           if len(cu_map) >= 2}
+            shared_names = {
+                name: cu_map for name, cu_map in name_to_cohort_units.items()
+                if len(cu_map) >= 2
+            }
 
             if not shared_names:
                 continue
@@ -820,10 +933,8 @@ class TimetableEngine:
                 cohorts_in_combined = [work_queue[cid][0] for cid in cohort_unit_map.keys()]
                 combined_students = sum(c.student_count for c in cohorts_in_combined)
 
-                # Use the unit with the most trainers as source
                 source_unit = max(cohort_unit_map.values(),
-                                 key=lambda u: u.qualified_trainers.count())
-                # Use intersection of qualified trainers across all units in group
+                                  key=lambda u: u.qualified_trainers.count())
                 trainer_id_sets = [
                     set(u.qualified_trainers.filter(is_active=True).values_list("id", flat=True))
                     for u in cohort_unit_map.values()
@@ -850,21 +961,17 @@ class TimetableEngine:
                 )
                 if ok:
                     placed_combined_keys.add(combined_key)
-                    # Remove all matched units from individual queues
                     for cid, unit in cohort_unit_map.items():
-                        _, units = work_queue[cid]
-                        work_queue[cid] = (work_queue[cid][0],
-                                          [u for u in units if u.id != unit.id])
+                        cohort_obj, units = work_queue[cid]
+                        work_queue[cid] = (cohort_obj, [u for u in units if u.id != unit.id])
                     placed += 1
 
         return placed
 
     def _try_place_combined(
-        self, unit, cohorts, trainers, rooms, days, periods, grid, cindex, cfg, combined_key,
-        all_units=None
+        self, unit, cohorts, trainers, rooms, days, periods, grid, cindex, cfg,
+        combined_key, all_units=None
     ) -> bool:
-        # all_units: list of CurriculumUnit, one per cohort (same order as cohorts)
-        # If not provided, use the same unit for all cohorts
         cohort_unit_map = {}
         if all_units:
             for c, u in zip(cohorts, all_units):
@@ -888,15 +995,14 @@ class TimetableEngine:
                 room = next((r for r in rooms if not grid.room_busy(str(r.id), key)), None)
                 if room is None:
                     continue
-                # Mark trainer+room+first cohort in grid before placing
+
                 grid.mark(str(trainer.id), str(cohorts[0].id), str(room.id), key)
-                # Mark ALL remaining cohorts so individual pass cannot reuse this trainer slot
                 for _c in cohorts[1:]:
                     grid._cohort[str(_c.id)].add(key)
                     grid._cohort_day_count[str(_c.id)][key.day] += 1
-                # Mark trainer slot as globally busy (block for all cohorts)
                 for _c in cohorts[1:]:
                     grid._trainer[str(trainer.id)].add(key)
+
                 for cohort in cohorts:
                     cohort_unit = cohort_unit_map[str(cohort.id)]
                     ScheduledUnit.objects.update_or_create(
@@ -917,34 +1023,38 @@ class TimetableEngine:
                 return True
         return False
 
-    # â”€â”€ Difficulty sort â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # -- Difficulty sort ----------------------------------------------------
 
     def _sort_by_difficulty(
-        self, work_queue: dict
+        self, work_queue: dict, cindex: ConstraintIndex
     ) -> list[tuple[str, list[CurriculumUnit]]]:
         """
-        Sort cohort-unit pairs so the most constrained are scheduled first:
-          1. Pinned units (hard constraints)
-          2. Double period units
-          3. Fewest qualified trainers
+        Sort cohort-unit pairs so the most constrained are scheduled first.
+
+        FIX: now accepts cindex so it can check constraints without extra
+        DB queries. Also now snapshots unit lists at sort time (after combined
+        scheduling has removed shared units).
         """
         def difficulty(item):
             cohort_id, (cohort, units) = item
-            pin_count    = sum(
+            if not units:
+                return (0, 0, 99)  # empty — put at end
+            pin_count = sum(
                 1 for u in units
-                if self._has_pin(str(u.id), cohort_id)
+                if cindex.get_pin(str(u.id), cohort_id) is not None
+                   or cindex.get_pinned_day(str(u.id), cohort_id) is not None
             )
             double_count = sum(1 for u in units if u.periods_per_week >= 2)
             avg_trainers = (
                 sum(u.qualified_trainers.count() for u in units) / len(units)
-                if units else 99
             )
-            # Lower score = harder = goes first
             return (-pin_count, -double_count, avg_trainers)
 
         items = list(work_queue.items())
         items.sort(key=difficulty)
-        return [(cid, units) for cid, (cohort, units) in items]
+        # Return (cohort_id, units_snapshot) — snapshot the list so later
+        # mutations to work_queue don't affect the loop.
+        return [(cid, list(units)) for cid, (cohort, units) in items]
 
     def _has_pin(self, unit_id: str, cohort_id: str) -> bool:
         return Constraint.objects.filter(
@@ -953,5 +1063,3 @@ class TimetableEngine:
             is_hard=True,
             is_active=True,
         ).exists()
-
-

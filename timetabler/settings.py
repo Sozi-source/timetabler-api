@@ -71,6 +71,7 @@ INSTALLED_APPS = [
 
 # â”€â”€â”€ Middleware â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 MIDDLEWARE = [
+    'timetabler.db_retry_middleware.DBRetryMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",            # Must be before CommonMiddleware
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -109,7 +110,14 @@ TEMPLATES = [
 import dj_database_url
 _db_url = os.environ.get("DATABASE_URL")
 if _db_url:
-    DATABASES = {"default": dj_database_url.config(default=_db_url, conn_max_age=0, ssl_require=True)}
+    DATABASES = {"default": dj_database_url.config(default=_db_url, conn_max_age=60, ssl_require=True)}
+    DATABASES['default'].setdefault('OPTIONS', {}).update({
+        'connect_timeout': 10,
+        'keepalives': 1,
+        'keepalives_idle': 30,
+        'keepalives_interval': 10,
+        'keepalives_count': 5,
+    })
 else:
     DATABASES = {
         "default": {
@@ -250,3 +258,14 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 100,
     "EXCEPTION_HANDLER": "timetable.exceptions.custom_exception_handler",
 }
+
+# Database connection keep-alive settings
+DATABASES['default'].setdefault('OPTIONS', {})
+DATABASES['default']['CONN_MAX_AGE'] = 60
+DATABASES['default']['OPTIONS'].update({
+    'connect_timeout': 10,
+    'keepalives': 1,
+    'keepalives_idle': 30,
+    'keepalives_interval': 10,
+    'keepalives_count': 5,
+})

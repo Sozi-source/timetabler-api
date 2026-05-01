@@ -169,9 +169,7 @@ class AIChatView(APIView):
 
         # Resolve term and institution
         try:
-            institution = Institution.objects.filter(
-                departments__users=request.user
-            ).first() or Institution.objects.first()
+            institution = Institution.objects.first()
 
             if term_id:
                 term = Term.objects.get(id=term_id)
