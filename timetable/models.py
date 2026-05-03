@@ -1,4 +1,4 @@
-﻿"""
+"""
 timetable/models.py
 ===================
 Industry-standard timetabling system.
@@ -830,7 +830,7 @@ class ScheduledUnit(TimeStampedModel):
         CurriculumUnit, on_delete=models.CASCADE, related_name="scheduled_units"
     )
     trainer         = models.ForeignKey(
-        Trainer, on_delete=models.CASCADE, related_name="scheduled_units"
+        Trainer, null=True, blank=True, on_delete=models.SET_NULL, related_name="scheduled_units"
     )
     room            = models.ForeignKey(
         Room, on_delete=models.CASCADE, related_name="scheduled_units"

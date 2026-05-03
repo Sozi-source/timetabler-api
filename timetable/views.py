@@ -58,7 +58,7 @@ import traceback
 from datetime import date
 
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q, Sum
+from django.db.models import Count, Prefetch, Q, Sum, F
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -74,6 +74,7 @@ from .models import (
     Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
 )
 from .scheduler import TimetableEngine
+
 
 
 # ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
@@ -140,14 +141,23 @@ def _period_dict(p: Period) -> dict:
 
 def _trainer_dict(t: Trainer, include_load: bool = False) -> dict:
     d = {
-        "id":              str(t.id),
-        "staff_id":        t.staff_id,
-        "full_name":       t.full_name,
-        "short_name":      t.short_name,
-        "department":      t.department.name,
-        "employment_type": t.get_employment_type_display(),
+        "id":                   str(t.id),
+        "staff_id":             t.staff_id,
+        "title":                t.title,
+        "first_name":           t.first_name,
+        "last_name":            t.last_name,
+        "full_name":            t.full_name,
+        "short_name":           t.short_name,
+        "email":                t.email,
+        "phone":                getattr(t, "phone", "") or "",
+        "department":           t.department.name,
+        "department_id":        str(t.department_id),
+        "institution_id":       str(t.institution_id),
+        "employment_type":      t.get_employment_type_display(),
+        "employment_type_code": t.employment_type,
         "max_periods_per_week": t.max_periods_per_week,
-        "email":           t.email,
+        "available_days":       t.available_days or [],
+        "is_active":            t.is_active,
     }
     if include_load and hasattr(t, "_scheduled_periods"):
         d["scheduled_periods_this_term"] = t._scheduled_periods
@@ -171,24 +181,32 @@ def _unit_dict(u: CurriculumUnit) -> dict:
 def _scheduled_unit_dict(su: ScheduledUnit) -> dict:
     return {
         "id":              str(su.id),
+        # Raw IDs — used by edit modals / dropdowns
+        "term":            str(su.term_id),
+        "curriculum_unit": str(su.curriculum_unit_id),
+        "cohort":          str(su.cohort_id) if su.cohort_id else None,
+        "trainer":         str(su.trainer_id) if su.trainer_id else None,
+        "room":            str(su.room_id) if su.room_id else None,
+        # Display names — rendered in cards / grids
         "unit_code":       su.curriculum_unit.code,
         "unit_name":       su.curriculum_unit.name,
-        "cohort":          su.cohort.name,
-        "cohort_id":       str(su.cohort_id),
-        "trainer":         su.trainer.short_name,
-        "trainer_id":      str(su.trainer_id),
-        "room":            su.room.code,
-        "room_id":         str(su.room_id),
-        "room_capacity":   su.room.capacity,
+        "cohort_name":     su.cohort.name if su.cohort else None,
+        "trainer_name":    su.trainer.short_name if su.trainer else None,
+        "trainer_full":    f"{su.trainer.title} {su.trainer.last_name}" if su.trainer else None,
+        "room_code":       su.room.code if su.room else None,
+        "room_capacity":   su.room.capacity if su.room else None,
+        # Scheduling
         "day":             su.day,
-        "period_label":    su.period.label,
-        "period_id":       str(su.period_id),
-        "period_start":    str(su.period.start_time),
-        "period_end":      str(su.period.end_time),
+        "period":          str(su.period_id),
+        "period_label":    su.period.label if su.period else None,
+        "period_start":    str(su.period.start_time) if su.period else None,
+        "period_end":      str(su.period.end_time) if su.period else None,
         "sequence":        su.sequence,
         "is_combined":     su.is_combined,
-        "combined_key":    su.combined_key,
+        "combined_key":    su.combined_key or "",
         "status":          su.status,
+        "published_at":    su.published_at.isoformat() if getattr(su, "published_at", None) else None,
+        "notes":           su.notes or "" if getattr(su, "notes", None) is not None else "",
     }
 
 
@@ -406,10 +424,11 @@ class TrainerListView(APIView):
         data = request.data
         try:
             dept = get_object_or_404(Department, id=data["department_id"])
+            staff_id = data.get("staff_id", "").strip() or f"TRN-{int(time.time()*1000) % 1000000}"
             t = Trainer.objects.create(
                 institution=inst,
                 department=dept,
-                staff_id=data["staff_id"],
+                staff_id=staff_id,
                 first_name=data["first_name"],
                 last_name=data["last_name"],
                 email=data["email"],
@@ -639,9 +658,266 @@ class UpdateProgressView(APIView):
         })
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# STEP 1 — Add this to timetable/views.py
+# Append the entire class below the existing UpdateProgressView class.
+# Also add to the endpoint map comment at the top:
+#   POST /api/term/advance-all/   AdvanceAllCohortsView
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+class AdvanceAllCohortsView(APIView):
+    """
+    POST /api/term/advance-all/
+    Two-phase bulk cohort advancement.
+
+    Phase: "preview"
+    ----------------
+    Body:  { "term_id": "<uuid>", "phase": "preview" }
+    Returns a preview of which units will be marked COMPLETED for every
+    active cohort whose current_term has units scheduled in this term.
+    The caller (AdvanceTermModal) shows checkboxes so the user can
+    uncheck any unit they do NOT want auto-marked as complete.
+
+    Response:
+    {
+      "ok": true,
+      "data": {
+        "cohorts": [
+          {
+            "cohort_id": "...",
+            "cohort_name": "CND JAN 26",
+            "from_term": 1,
+            "to_term": 2,
+            "can_advance": true,          // false if already at max term
+            "units_to_complete": [
+              { "unit_id": "...", "code": "CND1104", "name": "...", "mark_complete": true }
+            ]
+          }
+        ]
+      }
+    }
+
+    Phase: "confirm"
+    ----------------
+    Body:
+    {
+      "term_id": "<uuid>",
+      "phase": "confirm",
+      "overrides": {
+        "<unit_id>": false   // set false to skip marking that unit complete
+      }
+    }
+    Actions performed (all atomic):
+      1. For each active cohort not yet at max term:
+         a. Write ProgressRecord(status=COMPLETED) for units not overridden
+         b. Call cohort.advance_term()
+      2. Write one AuditLog entry.
+
+    Response:
+    {
+      "ok": true,
+      "data": {
+        "cohorts_advanced": 4,
+        "units_completed": 18,
+        "skipped_units": 2
+      }
+    }
+    """
+
+    permission_classes = [IsAuthenticated]
+
+    # ── helpers ──────────────────────────────────────────────────────────────
+
+    def _active_advanceable_cohorts(self):
+        """Return cohorts that are active and not yet in their final term."""
+        return (
+            Cohort.objects.filter(is_active=True)
+            .select_related("programme")
+            .filter(current_term__lt=F("programme__total_terms"))
+        )
+
+    def _units_for_cohort(self, cohort: Cohort, term) -> list[dict]:
+        """
+        Return CurriculumUnits for cohort.current_term that are scheduled
+        (DRAFT or PUBLISHED) in this term — these are the ones we offer to
+        mark COMPLETED.
+        """
+        scheduled_unit_ids = (
+            ScheduledUnit.objects.filter(
+                term=term,
+                cohort=cohort,
+                status__in=["DRAFT", "PUBLISHED"],
+            )
+            .values_list("curriculum_unit_id", flat=True)
+            .distinct()
+        )
+
+        units = CurriculumUnit.objects.filter(
+            id__in=scheduled_unit_ids,
+            programme=cohort.programme,
+            term_number=cohort.current_term,
+            is_active=True,
+        ).order_by("position")
+
+        return [
+            {
+                "unit_id":       str(u.id),
+                "code":          u.code,
+                "name":          u.name,
+                "credit_hours":  u.credit_hours,
+                "mark_complete": True,   # default: check all
+            }
+            for u in units
+        ]
+
+    # ── GET — lightweight preview without a body (for initial load) ───────────
+
+    def get(self, request):
+        """
+        GET /api/term/advance-all/?term=<id>
+        Convenience alias for phase=preview (avoids preflight in some clients).
+        """
+        return self._preview(request)
+
+    # ── POST — preview or confirm ─────────────────────────────────────────────
+
+    def post(self, request):
+        phase = request.data.get("phase", "preview")
+        if phase == "preview":
+            return self._preview(request)
+        elif phase == "confirm":
+            return self._confirm(request)
+        else:
+            return err(f"Unknown phase '{phase}'. Use 'preview' or 'confirm'.")
+
+    # ── Preview phase ─────────────────────────────────────────────────────────
+
+    def _preview(self, request):
+        term = _term_from_request(request)
+        if not term:
+            return err("Provide term_id or set a current term", status_code=404)
+
+        cohorts = self._active_advanceable_cohorts()
+        result  = []
+
+        for cohort in cohorts:
+            units = self._units_for_cohort(cohort, term)
+            result.append({
+                "cohort_id":         str(cohort.id),
+                "cohort_name":       cohort.name,
+                "programme":         cohort.programme.name,
+                "from_term":         cohort.current_term,
+                "to_term":           cohort.current_term + 1,
+                "can_advance":       cohort.current_term < cohort.programme.total_terms,
+                "units_to_complete": units,
+            })
+
+        return ok({
+            "term_id":   str(term.id),
+            "term_name": term.name,
+            "cohorts":   result,
+            "total_cohorts": len(result),
+        })
+
+    # ── Confirm phase ─────────────────────────────────────────────────────────
+
+    def _confirm(self, request):
+        term = _term_from_request(request)
+        if not term:
+            return err("Provide term_id or set a current term", status_code=404)
+
+        # overrides: { "<unit_id>": false } means "do NOT mark complete"
+        overrides: dict = request.data.get("overrides", {})
+
+        cohorts_advanced = 0
+        units_completed  = 0
+        skipped_units    = 0
+        log_lines        = []
+
+        try:
+            with transaction.atomic():
+                for cohort in self._active_advanceable_cohorts():
+                    units = self._units_for_cohort(cohort, term)
+                    if not units:
+                        # Still advance even with no scheduled units
+                        cohort.advance_term()
+                        cohorts_advanced += 1
+                        log_lines.append(
+                            f"{cohort.name}: advanced (no units to complete)"
+                        )
+                        continue
+
+                    completed_here = 0
+                    skipped_here   = 0
+
+                    for u in units:
+                        uid = u["unit_id"]
+                        # If the override is explicitly False, skip
+                        if overrides.get(uid) is False or overrides.get(uid) == False:
+                            skipped_here  += 1
+                            skipped_units += 1
+                            continue
+
+                        pr, _ = ProgressRecord.objects.get_or_create(
+                            cohort=cohort,
+                            curriculum_unit_id=uid,
+                            defaults={"term": term},
+                        )
+                        pr.status       = ProgressRecord.COMPLETED
+                        pr.completed_at = date.today()
+                        if not pr.started_at:
+                            pr.started_at = date.today()
+                        pr.save(update_fields=[
+                            "status", "completed_at", "started_at", "updated_at"
+                        ])
+                        completed_here += 1
+                        units_completed += 1
+
+                    cohort.advance_term()
+                    cohorts_advanced += 1
+                    log_lines.append(
+                        f"{cohort.name}: term {cohort.current_term - 1} → "
+                        f"{cohort.current_term}, "
+                        f"{completed_here} completed, {skipped_here} skipped"
+                    )
+
+        except Exception as e:
+            import traceback as tb
+            return err("Advance failed", tb.format_exc(), 500)
+
+        AuditLog.objects.create(
+            action="PROGRESS",
+            performed_by=request.user,
+            term=term,
+            description=(
+                f"Bulk term advancement: {cohorts_advanced} cohorts advanced, "
+                f"{units_completed} units completed, {skipped_units} skipped."
+            ),
+            payload={
+                "cohorts_advanced": cohorts_advanced,
+                "units_completed":  units_completed,
+                "skipped_units":    skipped_units,
+                "detail":           log_lines,
+            },
+        )
+
+        return ok({
+            "cohorts_advanced": cohorts_advanced,
+            "units_completed":  units_completed,
+            "skipped_units":    skipped_units,
+            "detail":           log_lines,
+        })
+
+
 # ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
 # Constraints
 # ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADD THIS CLASS to timetable/views.py
+# Place it BEFORE ConstraintDetailView
+# ─────────────────────────────────────────────────────────────────────────────
 
 class ConstraintListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -651,7 +927,9 @@ class ConstraintListView(APIView):
         cohort_id  = request.query_params.get("cohort")
         trainer_id = request.query_params.get("trainer")
 
-        qs = Constraint.objects.filter(is_active=True)
+        qs = Constraint.objects.select_related(
+            "curriculum_unit", "cohort", "trainer", "room"
+        )
         if unit_id:
             qs = qs.filter(curriculum_unit_id=unit_id)
         if cohort_id:
@@ -659,42 +937,20 @@ class ConstraintListView(APIView):
         if trainer_id:
             qs = qs.filter(trainer_id=trainer_id)
 
-        return ok([
-            {
-                "id":          str(c.id),
-                "scope":       c.scope,
-                "rule":        c.rule,
-                "is_hard":     c.is_hard,
-                "parameters":  c.parameters,
-                "notes":       c.notes,
-                "unit":        c.curriculum_unit.code if c.curriculum_unit_id else None,
-                "cohort":      c.cohort.name if c.cohort_id else None,
-                "trainer":     c.trainer.short_name if c.trainer_id else None,
-                "room":        c.room.code if c.room_id else None,
-            }
-            for c in qs.order_by("-is_hard", "scope")
-        ])
+        from .serializers import ConstraintSerializer
+        data = ConstraintSerializer(
+            qs.order_by("-is_hard", "scope"), many=True
+        ).data
+        return ok(data)
 
     def post(self, request):
-        data = request.data
-        try:
-            c = Constraint.objects.create(
-                scope=data["scope"],
-                rule=data["rule"],
-                is_hard=bool(data.get("is_hard", True)),
-                curriculum_unit_id=(data.get("curriculum_unit") or data.get("unit_id")),
-                cohort_id=data.get("cohort_id"),
-                trainer_id=data.get("trainer_id"),
-                room_id=data.get("room_id"),
-                parameters=data.get("parameters", {}),
-                notes=data.get("notes", ""),
-            )
+        from .serializers import ConstraintSerializer
+        ser = ConstraintSerializer(data=request.data)
+        if ser.is_valid():
+            c = ser.save()
             return ok({"id": str(c.id)}, 201)
-        except KeyError as e:
-            return err(f"Missing field: {e}")
-        except Exception as e:
-            return err(str(e), status_code=500)
-
+        return err(str(ser.errors), status_code=400)
+    
 
 class ConstraintDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -702,18 +958,21 @@ class ConstraintDetailView(APIView):
     def put(self, request, constraint_id):
         c    = get_object_or_404(Constraint, id=constraint_id)
         data = request.data
-        c.is_hard    = bool(data.get("is_hard", c.is_hard))
-        c.parameters = data.get("parameters", c.parameters)
-        c.notes      = data.get("notes", c.notes)
-        c.is_active  = bool(data.get("is_active", c.is_active))
+        c.scope          = data.get("scope",      c.scope)
+        c.rule           = data.get("rule",       c.rule)
+        c.is_hard        = bool(data.get("is_hard",   c.is_hard))
+        c.parameters     = data.get("parameters", c.parameters)
+        c.notes          = data.get("notes",      c.notes)
+        c.is_active      = bool(data.get("is_active", c.is_active))
+        c.cohort_id          = data.get("cohort",          c.cohort_id)
+        c.curriculum_unit_id = data.get("curriculum_unit", c.curriculum_unit_id)
         c.save()
         return ok({"id": str(c.id), "updated": True})
 
     def delete(self, request, constraint_id):
         c = get_object_or_404(Constraint, id=constraint_id)
-        c.is_active = False
-        c.save(update_fields=["is_active"])
-        return ok({"deleted": True})
+        c.delete()
+        return Response(status=204)
 
 
 class TrainerAvailabilityView(APIView):
@@ -757,6 +1016,243 @@ class TrainerAvailabilityView(APIView):
             },
         )
         return ok({"id": str(rule.id), "created": created}, 201 if created else 200)
+
+
+"""
+ADD THIS TO timetable/views.py  — paste before GenerateView
+Also add to timetable/urls.py:
+    path("timetable/validate/", views.ValidateView.as_view()),
+"""
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Pre-generation Validation
+# ─────────────────────────────────────────────────────────────────────────────
+
+class ValidateView(APIView):
+    """
+    GET /api/timetable/validate/?term=<uuid>
+
+    Runs a fast pre-generation data check and returns structured warnings.
+    The frontend calls this when the user clicks Generate, shows any issues
+    in a modal, and lets the user decide to fix first or generate anyway.
+
+    Response shape:
+    {
+      "ok": true,
+      "data": {
+        "blocking": [          ← MUST fix before generating (no trainer assigned)
+          {
+            "type": "NO_TRAINER",
+            "cohort": "CND JAN 26",
+            "unit_code": "CND1104",
+            "unit_name": "Food Science",
+            "message": "No qualified trainer assigned"
+          }
+        ],
+        "warnings": [          ← SHOULD fix but can generate anyway
+          {
+            "type": "SINGLE_TRAINER",
+            "trainer_name": "Fiona Kwamboka",
+            "units_count": 14,
+            "max_periods": 20,
+            "message": "Only trainer for 3 units — may exhaust mid-schedule"
+          },
+          {
+            "type": "TRAINER_OVERLOAD",
+            "trainer_name": "Mary Kaganjo",
+            "sessions_needed": 22,
+            "max_periods": 20,
+            "message": "Required sessions exceed max_periods_per_week"
+          },
+          {
+            "type": "NO_ROOM",
+            "cohort": "DHN MAY 25",
+            "unit_code": "DHN3105",
+            "message": "No room with sufficient capacity for 45 students"
+          }
+        ],
+        "can_generate": true,   ← false only if blocking items exist
+        "summary": {
+          "blocking_count": 0,
+          "warning_count": 3,
+          "cohorts_checked": 13,
+          "units_checked": 89
+        }
+      }
+    }
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        term = _term_from_request(request)
+        if not term:
+            return err("Provide term_id or set a current term", status_code=404)
+
+        inst = term.institution
+        blocking = []
+        warnings  = []
+
+        # ── Load all data once ────────────────────────────────────────────────
+        cohorts = list(
+            Cohort.objects.filter(
+                programme__department__institution=inst,
+                is_active=True,
+            ).select_related("programme")
+        )
+
+        all_trainers = list(
+            Trainer.objects.filter(institution=inst, is_active=True)
+            .select_related("department")
+        )
+
+        rooms = list(
+            Room.objects.filter(institution=inst, is_active=True)
+        )
+
+        periods = list(
+            Period.objects.filter(institution=inst, is_break=False)
+        )
+
+        days = list(inst.days_of_week)
+        total_slots = len(days) * len(periods)
+
+        # Trainer sessions already committed (from existing DRAFTs)
+        trainer_draft_load: dict[str, int] = {}
+        for t in all_trainers:
+            trainer_draft_load[str(t.id)] = 0
+
+        from collections import defaultdict
+        units_per_trainer: dict[str, list] = defaultdict(list)  # trainer_id → [(cohort, unit)]
+
+        cohorts_checked = 0
+        units_checked   = 0
+
+        for cohort in cohorts:
+            units = list(
+                CurriculumUnit.objects.filter(
+                    programme=cohort.programme,
+                    term_number=cohort.current_term,
+                    is_active=True,
+                ).prefetch_related("qualified_trainers")
+            )
+
+            cohorts_checked += 1
+            units_checked   += len(units)
+
+            # Sessions needed for this cohort
+            sessions_needed = sum(u.periods_per_week for u in units)
+
+            # Check cohort has enough free slots
+            if sessions_needed > total_slots:
+                warnings.append({
+                    "type":    "SLOT_SHORTAGE",
+                    "cohort":  cohort.name,
+                    "needed":  sessions_needed,
+                    "available": total_slots,
+                    "message": f"Needs {sessions_needed} sessions but only {total_slots} slots available in the week",
+                })
+
+            for unit in units:
+                outsourced = getattr(unit, "is_outsourced", False)
+
+                # Check room capacity
+                if not outsourced and cohort.student_count > 0:
+                    suitable_rooms = [r for r in rooms if r.capacity >= cohort.student_count]
+                    if not suitable_rooms:
+                        warnings.append({
+                            "type":       "NO_SUITABLE_ROOM",
+                            "cohort":     cohort.name,
+                            "unit_code":  unit.code,
+                            "unit_name":  unit.name,
+                            "students":   cohort.student_count,
+                            "max_room_capacity": max((r.capacity for r in rooms), default=0),
+                            "message":    f"No room with capacity ≥ {cohort.student_count} students",
+                        })
+
+                if outsourced:
+                    continue  # Outsourced units need no trainer — skip trainer checks
+
+                qualified = list(unit.qualified_trainers.filter(is_active=True))
+
+                # Check 1: No trainer at all
+                if not qualified:
+                    blocking.append({
+                        "type":      "NO_TRAINER",
+                        "cohort":    cohort.name,
+                        "unit_code": unit.code,
+                        "unit_name": unit.name,
+                        "message":   "No qualified trainer assigned — unit cannot be scheduled",
+                    })
+                    continue
+
+                # Check 2: Single trainer bottleneck
+                if len(qualified) == 1:
+                    t = qualified[0]
+                    tid = str(t.id)
+                    units_per_trainer[tid].append((cohort.name, unit.code))
+
+                # Track load
+                for t in qualified:
+                    trainer_draft_load[str(t.id)] += unit.periods_per_week
+
+        # ── Check 3: Trainer overload (sessions across ALL units > max) ───────
+        for t in all_trainers:
+            tid = str(t.id)
+            # Sum of periods_per_week for ALL units this trainer qualifies for
+            needed = sum(
+                u.periods_per_week
+                for u in CurriculumUnit.objects.filter(
+                    qualified_trainers=t,
+                    programme__department__institution=inst,
+                    is_active=True,
+                    is_outsourced=False,
+                ).filter(
+                    programme__cohorts__current_term__isnull=False
+                ).distinct()
+            )
+            if needed > t.max_periods_per_week:
+                warnings.append({
+                    "type":           "TRAINER_OVERLOAD",
+                    "trainer_name":   f"{t.first_name} {t.last_name}",
+                    "trainer_id":     tid,
+                    "sessions_needed": needed,
+                    "max_periods":    t.max_periods_per_week,
+                    "message":        (
+                        f"{t.first_name} {t.last_name} is qualified for {needed} sessions "
+                        f"but max is {t.max_periods_per_week}/week — some units may be unplaceable"
+                    ),
+                })
+
+        # ── Check 4: Single-trainer bottleneck warnings ───────────────────────
+        for t in all_trainers:
+            tid = str(t.id)
+            sole_units = units_per_trainer.get(tid, [])
+            if len(sole_units) >= 3:
+                warnings.append({
+                    "type":         "SINGLE_TRAINER_BOTTLENECK",
+                    "trainer_name": f"{t.first_name} {t.last_name}",
+                    "trainer_id":   tid,
+                    "sole_units":   sole_units,
+                    "units_count":  len(sole_units),
+                    "message":      (
+                        f"{t.first_name} {t.last_name} is the only trainer for {len(sole_units)} units "
+                        f"— if their week fills up, those units will be left short"
+                    ),
+                })
+
+        can_generate = len(blocking) == 0
+
+        return ok({
+            "blocking":  blocking,
+            "warnings":  warnings,
+            "can_generate": can_generate,
+            "summary": {
+                "blocking_count":  len(blocking),
+                "warning_count":   len(warnings),
+                "cohorts_checked": cohorts_checked,
+                "units_checked":   units_checked,
+            },
+        })
 
 
 # ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
@@ -969,7 +1465,7 @@ class CohortTimetableView(APIView):
         days    = list(inst.days_of_week)
 
         entries = (
-            ScheduledUnit.objects.filter(term=term, cohort=cohort, status="PUBLISHED")
+            ScheduledUnit.objects.filter(term=term, cohort=cohort, status__in=["DRAFT", "PUBLISHED"])
             .select_related("curriculum_unit", "trainer", "room", "period")
             .order_by("day", "period__order")
         )
@@ -1011,7 +1507,7 @@ class TrainerTimetableView(APIView):
         days    = list(inst.days_of_week)
 
         entries = (
-            ScheduledUnit.objects.filter(term=term, trainer=trainer, status=request.query_params.get("status", "DRAFT"))
+            ScheduledUnit.objects.filter(term=term, trainer=trainer, status__in=["DRAFT", "PUBLISHED"])
             .select_related("curriculum_unit", "cohort", "room", "period")
             .order_by("day", "period__order")
         )
@@ -1108,25 +1604,37 @@ class ConflictListView(APIView):
 
     def get(self, request):
         term      = _term_from_request(request)
-        res_status = request.query_params.get("status", "PENDING")
+        res_status = request.query_params.get("status", "")
 
-        qs = Conflict.objects.filter(term=term, resolution_status=res_status).order_by(
+        qs_base = Conflict.objects.filter(term=term)
+        if res_status:
+            qs_base = qs_base.filter(resolution_status=res_status)
+        qs = qs_base.order_by(
             "-severity", "-created_at"
         )
         return ok([
             {
-                "id":           str(c.id),
-                "type":         c.get_conflict_type_display(),
-                "severity":     c.severity,
-                "description":  c.description,
-                "unit":         c.curriculum_unit.code if c.curriculum_unit_id else None,
-                "cohort":       c.cohort.name if c.cohort_id else None,
-                "trainer":      c.trainer.short_name if c.trainer_id else None,
-                "room":         c.room.code if c.room_id else None,
+                "id":               str(c.id),
+                "term":             str(c.term_id),
+                "conflict_type":    c.conflict_type,
+                "severity":         c.severity,
+                "description":      c.description,
+                "cohort":           str(c.cohort_id) if c.cohort_id else None,
+                "cohort_name":      c.cohort.name if c.cohort_id else None,
+                "trainer":          str(c.trainer_id) if c.trainer_id else None,
+                "trainer_name":     c.trainer.short_name if c.trainer_id else None,
+                "room":             str(c.room_id) if c.room_id else None,
+                "room_code":        c.room.code if c.room_id else None,
+                "curriculum_unit":  str(c.curriculum_unit_id) if c.curriculum_unit_id else None,
+                "unit_code":        c.curriculum_unit.code if c.curriculum_unit_id else None,
                 "resolution_status": c.resolution_status,
-                "created_at":   c.created_at.strftime("%Y-%m-%d %H:%M"),
+                "resolved_by":      None,
+                "resolved_at":      None,
+                "resolution_note":  c.resolution_note if hasattr(c, "resolution_note") else "",
+                "involved_entries": [],
+                "created_at":       c.created_at.isoformat(),
             }
-            for c in qs
+            for c in qs.select_related("cohort", "trainer", "room", "curriculum_unit")
         ])
 
 
@@ -1441,7 +1949,7 @@ class TrainerDashboardView(APIView):
         days    = list(inst.days_of_week)
 
         entries = list(
-            ScheduledUnit.objects.filter(term=term, trainer=trainer, status=request.query_params.get("status", "DRAFT"))
+            ScheduledUnit.objects.filter(term=term, trainer=trainer, status__in=["DRAFT", "PUBLISHED"])
             .select_related("curriculum_unit", "cohort", "room", "period")
             .order_by("day", "period__order")
         )
@@ -1856,13 +2364,18 @@ class TrainerDetailView(APIView):
 
     def put(self, request, pk):
         t = get_object_or_404(Trainer, id=pk)
-        for field in ("staff_id", "full_name", "short_name", "email",
-                      "employment_type", "max_periods_per_week", "is_active"):
-            if field in request.data:
-                setattr(t, field, request.data[field])
-        if "department_id" in request.data:
-            t.department = get_object_or_404(Department, id=request.data["department_id"])
-        t.save()
+        data = request.data
+        for field in ("staff_id", "first_name", "last_name", "title", "email",
+                      "phone", "employment_type", "max_periods_per_week",
+                      "available_days", "is_active"):
+            if field in data:
+                setattr(t, field, data[field])
+        if "department_id" in data:
+            t.department = get_object_or_404(Department, id=data["department_id"])
+        try:
+            t.save()
+        except Exception as e:
+            return err(str(e), status_code=400)
         return ok(_trainer_dict(t))
 
     def delete(self, request, pk):
