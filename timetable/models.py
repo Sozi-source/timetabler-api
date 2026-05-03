@@ -144,6 +144,11 @@ class Programme(TimeStampedModel):
     name          = models.CharField(max_length=200)
     code          = models.CharField(max_length=30, unique=True)
     level         = models.CharField(max_length=10, choices=LEVEL_CHOICES)
+    has_attachment     = models.BooleanField(default=False)
+    attachment_term    = models.PositiveSmallIntegerField(
+    null=True, blank=True,
+    help_text="Which term number is the attachment/industrial placement",
+)
     total_terms   = models.PositiveSmallIntegerField(
         default=4,
         help_text="Total number of teaching terms in the programme",
@@ -375,22 +380,23 @@ class Cohort(TimeStampedModel):
 
     # ── Calendar-derived helpers (for display / CollegeCalendarView) ──────────
 
+    
     @property
     def computed_current_term(self) -> int:
-        """
-        Derives which term this cohort should be in based on their start date
-        and today's date, using the 3-semester / 4-month-per-term calendar.
-        Capped at programme.total_terms.
-
-        This is a READ-ONLY display helper — it does NOT set current_term.
-        The authoritative value is always current_term (cached from enrolment).
-        """
         today = date.today()
         start = date(self.start_year, self.start_month, 1)
         if today < start:
             return 1
-        months_elapsed = (today.year - start.year) * 12 + (today.month - start.month)
-        term = (months_elapsed // 4) + 1
+        # Each college semester = 1 term (4 months)
+        cohort_sem = (
+            1 if self.start_month <= 4 else
+            2 if self.start_month <= 8 else 3
+        )
+        cohort_idx  = self.start_year * 3 + (cohort_sem - 1)
+        today_year, today_sem = CollegeCalendar.semester_for_date(today)
+        today_idx   = today_year * 3 + (today_sem - 1)
+        elapsed     = today_idx - cohort_idx  # semesters elapsed
+        term        = elapsed + 1
         return max(1, min(term, self.programme.total_terms))
 
     @property
@@ -545,11 +551,38 @@ class CohortEnrolment(TimeStampedModel):
 
 @receiver(post_save, sender=CohortEnrolment)
 def _sync_cohort_term_on_enrolment_save(sender, instance, **kwargs):
-    """Keep Cohort.current_term in sync whenever an enrolment is saved."""
+    """
+    Keep Cohort.current_term in sync whenever an enrolment is saved.
+
+    Auto-completes ACTIVE enrolments only when BOTH conditions are true:
+      1. The cohort is at or past their final programme term.
+      2. The college term has already ended (end_date < today).
+
+    This ensures cohorts currently in their final term (still studying)
+    are NOT prematurely marked COMPLETED — only past-term stragglers are.
+    Cohorts advanced via AdvanceAllCohortsView are set COMPLETED explicitly
+    by that view and bypass this check entirely.
+    """
     try:
-        instance.cohort.sync_current_term_cache()
-    except Exception:
-        pass  # never break the save
+        cohort = instance.cohort
+        if (
+            instance.status == CohortEnrolment.ACTIVE
+            and instance.programme_term >= cohort.programme.total_terms
+            and instance.college_term.end_date < date.today()
+        ):
+            # Use update() to avoid re-triggering this signal recursively
+            CohortEnrolment.objects.filter(pk=instance.pk).update(
+                status=CohortEnrolment.COMPLETED
+            )
+            instance.refresh_from_db()
+
+        cohort.sync_current_term_cache()
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(
+            f"_sync_cohort_term_on_enrolment_save failed for {instance}: {e}",
+            exc_info=True,
+        )
 
 
 @receiver(post_delete, sender=CohortEnrolment)
