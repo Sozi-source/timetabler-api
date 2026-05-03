@@ -5,36 +5,40 @@ Industry-standard timetabling system.
 
 Design principles
 -----------------
-* FLAT over deep â€” fewer models, clearer foreign keys, no hidden syncs.
-* One source of truth â€” CurriculumUnit owns what units exist per programme-stage.
+* FLAT over deep — fewer models, clearer foreign keys, no hidden syncs.
+* One source of truth — CurriculumUnit owns what units exist per programme-stage.
   ScheduledUnit owns what is on the timetable. No IntakeUnit / Stage sync dance.
-* Template-first â€” the timetable is a weekly recurring template (one row per
-  programme Ã— unit Ã— slot). Physical week expansion is done in the view/export
+* Template-first — the timetable is a weekly recurring template (one row per
+  programme × unit × slot). Physical week expansion is done in the view/export
   layer, never stored.
-* Constraint-driven â€” hard/soft constraints are data, not code paths.
-* Progression tracking â€” StudentProgress records which units a student-group
-  has completed, is doing, or has yet to start.
-* Venue & trainer availability â€” first-class models, not JSON blobs.
-* Works for any institution â€” no assumptions about semester count, year length,
+* Constraint-driven — hard/soft constraints are data, not code paths.
+* Enrolment-based progression — CohortEnrolment is the authoritative record of
+  which programme term a cohort studies in a given college semester. Cohort.current_term
+  is a cached convenience field kept in sync by signals.
+* Venue & trainer availability — first-class models, not JSON blobs.
+* Works for any institution — no assumptions about semester count, year length,
   or curriculum shape.
 
 Model map
 ---------
-Institution          â€” the top-level tenant (multi-institution ready)
-Department           â€” faculty/school/department
-Programme            â€” any qualification with a curriculum
-CurriculumUnit       â€” a unit at a specific position in a programme's curriculum
-Cohort               â€” a group of students doing a programme (intake)
-Trainer              â€” lecturer/instructor/facilitator
-Room                 â€” any schedulable space (classroom, lab, online)
-Period               â€” a named time-slot (e.g. "Period 1 08:00-10:00")
-Term                 â€” an academic term/semester
-Constraint           â€” scheduling rule (hard or soft) for a unit/trainer/room
-ScheduledUnit        â€” one row in the master timetable template
-ProgressRecord       â€” cohort's completion status per curriculum unit
-TrainerAvailability  â€” days/periods a trainer is available each term
-Conflict             â€” unresolved clash found during generation
-AuditLog             â€” immutable change trail
+Institution          — the top-level tenant (multi-institution ready)
+Department           — faculty/school/department
+Programme            — any qualification with a curriculum
+CurriculumUnit       — a unit at a specific position in a programme's curriculum
+CurriculumUnitTrainer — through model linking units to qualified trainers
+Cohort               — a group of students doing a programme (intake)
+CohortEnrolment      — authoritative record: which programme term a cohort
+                       studies in a given college semester
+Trainer              — lecturer/instructor/facilitator
+Room                 — any schedulable space (classroom, lab, online)
+Period               — a named time-slot (e.g. "Period 1 08:00-10:00")
+Term                 — an academic term/semester
+Constraint           — scheduling rule (hard or soft) for a unit/trainer/room
+ScheduledUnit        — one row in the master timetable template
+ProgressRecord       — cohort's completion status per curriculum unit
+TrainerAvailability  — days/periods a trainer is available each term
+Conflict             — unresolved clash found during generation
+AuditLog             — immutable change trail
 """
 
 from __future__ import annotations
@@ -47,15 +51,17 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models, transaction
 from django.db.models import Q, UniqueConstraint
+from django.db.models.signals import post_delete, post_save
+from django.dispatch import receiver
 from django.utils import timezone
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 # Helpers / Mixins
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 
 class TimeStampedModel(models.Model):
-    """Abstract base â€” UUID pk, created/updated timestamps, soft-delete."""
+    """Abstract base — UUID pk, created/updated timestamps, soft-delete."""
 
     id         = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -68,17 +74,16 @@ class TimeStampedModel(models.Model):
         abstract = True
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Institution (multi-tenancy ready â€” leave as single row if not needed)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# Institution (multi-tenancy ready — leave as single row if not needed)
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Institution(TimeStampedModel):
-    name          = models.CharField(max_length=200, unique=True)
-    short_name    = models.CharField(max_length=50)
-    country       = models.CharField(max_length=100, blank=True)
-    timezone      = models.CharField(max_length=60, default="Africa/Nairobi")
-    # Timetable policy knobs â€” institutions differ
-    days_of_week  = models.JSONField(
+    name               = models.CharField(max_length=200, unique=True)
+    short_name         = models.CharField(max_length=50)
+    country            = models.CharField(max_length=100, blank=True)
+    timezone           = models.CharField(max_length=60, default="Africa/Nairobi")
+    days_of_week       = models.JSONField(
         default=list,
         help_text='Ordered list e.g. ["MON","TUE","WED","THU","FRI"]',
     )
@@ -95,62 +100,59 @@ class Institution(TimeStampedModel):
         return self.short_name or self.name
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 # Department
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Department(TimeStampedModel):
     institution = models.ForeignKey(
         Institution, on_delete=models.CASCADE, related_name="departments"
     )
-    name        = models.CharField(max_length=200)
-    code        = models.CharField(max_length=20)
-    hod         = models.CharField(max_length=200, blank=True)
-    email       = models.EmailField(blank=True)
-    is_active   = models.BooleanField(default=True)
+    name      = models.CharField(max_length=200)
+    code      = models.CharField(max_length=20)
+    hod       = models.CharField(max_length=200, blank=True)
+    email     = models.EmailField(blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering            = ["name"]
-        unique_together     = [("institution", "code")]
+        ordering        = ["name"]
+        unique_together = [("institution", "code")]
 
     def __str__(self):
-        return f"{self.code} â€“ {self.name}"
+        return f"{self.code} — {self.name}"
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 # Programme
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Programme(TimeStampedModel):
     LEVEL_CHOICES = [
-        ("CERT",   "Certificate"),
-        ("DIP",    "Diploma"),
-        ("HDIP",   "Higher Diploma"),
-        ("DEG",    "Degree"),
-        ("PG_DIP", "Postgraduate Diploma"),
-        ("MASTERS","Masters"),
-        ("PHD",    "PhD"),
-        ("OTHER",  "Other"),
+        ("CERT",    "Certificate"),
+        ("DIP",     "Diploma"),
+        ("HDIP",    "Higher Diploma"),
+        ("DEG",     "Degree"),
+        ("PG_DIP",  "Postgraduate Diploma"),
+        ("MASTERS", "Masters"),
+        ("PHD",     "PhD"),
+        ("OTHER",   "Other"),
     ]
 
-    department   = models.ForeignKey(
+    department    = models.ForeignKey(
         Department, on_delete=models.CASCADE, related_name="programmes"
     )
-    name         = models.CharField(max_length=200)
-    code         = models.CharField(max_length=30, unique=True)
-    level        = models.CharField(max_length=10, choices=LEVEL_CHOICES)
-    total_terms  = models.PositiveSmallIntegerField(
+    name          = models.CharField(max_length=200)
+    code          = models.CharField(max_length=30, unique=True)
+    level         = models.CharField(max_length=10, choices=LEVEL_CHOICES)
+    total_terms   = models.PositiveSmallIntegerField(
         default=4,
         help_text="Total number of teaching terms in the programme",
     )
-    # Programmes that share units are linked via a group code.
-    # Any programmes with the same sharing_group will have their overlapping
-    # curriculum units scheduled together (combined class).
     sharing_group = models.CharField(
         max_length=60, blank=True, db_index=True,
         help_text="Set the same value on programmes that share units.",
     )
-    is_active    = models.BooleanField(default=True)
+    is_active     = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["code"]
@@ -167,19 +169,15 @@ class Programme(TimeStampedModel):
         ).exclude(pk=self.pk)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# CurriculumUnit  (replaces Stage + Unit + IntakeUnit in one clean model)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# CurriculumUnit
+# ─────────────────────────────────────────────────────────────────────────────
 
 class CurriculumUnit(TimeStampedModel):
     """
     A unit at a specific position in a programme's curriculum.
-
-    term_number  â€” which term it belongs to (1-based, e.g. 1 = first term).
-    position     â€” order within that term (for display sorting).
-
-    There is NO separate Stage model. A "stage" is simply a term_number.
-    This avoids the fragile IntakeUnit sync that caused bugs in the old code.
+    term_number — which term it belongs to (1-based).
+    position    — order within that term (for display sorting).
     """
     UNIT_TYPE_CHOICES = [
         ("CORE",      "Core"),
@@ -188,31 +186,35 @@ class CurriculumUnit(TimeStampedModel):
         ("PROJECT",   "Project"),
     ]
 
-    programme        = models.ForeignKey(
+    programme          = models.ForeignKey(
         Programme, on_delete=models.CASCADE, related_name="curriculum_units"
     )
-    term_number      = models.PositiveSmallIntegerField(
+    term_number        = models.PositiveSmallIntegerField(
         help_text="Which term (1 = first term of programme)",
     )
-    position         = models.PositiveSmallIntegerField(default=1)
-    code             = models.CharField(max_length=30)
-    name             = models.CharField(max_length=200)
-    unit_type        = models.CharField(
+    position           = models.PositiveSmallIntegerField(default=1)
+    code               = models.CharField(max_length=30)
+    name               = models.CharField(max_length=200)
+    unit_type          = models.CharField(
         max_length=10, choices=UNIT_TYPE_CHOICES, default="CORE"
     )
-    credit_hours     = models.PositiveSmallIntegerField(default=3)
-    # How many periods per week this unit needs on the timetable
-    periods_per_week = models.PositiveSmallIntegerField(
+    credit_hours       = models.PositiveSmallIntegerField(default=3)
+    periods_per_week   = models.PositiveSmallIntegerField(
         default=1,
         help_text="1 = single period, 2 = double period (consecutive)",
     )
-    # Trainers qualified to teach this unit (M2M for flexibility)
     qualified_trainers = models.ManyToManyField(
-        "Trainer", blank=True, related_name="qualified_units", through="CurriculumUnitTrainer"
+        "Trainer",
+        blank=True,
+        related_name="qualified_units",
+        through="CurriculumUnitTrainer",
     )
-    is_outsourced    = models.BooleanField(default=False, help_text='Unit is taught by an external/outsourced trainer')
-    is_active        = models.BooleanField(default=True)
-    notes            = models.TextField(blank=True)
+    is_outsourced      = models.BooleanField(
+        default=False,
+        help_text="Unit is taught by an external/outsourced trainer",
+    )
+    is_active          = models.BooleanField(default=True)
+    notes              = models.TextField(blank=True)
 
     class Meta:
         ordering        = ["programme", "term_number", "position"]
@@ -223,22 +225,19 @@ class CurriculumUnit(TimeStampedModel):
         ]
 
     def __str__(self):
-        return f"{self.programme.code} T{self.term_number} â€“ {self.code} {self.name}"
+        return f"{self.programme.code} T{self.term_number} — {self.code} {self.name}"
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Cohort  (replaces Intake â€” cleaner name, same concept)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-
-# -----------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 # CurriculumUnitTrainer  (through model for qualified_trainers)
-# -----------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+
 class CurriculumUnitTrainer(TimeStampedModel):
     TRAINER_TYPE_CHOICES = [
         ("INTERNAL",   "Internal"),
         ("OUTSOURCED", "Outsourced"),
     ]
+
     curriculum_unit = models.ForeignKey(
         CurriculumUnit, on_delete=models.CASCADE, related_name="unit_trainers"
     )
@@ -250,34 +249,49 @@ class CurriculumUnitTrainer(TimeStampedModel):
     )
     label = models.CharField(
         max_length=100, blank=True,
-        help_text="Optional custom label e.g. 'HOD Physics dept'"
+        help_text="Optional custom label e.g. 'HOD Physics dept'",
     )
 
     class Meta:
         unique_together = [("curriculum_unit", "trainer")]
-        ordering = ["trainer_type", "trainer__last_name"]
+        ordering        = ["trainer_type", "trainer__last_name"]
 
     def __str__(self):
-        return f"{self.curriculum_unit.code} - {self.trainer.short_name} ({self.trainer_type})"
+        return (
+            f"{self.curriculum_unit.code} - "
+            f"{self.trainer.short_name} ({self.trainer_type})"
+        )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cohort
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Cohort(TimeStampedModel):
     """
     A group of students admitted to a programme at a specific time.
-    current_term is the term they are currently studying.
-    It is set manually or via the advance_term() helper.
+
+    current_term is a CACHED field — it reflects the programme_term from the
+    cohort's latest ACTIVE CohortEnrolment. It is kept in sync automatically
+    via post_save / post_delete signals on CohortEnrolment.
+
+    Do NOT set current_term directly in application code; create or update
+    CohortEnrolment records instead. The only exception is the backfill
+    management command and the legacy advance_term() helper (kept for
+    scheduler compatibility).
     """
     programme     = models.ForeignKey(
         Programme, on_delete=models.CASCADE, related_name="cohorts"
     )
     name          = models.CharField(max_length=100)
-    # When they started (year + month is enough for any institution)
     start_year    = models.PositiveSmallIntegerField()
     start_month   = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(12)]
     )
+    # Cached from latest active CohortEnrolment — do not set directly.
     current_term  = models.PositiveSmallIntegerField(
         default=1,
-        help_text="Which programme term this cohort is currently in",
+        help_text="Cached from latest active enrolment. Do not edit directly.",
     )
     student_count = models.PositiveIntegerField(default=0)
     is_active     = models.BooleanField(default=True)
@@ -291,27 +305,55 @@ class Cohort(TimeStampedModel):
         ]
 
     def __str__(self):
-        return f"{self.programme.code} â€“ {self.name}"
+        return f"{self.programme.code} — {self.name}"
 
-    # â”€â”€ Progression helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Enrolment helpers ─────────────────────────────────────────────────────
 
-    def current_units(self) -> models.QuerySet:
-        """Units the cohort is studying this term."""
+    def active_enrolment(self, college_term=None):
+        """
+        Return the ACTIVE CohortEnrolment for the given college term,
+        or the most recent ACTIVE enrolment if no term is given.
+        """
+        qs = self.enrolments.filter(status=CohortEnrolment.ACTIVE)
+        if college_term:
+            return qs.filter(college_term=college_term).first()
+        return qs.order_by("-college_term__start_date").first()
+
+    def enrolment_for_term(self, college_term):
+        """Return the enrolment (any status) for a specific college term."""
+        return self.enrolments.filter(college_term=college_term).first()
+
+    def sync_current_term_cache(self) -> bool:
+        """
+        Update the cached current_term from the latest active enrolment.
+        Called automatically by post_save / post_delete signals on CohortEnrolment.
+        Returns True if the value changed and was saved.
+        """
+        enrolment = self.active_enrolment()
+        new_val   = enrolment.programme_term if enrolment else 1
+        if self.current_term != new_val:
+            self.current_term = new_val
+            self.save(update_fields=["current_term", "updated_at"])
+            return True
+        return False
+
+    # ── Legacy / scheduler helpers ────────────────────────────────────────────
+
+    def current_units(self):
+        """Units the cohort is studying this term (uses cached current_term)."""
         return CurriculumUnit.objects.filter(
             programme=self.programme,
             term_number=self.current_term,
             is_active=True,
         )
 
-    def completed_units(self) -> models.QuerySet:
-        """Units marked completed in progress records."""
+    def completed_units(self):
         completed_ids = ProgressRecord.objects.filter(
             cohort=self, status=ProgressRecord.COMPLETED
         ).values_list("curriculum_unit_id", flat=True)
         return CurriculumUnit.objects.filter(id__in=completed_ids)
 
-    def remaining_units(self) -> models.QuerySet:
-        """Future curriculum units not yet completed."""
+    def remaining_units(self):
         completed_ids = ProgressRecord.objects.filter(
             cohort=self, status=ProgressRecord.COMPLETED
         ).values_list("curriculum_unit_id", flat=True)
@@ -322,20 +364,26 @@ class Cohort(TimeStampedModel):
         ).exclude(id__in=completed_ids)
 
     def advance_term(self, by: int = 1) -> None:
-        """Move cohort to the next term (call at end of term)."""
-        max_term = self.programme.total_terms
+        """
+        Legacy helper — still works but the preferred approach is to let
+        AdvanceAllCohortsView create new CohortEnrolment records, which
+        will update current_term via signal automatically.
+        """
+        max_term          = self.programme.total_terms
         self.current_term = min(self.current_term + by, max_term)
         self.save(update_fields=["current_term", "updated_at"])
+
+    # ── Calendar-derived helpers (for display / CollegeCalendarView) ──────────
 
     @property
     def computed_current_term(self) -> int:
         """
-        Auto-calculate which term this cohort should be in based on their
-        start date. Assumes 3 terms per year, each 4 months long:
-          Term 1: Jan–Apr  (start_month 1)
-          Term 2: May–Aug  (start_month 5)
-          Term 3: Sep–Dec  (start_month 9)
-        Capped at programme.total_terms so it never exceeds the programme length.
+        Derives which term this cohort should be in based on their start date
+        and today's date, using the 3-semester / 4-month-per-term calendar.
+        Capped at programme.total_terms.
+
+        This is a READ-ONLY display helper — it does NOT set current_term.
+        The authoritative value is always current_term (cached from enrolment).
         """
         today = date.today()
         start = date(self.start_year, self.start_month, 1)
@@ -347,25 +395,12 @@ class Cohort(TimeStampedModel):
 
     @property
     def term_is_synced(self) -> bool:
-        """True if current_term matches what the calendar says it should be."""
+        """True if current_term matches the computed calendar value."""
         return self.current_term == self.computed_current_term
-
-    def sync_current_term(self) -> bool:
-        """
-        Update current_term to match the computed calendar value.
-        Safe to call at any time — only saves if something changed.
-        Returns True if current_term was updated, False if already correct.
-        """
-        computed = self.computed_current_term
-        if computed != self.current_term:
-            self.current_term = computed
-            self.save(update_fields=["current_term", "updated_at"])
-            return True
-        return False
 
     @property
     def progress_summary(self) -> dict:
-        total     = CurriculumUnit.objects.filter(
+        total = CurriculumUnit.objects.filter(
             programme=self.programme, is_active=True
         ).count()
         completed = ProgressRecord.objects.filter(
@@ -383,9 +418,152 @@ class Cohort(TimeStampedModel):
         }
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# ProgressRecord  (tracks student-group progression through curriculum)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# CohortEnrolment  — authoritative record of term progression
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CohortEnrolment(TimeStampedModel):
+    """
+    One row per cohort per college semester.
+
+    programme_term  — which term of their programme they study THIS semester.
+                      e.g. CND JAN 26 is in programme_term=2 during Sem 2 2026.
+
+    status          — lifecycle state for this enrolment period:
+      ACTIVE      — cohort is studying this semester (normal)
+      DEFERRED    — cohort has paused for this semester only
+      COMPLETED   — cohort finished this programme term this semester
+      WITHDRAWN   — cohort left the programme
+
+    Deferral is modelled here, not on the Cohort. A deferred cohort simply
+    has no ACTIVE enrolment for that semester — their programme_term does
+    not advance. When they resume, a new enrolment is created with the
+    same programme_term they paused at.
+
+    Signals on this model keep Cohort.current_term in sync automatically.
+    """
+
+    ACTIVE    = "ACTIVE"
+    DEFERRED  = "DEFERRED"
+    COMPLETED = "COMPLETED"
+    WITHDRAWN = "WITHDRAWN"
+
+    STATUS_CHOICES = [
+        (ACTIVE,    "Active"),
+        (DEFERRED,  "Deferred"),
+        (COMPLETED, "Completed"),
+        (WITHDRAWN, "Withdrawn"),
+    ]
+
+    cohort         = models.ForeignKey(
+        Cohort, on_delete=models.CASCADE, related_name="enrolments"
+    )
+    college_term   = models.ForeignKey(
+        "Term", on_delete=models.CASCADE, related_name="enrolments"
+    )
+    programme_term = models.PositiveSmallIntegerField(
+        help_text="Which term of their programme this cohort studies this semester",
+    )
+    status = models.CharField(
+        max_length=12, choices=STATUS_CHOICES, default=ACTIVE
+    )
+    notes  = models.TextField(blank=True)
+
+    class Meta:
+        unique_together = [("cohort", "college_term")]
+        ordering        = ["college_term__start_date", "cohort__name"]
+        indexes         = [
+            models.Index(fields=["cohort", "status"]),
+            models.Index(fields=["college_term", "status"]),
+            models.Index(fields=["programme_term"]),
+        ]
+        constraints = [
+            # A cohort may only have one ACTIVE enrolment per college term.
+            # (unique_together already enforces one row per cohort+term, which
+            #  implies this, but we keep it explicit for documentation.)
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.cohort.name} | {self.college_term.name} | "
+            f"T{self.programme_term} [{self.status}]"
+        )
+
+    # ── Convenience properties ────────────────────────────────────────────────
+
+    @property
+    def is_active(self) -> bool:
+        return self.status == self.ACTIVE
+
+    @property
+    def is_graduating(self) -> bool:
+        """True if this is the cohort's final programme term."""
+        return self.programme_term >= self.cohort.programme.total_terms
+
+    # ── Unit helpers ──────────────────────────────────────────────────────────
+
+    def get_units(self):
+        """All active curriculum units for this enrolment's programme term."""
+        return CurriculumUnit.objects.filter(
+            programme=self.cohort.programme,
+            term_number=self.programme_term,
+            is_active=True,
+        ).order_by("position")
+
+    def get_scheduled_unit_ids(self) -> set:
+        """IDs of units that appeared on the timetable this semester."""
+        return set(
+            ScheduledUnit.objects.filter(
+                term=self.college_term,
+                cohort=self.cohort,
+                status__in=["DRAFT", "PUBLISHED"],
+            ).values_list("curriculum_unit_id", flat=True).distinct()
+        )
+
+    def unit_preview(self) -> list[dict]:
+        """
+        Returns each unit for this enrolment with a mark_complete flag
+        indicating whether it appeared on the timetable this semester.
+        Used by AdvanceAllCohortsView._preview() and ._confirm().
+        """
+        scheduled_ids = self.get_scheduled_unit_ids()
+        return [
+            {
+                "unit_id":       str(u.id),
+                "code":          u.code,
+                "name":          u.name,
+                "credit_hours":  u.credit_hours,
+                "mark_complete": str(u.id) in {str(i) for i in scheduled_ids},
+            }
+            for u in self.get_units()
+        ]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Signals — keep Cohort.current_term cache in sync with CohortEnrolment
+# ─────────────────────────────────────────────────────────────────────────────
+
+@receiver(post_save, sender=CohortEnrolment)
+def _sync_cohort_term_on_enrolment_save(sender, instance, **kwargs):
+    """Keep Cohort.current_term in sync whenever an enrolment is saved."""
+    try:
+        instance.cohort.sync_current_term_cache()
+    except Exception:
+        pass  # never break the save
+
+
+@receiver(post_delete, sender=CohortEnrolment)
+def _sync_cohort_term_on_enrolment_delete(sender, instance, **kwargs):
+    """Keep Cohort.current_term in sync when an enrolment is deleted."""
+    try:
+        instance.cohort.sync_current_term_cache()
+    except Exception:
+        pass
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ProgressRecord  (tracks cohort progression through curriculum units)
+# ─────────────────────────────────────────────────────────────────────────────
 
 class ProgressRecord(TimeStampedModel):
     NOT_STARTED = "NOT_STARTED"
@@ -406,25 +584,44 @@ class ProgressRecord(TimeStampedModel):
     curriculum_unit = models.ForeignKey(
         CurriculumUnit, on_delete=models.CASCADE, related_name="progress_records"
     )
+    # The college term in which this unit was studied — kept for backwards
+    # compatibility and reporting. enrolment is the richer reference.
     term            = models.ForeignKey(
         "Term", on_delete=models.CASCADE, related_name="progress_records"
     )
-    status          = models.CharField(
+    # FK to enrolment — the precise context (which semester this was studied).
+    # Nullable for backwards-compat; always populated for new records.
+    enrolment       = models.ForeignKey(
+        CohortEnrolment,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="progress_records",
+        help_text="The enrolment period during which this unit was studied.",
+    )
+    status      = models.CharField(
         max_length=12, choices=STATUS_CHOICES, default=NOT_STARTED
     )
-    started_at      = models.DateField(null=True, blank=True)
-    completed_at    = models.DateField(null=True, blank=True)
-    score           = models.DecimalField(
+    started_at  = models.DateField(null=True, blank=True)
+    completed_at = models.DateField(null=True, blank=True)
+    score       = models.DecimalField(
         max_digits=5, decimal_places=2, null=True, blank=True
     )
-    notes           = models.TextField(blank=True)
+    notes       = models.TextField(blank=True)
 
     class Meta:
-        unique_together = [("cohort", "curriculum_unit", "term")]
-        ordering        = ["cohort", "curriculum_unit__term_number", "curriculum_unit__position"]
-        indexes         = [
+        # One progress record per cohort × unit (across all time).
+        # The enrolment / term fields record *when* it was completed.
+        unique_together = [("cohort", "curriculum_unit")]
+        ordering        = [
+            "cohort",
+            "curriculum_unit__term_number",
+            "curriculum_unit__position",
+        ]
+        indexes = [
             models.Index(fields=["cohort", "status"]),
             models.Index(fields=["curriculum_unit", "status"]),
+            models.Index(fields=["enrolment"]),
         ]
 
     def __str__(self):
@@ -443,9 +640,9 @@ class ProgressRecord(TimeStampedModel):
         self.save(update_fields=["status", "started_at", "updated_at"])
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 # Room
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Room(TimeStampedModel):
     ROOM_TYPE_CHOICES = [
@@ -460,17 +657,17 @@ class Room(TimeStampedModel):
         ("OTHER",     "Other"),
     ]
 
-    institution  = models.ForeignKey(
+    institution = models.ForeignKey(
         Institution, on_delete=models.CASCADE, related_name="rooms"
     )
-    code         = models.CharField(max_length=20)
-    name         = models.CharField(max_length=100)
-    room_type    = models.CharField(max_length=10, choices=ROOM_TYPE_CHOICES)
-    capacity     = models.PositiveIntegerField(validators=[MinValueValidator(1)])
-    building     = models.CharField(max_length=100, blank=True)
-    floor        = models.SmallIntegerField(default=0)
-    is_active    = models.BooleanField(default=True)
-    features     = models.JSONField(
+    code        = models.CharField(max_length=20)
+    name        = models.CharField(max_length=100)
+    room_type   = models.CharField(max_length=10, choices=ROOM_TYPE_CHOICES)
+    capacity    = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    building    = models.CharField(max_length=100, blank=True)
+    floor       = models.SmallIntegerField(default=0)
+    is_active   = models.BooleanField(default=True)
+    features    = models.JSONField(
         default=list,
         help_text='e.g. ["projector","whiteboard","aircon"]',
     )
@@ -487,26 +684,26 @@ class Room(TimeStampedModel):
         return f"{self.code} ({self.capacity})"
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Period  (replaces TimeSlot â€” cleaner name, same concept)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# Period
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Period(models.Model):
     """
     A named time block (e.g. Period 1: 08:00-10:00).
-    Belongs to an institution â€” different institutions may have different
+    Belongs to an institution — different institutions may have different
     period structures.
     """
-    institution  = models.ForeignKey(
+    institution = models.ForeignKey(
         Institution, on_delete=models.CASCADE, related_name="periods"
     )
-    label        = models.CharField(
+    label       = models.CharField(
         max_length=30, help_text='e.g. "Period 1" or "Morning Block"'
     )
-    start_time   = models.TimeField()
-    end_time     = models.TimeField()
-    order        = models.PositiveSmallIntegerField()
-    is_break     = models.BooleanField(
+    start_time  = models.TimeField()
+    end_time    = models.TimeField()
+    order       = models.PositiveSmallIntegerField()
+    is_break    = models.BooleanField(
         default=False,
         help_text="Mark breaks so the scheduler skips them",
     )
@@ -516,7 +713,7 @@ class Period(models.Model):
         unique_together = [("institution", "order")]
 
     def __str__(self):
-        return f"{self.label} ({self.start_time:%H:%M}â€“{self.end_time:%H:%M})"
+        return f"{self.label} ({self.start_time:%H:%M}–{self.end_time:%H:%M})"
 
     @property
     def duration_hours(self) -> float:
@@ -528,33 +725,48 @@ class Period(models.Model):
         return round(delta.seconds / 3600, 2)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Term  (replaces Semester â€” institution-agnostic)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# Term
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Term(TimeStampedModel):
     """
     An academic term for an institution.
-    name is free-form so any convention works (Semester 1, Term 2, Q3, etc.).
+    college_year / college_semester encode the fixed 3-semester calendar:
+      Sem 1 = Jan–Apr, Sem 2 = May–Aug, Sem 3 = Sep–Dec.
     """
-    institution    = models.ForeignKey(
+    institution      = models.ForeignKey(
         Institution, on_delete=models.CASCADE, related_name="terms"
     )
-    name           = models.CharField(max_length=100)
-    start_date     = models.DateField()
-    end_date       = models.DateField()
-    teaching_weeks = models.PositiveSmallIntegerField(default=14)
-    is_current     = models.BooleanField(default=False)
+    name             = models.CharField(max_length=100)
+    start_date       = models.DateField()
+    end_date         = models.DateField()
+    teaching_weeks   = models.PositiveSmallIntegerField(default=14)
+    is_current       = models.BooleanField(default=False)
+    college_year     = models.PositiveSmallIntegerField(
+        null=True, blank=True, db_index=True,
+        help_text="Calendar year this college semester belongs to, e.g. 2026",
+    )
+    college_semester = models.PositiveSmallIntegerField(
+        null=True, blank=True,
+        choices=[
+            (1, "Semester 1 (Jan–Apr)"),
+            (2, "Semester 2 (May–Aug)"),
+            (3, "Semester 3 (Sep–Dec)"),
+        ],
+        help_text="Which college-wide semester: 1=Jan, 2=May, 3=Sep",
+    )
 
     class Meta:
         ordering = ["-start_date"]
         indexes  = [
             models.Index(fields=["institution", "is_current"]),
             models.Index(fields=["start_date", "end_date"]),
+            models.Index(fields=["college_year", "college_semester"]),
         ]
 
     def __str__(self):
-        return f"{self.institution.short_name} â€“ {self.name}"
+        return f"{self.institution.short_name} – {self.name}"
 
     def clean(self):
         if self.start_date and self.end_date and self.start_date >= self.end_date:
@@ -582,9 +794,77 @@ class Term(TimeStampedModel):
         return max(0, self.teaching_weeks - self.week_number)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Trainer  (replaces Lecturer)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# CollegeCalendar  — stateless utility for the 3-semester year
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CollegeCalendar:
+    """
+    Sem 1 → 1 Jan – 30 Apr
+    Sem 2 → 1 May – 31 Aug
+    Sem 3 → 1 Sep – 31 Dec
+    """
+    SEM_START_MONTH: dict[int, int] = {1: 1, 2: 5, 3: 9}
+    SEM_END_MONTH:   dict[int, int] = {1: 4, 2: 8, 3: 12}
+
+    @staticmethod
+    def semester_for_date(d: date) -> tuple[int, int]:
+        m = d.month
+        if m <= 4:
+            return d.year, 1
+        if m <= 8:
+            return d.year, 2
+        return d.year, 3
+
+    @staticmethod
+    def current_semester() -> tuple[int, int]:
+        return CollegeCalendar.semester_for_date(date.today())
+
+    @staticmethod
+    def next_semester(year: int, semester: int) -> tuple[int, int]:
+        if semester == 3:
+            return year + 1, 1
+        return year, semester + 1
+
+    @staticmethod
+    def semester_dates(year: int, semester: int) -> tuple[date, date]:
+        start_month = CollegeCalendar.SEM_START_MONTH[semester]
+        end_month   = CollegeCalendar.SEM_END_MONTH[semester]
+        end_day     = 30 if end_month == 4 else 31
+        return date(year, start_month, 1), date(year, end_month, end_day)
+
+    @staticmethod
+    def cohort_term_at(
+        cohort_start_year: int,
+        cohort_start_month: int,
+        college_year: int,
+        college_semester: int,
+        total_terms: int,
+    ) -> int | None:
+        """
+        Return which programme term a cohort was/is in during a given
+        college semester, or None if they hadn't started yet.
+        """
+        target_idx       = college_year * 3 + (college_semester - 1)
+        cohort_sem       = (
+            1 if cohort_start_month <= 4 else
+            2 if cohort_start_month <= 8 else 3
+        )
+        cohort_start_idx = cohort_start_year * 3 + (cohort_sem - 1)
+        elapsed          = target_idx - cohort_start_idx
+        if elapsed < 0:
+            return None
+        return min(elapsed + 1, total_terms)
+
+    @staticmethod
+    def semester_label(year: int, semester: int) -> str:
+        labels = {1: "Jan–Apr", 2: "May–Aug", 3: "Sep–Dec"}
+        return f"Sem {semester} – {year} ({labels[semester]})"
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Trainer
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Trainer(TimeStampedModel):
     EMPLOYMENT_CHOICES = [
@@ -594,39 +874,37 @@ class Trainer(TimeStampedModel):
         ("CT", "Contract"),
     ]
 
-    institution      = models.ForeignKey(
+    institution          = models.ForeignKey(
         Institution, on_delete=models.CASCADE, related_name="trainers"
     )
-    department       = models.ForeignKey(
+    department           = models.ForeignKey(
         Department, on_delete=models.CASCADE, related_name="trainers"
     )
-    staff_id         = models.CharField(max_length=30, unique=True)
-    title            = models.CharField(max_length=20, blank=True)
-    first_name       = models.CharField(max_length=100)
-    last_name        = models.CharField(max_length=100)
-    email            = models.EmailField(unique=True)
-    phone            = models.CharField(max_length=20, blank=True)
-    employment_type  = models.CharField(
+    staff_id             = models.CharField(max_length=30, unique=True)
+    title                = models.CharField(max_length=20, blank=True)
+    first_name           = models.CharField(max_length=100)
+    last_name            = models.CharField(max_length=100)
+    email                = models.EmailField(unique=True)
+    phone                = models.CharField(max_length=20, blank=True)
+    employment_type      = models.CharField(
         max_length=2, choices=EMPLOYMENT_CHOICES, default="FT"
     )
     max_periods_per_week = models.PositiveSmallIntegerField(
         default=20,
         help_text="Maximum teaching periods (not hours) per week",
     )
-    # Full-time staff available all institution days by default.
-    # Part-time / visiting â€” store their specific available days as a list.
-    available_days   = models.JSONField(
+    available_days       = models.JSONField(
         default=list,
         help_text=(
             'Specific days available, e.g. ["MON","WED","FRI"]. '
             "Leave empty for FT staff (means all institution days)."
         ),
     )
-    user             = models.OneToOneField(
+    user      = models.OneToOneField(
         User, null=True, blank=True, on_delete=models.SET_NULL,
         related_name="trainer_profile",
     )
-    is_active        = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ["last_name", "first_name"]
@@ -648,21 +926,16 @@ class Trainer(TimeStampedModel):
         return f"{self.title} {self.last_name}".strip()
 
     def get_available_days(self, institution: Institution) -> list[str]:
-        """Return the effective days this trainer is available."""
         if self.employment_type == "FT" and not self.available_days:
             return list(institution.days_of_week)
         return list(self.available_days)
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# TrainerAvailability  (per-term availability / blocking)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# TrainerAvailability
+# ─────────────────────────────────────────────────────────────────────────────
 
 class TrainerAvailability(TimeStampedModel):
-    """
-    Blocks or declares specific periods unavailable for a trainer in a term.
-    The scheduler checks this before assigning any slot.
-    """
     BLOCK_REASON_CHOICES = [
         ("LEAVE",       "Annual Leave"),
         ("SICK",        "Sick Leave"),
@@ -672,25 +945,25 @@ class TrainerAvailability(TimeStampedModel):
         ("PREFERRED",   "Preferred slot (soft)"),
     ]
 
-    trainer       = models.ForeignKey(
+    trainer      = models.ForeignKey(
         Trainer, on_delete=models.CASCADE, related_name="availability_rules"
     )
-    term          = models.ForeignKey(
+    term         = models.ForeignKey(
         Term, on_delete=models.CASCADE, related_name="trainer_availability"
     )
-    day           = models.CharField(max_length=3)   # MON, TUE, â€¦
-    period        = models.ForeignKey(
+    day          = models.CharField(max_length=3)   # MON, TUE, …
+    period       = models.ForeignKey(
         Period, on_delete=models.CASCADE, null=True, blank=True,
         help_text="Leave blank to block the entire day",
     )
-    is_available  = models.BooleanField(
+    is_available = models.BooleanField(
         default=False,
         help_text="False = BLOCKED, True = explicitly available (for soft preferences)",
     )
-    reason        = models.CharField(
+    reason       = models.CharField(
         max_length=15, choices=BLOCK_REASON_CHOICES, default="UNAVAILABLE"
     )
-    notes         = models.TextField(blank=True)
+    notes        = models.TextField(blank=True)
 
     class Meta:
         ordering = ["trainer", "day", "period__order"]
@@ -705,28 +978,11 @@ class TrainerAvailability(TimeStampedModel):
         return f"{self.trainer.short_name} {self.day} {slot} [{flag}]"
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Constraint  (scheduling rules â€” hard and soft)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# Constraint
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Constraint(TimeStampedModel):
-    """
-    A scheduling rule that the engine must (HARD) or should (SOFT) respect.
-
-    scope    â€” what the rule applies to (unit, trainer, room, cohort)
-    rule     â€” what the rule says
-
-    Supported rule types
-    --------------------
-    PIN_DAY_PERIOD   â€” must be on a specific day + period
-    PIN_DAY          â€” must be on a specific day (any period)
-    PREFERRED_ROOM   â€” try to use this room
-    AVOID_DAY        â€” avoid a given day
-    AVOID_PERIOD     â€” avoid a given period
-    BACK_TO_BACK     â€” schedule consecutive periods (for double units)
-    MAX_PER_DAY      â€” maximum periods per day for a cohort/trainer
-    """
-
     SCOPE_CHOICES = [
         ("UNIT",    "Curriculum Unit"),
         ("TRAINER", "Trainer"),
@@ -734,48 +990,40 @@ class Constraint(TimeStampedModel):
         ("COHORT",  "Cohort"),
     ]
     RULE_CHOICES = [
-        ("PIN_DAY_PERIOD",  "Pin to day + period"),
-        ("PIN_DAY",         "Pin to day (any period)"),
-        ("PREFERRED_ROOM",  "Preferred room"),
-        ("AVOID_DAY",       "Avoid day"),
-        ("AVOID_PERIOD",    "Avoid period"),
-        ("BACK_TO_BACK",    "Schedule back-to-back"),
-        ("MAX_PER_DAY",     "Max periods per day"),
+        ("PIN_DAY_PERIOD", "Pin to day + period"),
+        ("PIN_DAY",        "Pin to day (any period)"),
+        ("PREFERRED_ROOM", "Preferred room"),
+        ("AVOID_DAY",      "Avoid day"),
+        ("AVOID_PERIOD",   "Avoid period"),
+        ("BACK_TO_BACK",   "Schedule back-to-back"),
+        ("MAX_PER_DAY",    "Max periods per day"),
     ]
 
-    scope          = models.CharField(max_length=8, choices=SCOPE_CHOICES)
-    rule           = models.CharField(max_length=20, choices=RULE_CHOICES)
-    is_hard        = models.BooleanField(
+    scope           = models.CharField(max_length=8, choices=SCOPE_CHOICES)
+    rule            = models.CharField(max_length=20, choices=RULE_CHOICES)
+    is_hard         = models.BooleanField(
         default=True,
         help_text="Hard constraints must be satisfied. Soft = try but can skip.",
     )
-    # At most one of these points to the constrained entity
     curriculum_unit = models.ForeignKey(
         CurriculumUnit, null=True, blank=True, on_delete=models.CASCADE,
-        related_name="constraints"
+        related_name="constraints",
     )
-    trainer        = models.ForeignKey(
+    trainer         = models.ForeignKey(
         Trainer, null=True, blank=True, on_delete=models.CASCADE,
-        related_name="constraints"
+        related_name="constraints",
     )
-    room           = models.ForeignKey(
+    room            = models.ForeignKey(
         Room, null=True, blank=True, on_delete=models.CASCADE,
-        related_name="constraints"
+        related_name="constraints",
     )
-    cohort         = models.ForeignKey(
+    cohort          = models.ForeignKey(
         Cohort, null=True, blank=True, on_delete=models.CASCADE,
-        related_name="constraints"
+        related_name="constraints",
     )
-    # Rule parameters â€” flexible JSON payload
-    # PIN_DAY_PERIOD:  {"day": "MON", "period_id": "<uuid>"}
-    # PIN_DAY:         {"day": "WED"}
-    # PREFERRED_ROOM:  {"room_id": "<uuid>"}
-    # AVOID_DAY:       {"day": "FRI"}
-    # AVOID_PERIOD:    {"period_id": "<uuid>"}
-    # MAX_PER_DAY:     {"max": 2}
-    parameters     = models.JSONField(default=dict)
-    is_active      = models.BooleanField(default=True)
-    notes          = models.TextField(blank=True)
+    parameters      = models.JSONField(default=dict)
+    is_active       = models.BooleanField(default=True)
+    notes           = models.TextField(blank=True)
 
     class Meta:
         ordering = ["-is_hard", "scope", "rule"]
@@ -787,33 +1035,14 @@ class Constraint(TimeStampedModel):
 
     def __str__(self):
         hardness = "HARD" if self.is_hard else "SOFT"
-        return f"[{hardness}] {self.scope} {self.rule} â€“ {self.parameters}"
+        return f"[{hardness}] {self.scope} {self.rule} — {self.parameters}"
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 # ScheduledUnit  (the master timetable template)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 
 class ScheduledUnit(TimeStampedModel):
-    """
-    One row in the weekly timetable template.
-
-    Represents: cohort X studies curriculum_unit Y with trainer Z
-                in room R on day D at period P during term T.
-
-    This is a TEMPLATE â€” it repeats every teaching week of the term.
-    week_number is NOT stored; derive it in the view layer if needed.
-
-    For double/consecutive periods, two ScheduledUnit rows are created
-    (same unit, same day, consecutive periods) linked by sequence (1 and 2).
-
-    status
-    ------
-    DRAFT      â€” generated, not published
-    PUBLISHED  â€” live and visible to students / trainers
-    CANCELLED  â€” cancelled for this term
-    """
-
     STATUS_CHOICES = [
         ("DRAFT",     "Draft"),
         ("PUBLISHED", "Published"),
@@ -830,21 +1059,20 @@ class ScheduledUnit(TimeStampedModel):
         CurriculumUnit, on_delete=models.CASCADE, related_name="scheduled_units"
     )
     trainer         = models.ForeignKey(
-        Trainer, null=True, blank=True, on_delete=models.SET_NULL, related_name="scheduled_units"
+        Trainer, null=True, blank=True, on_delete=models.SET_NULL,
+        related_name="scheduled_units",
     )
     room            = models.ForeignKey(
         Room, on_delete=models.CASCADE, related_name="scheduled_units"
     )
-    day             = models.CharField(max_length=3)       # MON, TUE, â€¦
+    day             = models.CharField(max_length=3)
     period          = models.ForeignKey(
         Period, on_delete=models.CASCADE, related_name="scheduled_units"
     )
-    # For consecutive double periods: sequence = 1 for first slot, 2 for second
     sequence        = models.PositiveSmallIntegerField(
         default=0,
         help_text="0 = single period; 1 = first of a pair; 2 = second of a pair",
     )
-    # Combined classes: multiple cohorts attending the same session
     is_combined     = models.BooleanField(default=False)
     combined_key    = models.CharField(
         max_length=100, blank=True, db_index=True,
@@ -866,19 +1094,16 @@ class ScheduledUnit(TimeStampedModel):
             models.Index(fields=["combined_key"]),
         ]
         constraints = [
-            # Prevent trainer double-booking (published only)
             UniqueConstraint(
                 fields=["term", "trainer", "day", "period"],
                 condition=Q(status="PUBLISHED"),
                 name="uniq_trainer_slot_published",
             ),
-            # Prevent cohort double-booking (published only)
             UniqueConstraint(
                 fields=["term", "cohort", "day", "period"],
                 condition=Q(status="PUBLISHED"),
                 name="uniq_cohort_slot_published",
             ),
-            # Prevent room double-booking (published only)
             UniqueConstraint(
                 fields=["term", "room", "day", "period"],
                 condition=Q(status="PUBLISHED"),
@@ -899,67 +1124,61 @@ class ScheduledUnit(TimeStampedModel):
         self.save(update_fields=["status", "published_at", "updated_at"])
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-# Conflict  (clashes found during / after generation)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
+# Conflict
+# ─────────────────────────────────────────────────────────────────────────────
 
 class Conflict(TimeStampedModel):
-    """
-    A scheduling conflict that could not be auto-resolved.
-    The scheduler creates these; coordinators resolve them.
-    """
     TYPE_CHOICES = [
-        ("TRAINER_CLASH",  "Trainer double-booked"),
-        ("ROOM_CLASH",     "Room double-booked"),
-        ("COHORT_CLASH",   "Cohort double-booked"),
-        ("NO_TRAINER",     "No qualified trainer"),
-        ("NO_ROOM",        "No suitable room"),
-        ("CONSTRAINT",     "Constraint violated"),
-        ("CAPACITY",       "Room capacity exceeded"),
+        ("TRAINER_CLASH", "Trainer double-booked"),
+        ("ROOM_CLASH",    "Room double-booked"),
+        ("COHORT_CLASH",  "Cohort double-booked"),
+        ("NO_TRAINER",    "No qualified trainer"),
+        ("NO_ROOM",       "No suitable room"),
+        ("CONSTRAINT",    "Constraint violated"),
+        ("CAPACITY",      "Room capacity exceeded"),
     ]
     SEVERITY_CHOICES = [
-        ("HIGH",   "High â€“ blocks publishing"),
-        ("MEDIUM", "Medium â€“ possible issue"),
-        ("LOW",    "Low â€“ informational"),
+        ("HIGH",   "High — blocks publishing"),
+        ("MEDIUM", "Medium — possible issue"),
+        ("LOW",    "Low — informational"),
     ]
     RESOLUTION_CHOICES = [
-        ("PENDING",   "Pending"),
-        ("RESOLVED",  "Resolved"),
-        ("OVERRIDDEN","Overridden"),
-        ("IGNORED",   "Ignored"),
+        ("PENDING",    "Pending"),
+        ("RESOLVED",   "Resolved"),
+        ("OVERRIDDEN", "Overridden"),
+        ("IGNORED",    "Ignored"),
     ]
 
-    term            = models.ForeignKey(
+    term              = models.ForeignKey(
         Term, on_delete=models.CASCADE, related_name="conflicts"
     )
-    conflict_type   = models.CharField(max_length=15, choices=TYPE_CHOICES)
-    severity        = models.CharField(
+    conflict_type     = models.CharField(max_length=15, choices=TYPE_CHOICES)
+    severity          = models.CharField(
         max_length=6, choices=SEVERITY_CHOICES, default="HIGH"
     )
-    description     = models.TextField()
-    # What was being scheduled when the conflict was found
-    curriculum_unit = models.ForeignKey(
+    description       = models.TextField()
+    curriculum_unit   = models.ForeignKey(
         CurriculumUnit, null=True, blank=True, on_delete=models.SET_NULL
     )
-    cohort          = models.ForeignKey(
+    cohort            = models.ForeignKey(
         Cohort, null=True, blank=True, on_delete=models.SET_NULL
     )
-    trainer         = models.ForeignKey(
+    trainer           = models.ForeignKey(
         Trainer, null=True, blank=True, on_delete=models.SET_NULL
     )
-    room            = models.ForeignKey(
+    room              = models.ForeignKey(
         Room, null=True, blank=True, on_delete=models.SET_NULL
     )
-    # Resolution
     resolution_status = models.CharField(
         max_length=10, choices=RESOLUTION_CHOICES, default="PENDING"
     )
-    resolved_by     = models.ForeignKey(
+    resolved_by       = models.ForeignKey(
         User, null=True, blank=True, on_delete=models.SET_NULL,
-        related_name="resolved_conflicts"
+        related_name="resolved_conflicts",
     )
-    resolved_at     = models.DateTimeField(null=True, blank=True)
-    resolution_note = models.TextField(blank=True)
+    resolved_at       = models.DateTimeField(null=True, blank=True)
+    resolution_note   = models.TextField(blank=True)
 
     class Meta:
         ordering = ["-created_at", "-severity"]
@@ -978,25 +1197,25 @@ class Conflict(TimeStampedModel):
         self.resolution_note   = note
         self.save(update_fields=[
             "resolution_status", "resolved_by", "resolved_at",
-            "resolution_note", "updated_at"
+            "resolution_note", "updated_at",
         ])
 
 
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 # AuditLog  (immutable change trail)
-# â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ─────────────────────────────────────────────────────────────────────────────
 
 class AuditLog(models.Model):
-    """Immutable â€” never delete rows from this table."""
+    """Immutable — never delete rows from this table."""
 
     ACTION_CHOICES = [
-        ("GENERATE",  "Timetable Generated"),
-        ("PUBLISH",   "Timetable Published"),
-        ("DELETE",    "Timetable Deleted"),
-        ("EDIT",      "Entry Edited"),
-        ("CANCEL",    "Entry Cancelled"),
-        ("RESOLVE",   "Conflict Resolved"),
-        ("PROGRESS",  "Progress Updated"),
+        ("GENERATE", "Timetable Generated"),
+        ("PUBLISH",  "Timetable Published"),
+        ("DELETE",   "Timetable Deleted"),
+        ("EDIT",     "Entry Edited"),
+        ("CANCEL",   "Entry Cancelled"),
+        ("RESOLVE",  "Conflict Resolved"),
+        ("PROGRESS", "Progress Updated"),
     ]
 
     id           = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -1009,15 +1228,10 @@ class AuditLog(models.Model):
         Term, null=True, on_delete=models.SET_NULL, related_name="audit_logs"
     )
     description  = models.TextField()
-    payload      = models.JSONField(default=dict)   # before/after snapshots
+    payload      = models.JSONField(default=dict)
 
     class Meta:
         ordering = ["-timestamp"]
 
     def __str__(self):
         return f"{self.action} by {self.performed_by} @ {self.timestamp:%Y-%m-%d %H:%M}"
-
-
-
-
-
