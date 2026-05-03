@@ -44,10 +44,15 @@ urlpatterns = [
     path("cohorts/<uuid:cohort_id>/advance/",         views.AdvanceCohortView.as_view()),
     path("cohorts/<uuid:cohort_id>/progress/update/", views.UpdateProgressView.as_view()),
 
+    path("term/advance-all/", views.AdvanceAllCohortsView.as_view()),
+
     # ── Constraints ──────────────────────────────────────────────────────────
     path("constraints/",                views.ConstraintListView.as_view()),
     path("constraints/<uuid:constraint_id>/", views.ConstraintDetailView.as_view()),
 
+    # Validate timetable against constraints
+    path("timetable/validate/", views.ValidateView.as_view()),
+    
     # ── Timetable generation ─────────────────────────────────────────────────
     path("timetable/generate/",         views.GenerateView.as_view()),
     path("timetable/publish/",          views.PublishView.as_view()),
