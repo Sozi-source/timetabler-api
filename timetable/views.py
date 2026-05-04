@@ -7,7 +7,7 @@ Clean, flat REST API.  Every endpoint returns a predictable shape:
 
 Endpoint map
 ------------
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Institution / setup ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Institution / setup ──────────────────────────────────────────────────────
 GET  /api/institution/                          InstitutionView
 GET  /api/departments/                          DepartmentListView
 GET  /api/programmes/                           ProgrammeListView
@@ -17,37 +17,49 @@ GET  /api/rooms/                                RoomListView
 GET  /api/trainers/                             TrainerListView
 GET  /api/terms/                                TermListView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Cohorts & progression ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Cohorts & progression ────────────────────────────────────────────────────
 GET  /api/cohorts/                              CohortListView
 GET  /api/cohorts/<id>/progress/               CohortProgressView
 POST /api/cohorts/<id>/advance/                AdvanceCohortView
 POST /api/cohorts/<id>/progress/update/        UpdateProgressView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Constraints ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Enrolments ───────────────────────────────────────────────────────────────
+GET  /api/enrolments/                          CohortEnrolmentListView
+POST /api/enrolments/                          CohortEnrolmentListView
+GET  /api/enrolments/<id>/                     CohortEnrolmentDetailView
+PUT  /api/enrolments/<id>/                     CohortEnrolmentDetailView
+DEL  /api/enrolments/<id>/                     CohortEnrolmentDetailView
+
+── Semester advancement ─────────────────────────────────────────────────────
+GET  /api/term/advance-all/?term=<id>          AdvanceAllCohortsView (preview)
+POST /api/term/advance-all/                    AdvanceAllCohortsView (confirm)
+
+── Constraints ──────────────────────────────────────────────────────────────
 GET  /api/constraints/                          ConstraintListView
 POST /api/constraints/                          ConstraintListView
 PUT  /api/constraints/<id>/                     ConstraintDetailView
 DEL  /api/constraints/<id>/                     ConstraintDetailView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Timetable generation ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Timetable generation ─────────────────────────────────────────────────────
 POST /api/timetable/generate/                   GenerateView
 POST /api/timetable/publish/                    PublishView
 DEL  /api/timetable/drafts/                     DeleteDraftsView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Timetable reading ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Timetable reading ────────────────────────────────────────────────────────
 GET  /api/timetable/master/?term=<id>           MasterTimetableView
 GET  /api/timetable/cohort/<id>/?term=<id>      CohortTimetableView
 GET  /api/timetable/trainer/<id>/?term=<id>     TrainerTimetableView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Conflicts ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Conflicts ────────────────────────────────────────────────────────────────
 GET  /api/conflicts/?term=<id>                  ConflictListView
 POST /api/conflicts/<id>/resolve/               ResolveConflictView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Exports ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Exports ──────────────────────────────────────────────────────────────────
 GET  /api/export/master/?term=<id>&fmt=html     ExportMasterView
 GET  /api/export/trainer/<id>/?term=<id>        ExportTrainerView
+GET  /api/export/cohort/<id>/?term=<id>         ExportCohortView
 
-ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Dashboard ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+── Dashboard ────────────────────────────────────────────────────────────────
 GET  /api/dashboard/                            DashboardView
 GET  /api/dashboard/trainer/                    TrainerDashboardView
 """
@@ -55,37 +67,37 @@ GET  /api/dashboard/trainer/                    TrainerDashboardView
 from __future__ import annotations
 
 import traceback
+from collections import defaultdict
 from datetime import date
 
 from django.db import transaction
-from django.db.models import Count, Prefetch, Q, Sum, F
+from django.db.models import Count, Q, F
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import (
-    AuditLog, Cohort, Conflict, Constraint, CurriculumUnit, CurriculumUnitTrainer,
-    Department, Institution, Period, Programme, ProgressRecord,
-    Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
+    AuditLog, Cohort, CohortEnrolment, Conflict, Constraint,
+    CurriculumUnit, CurriculumUnitTrainer,
+    CollegeCalendar, Department, Institution, Period, Programme,
+    ProgressRecord, Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
 )
 from .scheduler import TimetableEngine
 
 
-
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Response helpers
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
-def ok(data, status_code=200) -> Response:
+def ok(data, status_code: int = 200) -> Response:
     return Response({"ok": True, "data": data}, status=status_code)
 
 
-def err(message: str, detail: str = "", status_code=400) -> Response:
+def err(message: str, detail: str = "", status_code: int = 400) -> Response:
     payload = {"ok": False, "error": message}
     if detail:
         payload["detail"] = detail
@@ -101,7 +113,6 @@ def _term_from_request(request) -> Term | None:
     )
     if tid:
         return Term.objects.filter(id=tid).first()
-    # Fall back to current term for the institution
     inst = _institution(request)
     if inst:
         return Term.objects.filter(institution=inst, is_current=True).first()
@@ -109,23 +120,38 @@ def _term_from_request(request) -> Term | None:
 
 
 def _institution(request) -> Institution | None:
-    # In a multi-tenant setup resolve from user profile or header.
-    # For single-institution setups, just return the first one.
-    return Institution.objects.filter().first()
+    return Institution.objects.first()
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# Serialisation helpers  (plain dicts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no DRF serializers needed for reads)
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
+# Serialisation helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _term_dict(t: Term) -> dict:
+    return {
+        "id":               str(t.id),
+        "name":             t.name,
+        "start_date":       str(t.start_date),
+        "end_date":         str(t.end_date),
+        "teaching_weeks":   t.teaching_weeks,
+        "is_current":       t.is_current,
+        "current_week":     t.week_number,
+        "weeks_remaining":  t.weeks_remaining,
+        "college_year":     t.college_year,
+        "college_semester": t.college_semester,
+    }
+
 
 def _period_dict(p: Period) -> dict:
-    import datetime
-    def _duration(s, e):
+    import datetime as dt
+    def _dur(s, e):
         try:
-            if isinstance(s, str): s = datetime.time.fromisoformat(s[:5])
-            if isinstance(e, str): e = datetime.time.fromisoformat(e[:5])
-            today = datetime.date.today()
-            return (datetime.datetime.combine(today, e) - datetime.datetime.combine(today, s)).seconds / 3600
+            if isinstance(s, str): s = dt.time.fromisoformat(s[:5])
+            if isinstance(e, str): e = dt.time.fromisoformat(e[:5])
+            today = dt.date.today()
+            return (
+                dt.datetime.combine(today, e) - dt.datetime.combine(today, s)
+            ).seconds / 3600
         except Exception:
             return 0
     return {
@@ -135,7 +161,7 @@ def _period_dict(p: Period) -> dict:
         "end":      str(p.end_time),
         "order":    p.order,
         "is_break": p.is_break,
-        "duration": _duration(p.start_time, p.end_time),
+        "duration": _dur(p.start_time, p.end_time),
     }
 
 
@@ -166,28 +192,26 @@ def _trainer_dict(t: Trainer, include_load: bool = False) -> dict:
 
 def _unit_dict(u: CurriculumUnit) -> dict:
     return {
-        "id":              str(u.id),
-        "code":            u.code,
-        "name":            u.name,
-        "term_number":     u.term_number,
-        "credit_hours":    u.credit_hours,
+        "id":               str(u.id),
+        "code":             u.code,
+        "name":             u.name,
+        "term_number":      u.term_number,
+        "credit_hours":     u.credit_hours,
         "periods_per_week": u.periods_per_week,
-        "unit_type":       u.get_unit_type_display(),
-        "is_double":       u.periods_per_week >= 2,
-        "is_outsourced":   u.is_outsourced,
+        "unit_type":        u.get_unit_type_display(),
+        "is_double":        u.periods_per_week >= 2,
+        "is_outsourced":    u.is_outsourced,
     }
 
 
 def _scheduled_unit_dict(su: ScheduledUnit) -> dict:
     return {
         "id":              str(su.id),
-        # Raw IDs — used by edit modals / dropdowns
         "term":            str(su.term_id),
         "curriculum_unit": str(su.curriculum_unit_id),
         "cohort":          str(su.cohort_id) if su.cohort_id else None,
         "trainer":         str(su.trainer_id) if su.trainer_id else None,
         "room":            str(su.room_id) if su.room_id else None,
-        # Display names — rendered in cards / grids
         "unit_code":       su.curriculum_unit.code,
         "unit_name":       su.curriculum_unit.name,
         "cohort_name":     su.cohort.name if su.cohort else None,
@@ -195,7 +219,6 @@ def _scheduled_unit_dict(su: ScheduledUnit) -> dict:
         "trainer_full":    f"{su.trainer.title} {su.trainer.last_name}" if su.trainer else None,
         "room_code":       su.room.code if su.room else None,
         "room_capacity":   su.room.capacity if su.room else None,
-        # Scheduling
         "day":             su.day,
         "period":          str(su.period_id),
         "period_label":    su.period.label if su.period else None,
@@ -206,13 +229,31 @@ def _scheduled_unit_dict(su: ScheduledUnit) -> dict:
         "combined_key":    su.combined_key or "",
         "status":          su.status,
         "published_at":    su.published_at.isoformat() if getattr(su, "published_at", None) else None,
-        "notes":           su.notes or "" if getattr(su, "notes", None) is not None else "",
+        "notes":           su.notes or "",
     }
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+def _enrolment_dict(e: CohortEnrolment) -> dict:
+    return {
+        "id":               str(e.id),
+        "cohort_id":        str(e.cohort_id),
+        "cohort_name":      e.cohort.name,
+        "programme":        e.cohort.programme.name,
+        "programme_code":   e.cohort.programme.code,
+        "programme_id":     str(e.cohort.programme_id),
+        "college_term_id":  str(e.college_term_id),
+        "college_term_name": e.college_term.name,
+        "programme_term":   e.programme_term,
+        "status":           e.status,
+        "is_graduating":    e.is_graduating,
+        "student_count":    e.cohort.student_count,
+        "notes":            e.notes,
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Institution / Setup views
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class InstitutionView(APIView):
     permission_classes = [IsAuthenticated]
@@ -236,13 +277,16 @@ class DepartmentListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        inst = _institution(request)
+        inst  = _institution(request)
         depts = Department.objects.filter(institution=inst, is_active=True).order_by("name")
         return ok([
-            {"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active}
+            {
+                "id": str(d.id), "code": d.code, "name": d.name,
+                "hod": d.hod, "institution_id": str(d.institution_id),
+                "is_active": d.is_active,
+            }
             for d in depts
         ])
-
 
     def post(self, request):
         inst = _institution(request)
@@ -254,11 +298,17 @@ class DepartmentListView(APIView):
                 name=data["name"],
                 hod=data.get("hod", ""),
             )
-            return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active}, 201)
+            return ok(
+                {"id": str(d.id), "code": d.code, "name": d.name,
+                 "hod": d.hod, "institution_id": str(d.institution_id),
+                 "is_active": d.is_active},
+                201,
+            )
         except KeyError as e:
             return err(f"Missing field: {e}")
         except Exception as e:
             return err(str(e), status_code=500)
+
 
 class ProgrammeListView(APIView):
     permission_classes = [IsAuthenticated]
@@ -281,7 +331,6 @@ class ProgrammeListView(APIView):
             for p in qs.order_by("code")
         ])
 
-
     def post(self, request):
         data = request.data
         try:
@@ -300,27 +349,21 @@ class ProgrammeListView(APIView):
         except Exception as e:
             return err(str(e), status_code=500)
 
+
 class CurriculumView(APIView):
-    """
-    GET /api/curriculum/?programme=<id>&term_number=<n>
-    Returns all CurriculumUnits for a programme (optionally filtered by term).
-    """
+    """GET /api/curriculum/?programme=<id>&term_number=<n>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        prog_id = request.query_params.get("programme")
+        prog_id  = request.query_params.get("programme")
         term_num = request.query_params.get("term_number")
-
         if not prog_id:
             return err("programme query param required")
-
         qs = CurriculumUnit.objects.filter(
             programme_id=prog_id, is_active=True
         ).prefetch_related("qualified_trainers").order_by("term_number", "position")
-
         if term_num:
             qs = qs.filter(term_number=term_num)
-
         return ok([
             {
                 **_unit_dict(u),
@@ -337,7 +380,7 @@ class PeriodListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        inst = _institution(request)
+        inst    = _institution(request)
         periods = Period.objects.filter(institution=inst).order_by("order")
         return ok([_period_dict(p) for p in periods])
 
@@ -364,8 +407,8 @@ class RoomListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        inst = _institution(request)
-        qs = Room.objects.filter(institution=inst, is_active=True).order_by("code")
+        inst      = _institution(request)
+        qs        = Room.objects.filter(institution=inst, is_active=True).order_by("code")
         room_type = request.query_params.get("room_type")
         if room_type:
             qs = qs.filter(room_type=room_type)
@@ -381,7 +424,6 @@ class RoomListView(APIView):
             }
             for r in qs
         ])
-
 
     def post(self, request):
         inst = _institution(request)
@@ -402,28 +444,27 @@ class RoomListView(APIView):
         except Exception as e:
             return err(str(e), status_code=500)
 
+
 class TrainerListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        inst = _institution(request)
-        dept_id = request.query_params.get("department")
-        unit_id = request.query_params.get("unit")
-
-        qs = Trainer.objects.filter(institution=inst, is_active=True).select_related("department")
+        inst      = _institution(request)
+        dept_id   = request.query_params.get("department")
+        unit_id   = request.query_params.get("unit")
+        qs        = Trainer.objects.filter(institution=inst, is_active=True).select_related("department")
         if dept_id:
             qs = qs.filter(department_id=dept_id)
         if unit_id:
             qs = qs.filter(qualified_units__id=unit_id)
-
         return ok([_trainer_dict(t) for t in qs.order_by("last_name")])
 
-
     def post(self, request):
+        import time
         inst = _institution(request)
         data = request.data
         try:
-            dept = get_object_or_404(Department, id=data["department_id"])
+            dept     = get_object_or_404(Department, id=data["department_id"])
             staff_id = data.get("staff_id", "").strip() or f"TRN-{int(time.time()*1000) % 1000000}"
             t = Trainer.objects.create(
                 institution=inst,
@@ -443,60 +484,172 @@ class TrainerListView(APIView):
         except Exception as e:
             return err(str(e), status_code=500)
 
+
 class TermListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        inst = _institution(request)
+        inst  = _institution(request)
         terms = Term.objects.filter(institution=inst).order_by("-start_date")
-        return ok([
-            {
-                "id":             str(t.id),
-                "name":           t.name,
-                "start_date":     str(t.start_date),
-                "end_date":       str(t.end_date),
-                "teaching_weeks": t.teaching_weeks,
-                "is_current":     t.is_current,
-                "current_week":   t.week_number,
-                "weeks_remaining": t.weeks_remaining,
-            }
-            for t in terms
-        ])
+        return ok([_term_dict(t) for t in terms])
 
     def post(self, request):
-        """Create a new term."""
         inst = _institution(request)
         data = request.data
+        college_year     = data.get("college_year")
+        college_semester = data.get("college_semester")
+
+        if college_year and college_semester:
+            try:
+                college_year     = int(college_year)
+                college_semester = int(college_semester)
+                assert college_semester in (1, 2, 3)
+            except (ValueError, AssertionError):
+                return err("college_year must be an integer; college_semester must be 1, 2 or 3")
+            start_date, end_date = CollegeCalendar.semester_dates(college_year, college_semester)
+            sem_labels = {1: "Sem 1", 2: "Sem 2", 3: "Sem 3"}
+            name = data.get("name", f"{inst.short_name} – {sem_labels[college_semester]} {college_year}")
+        else:
+            try:
+                name             = data["name"]
+                start_date       = data["start_date"]
+                end_date         = data["end_date"]
+                college_year     = data.get("college_year")
+                college_semester = data.get("college_semester")
+            except KeyError as e:
+                return err(f"Missing field: {e}")
+
         try:
             term = Term.objects.create(
-                institution=inst,
-                name=data["name"],
-                start_date=data["start_date"],
-                end_date=data["end_date"],
-                teaching_weeks=int(data.get("teaching_weeks", 14)),
-                is_current=bool(data.get("is_current", False)),
+                institution      = inst,
+                name             = name,
+                start_date       = start_date,
+                end_date         = end_date,
+                teaching_weeks   = int(data.get("teaching_weeks", 14)),
+                is_current       = bool(data.get("is_current", False)),
+                college_year     = college_year,
+                college_semester = college_semester,
             )
-            return ok({"id": str(term.id), "name": term.name}, status_code=201)
-        except KeyError as e:
-            return err(f"Missing field: {e}")
+            return ok(_term_dict(term), 201)
         except Exception as e:
             return err(str(e), traceback.format_exc(), 500)
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
+# CollegeCalendarView
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CollegeCalendarView(APIView):
+    """GET /api/calendar/"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        inst = _institution(request)
+        today_year, today_sem = CollegeCalendar.current_semester()
+        sems_window = self._semester_window(today_year, today_sem, back=2, forward=2)
+
+        term_map: dict[tuple[int, int], Term] = {}
+        for t in Term.objects.filter(institution=inst):
+            if t.college_year and t.college_semester:
+                term_map[(t.college_year, t.college_semester)] = t
+
+        cohorts = list(
+            Cohort.objects.filter(
+                programme__department__institution=inst, is_active=True
+            ).select_related("programme")
+        )
+
+        semesters = []
+        for year, sem in sems_window:
+            is_current = (year == today_year and sem == today_sem)
+            is_past    = (year * 3 + sem) < (today_year * 3 + today_sem)
+            term       = term_map.get((year, sem))
+
+            cohort_entries = []
+            for c in cohorts:
+                prog_term = CollegeCalendar.cohort_term_at(
+                    c.start_year, c.start_month, year, sem, c.programme.total_terms
+                )
+                if prog_term is None:
+                    continue
+                cohort_entries.append({
+                    "cohort_id":           str(c.id),
+                    "cohort_name":         c.name,
+                    "programme":           c.programme.name,
+                    "programme_code":      c.programme.code,
+                    "programme_term":      prog_term,
+                    "current_stored_term": c.current_term,
+                    "is_new_intake":       prog_term == 1,
+                    "is_graduating":       prog_term == c.programme.total_terms,
+                    "student_count":       c.student_count,
+                })
+
+            can_advance = False
+            if is_current and term:
+                next_year, next_sem = CollegeCalendar.next_semester(year, sem)
+                has_next_term   = (next_year, next_sem) in term_map
+                published_count = ScheduledUnit.objects.filter(
+                    term=term, status="PUBLISHED"
+                ).count()
+                can_advance = has_next_term and published_count > 0
+
+            semesters.append({
+                "year":         year,
+                "semester":     sem,
+                "label":        CollegeCalendar.semester_label(year, sem),
+                "is_current":   is_current,
+                "is_past":      is_past,
+                "term":         _term_dict(term) if term else None,
+                "cohorts":      cohort_entries,
+                "cohort_count": len(cohort_entries),
+                "can_advance":  can_advance,
+            })
+
+        current_entry = next((s for s in semesters if s["is_current"]), None)
+        return ok({
+            "today":     {"year": today_year, "semester": today_sem},
+            "current":   current_entry,
+            "semesters": semesters,
+        })
+
+    def _semester_window(self, year, sem, back, forward):
+        cur_idx = year * 3 + (sem - 1)
+        result  = []
+        for idx in range(cur_idx - back, cur_idx + forward + 1):
+            y, s = divmod(idx, 3)
+            result.append((y, s + 1))
+        return result
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Cohorts & Progression
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class CohortListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         prog_id = request.query_params.get("programme")
-        qs = Cohort.objects.filter(is_active=True).select_related("programme")
+        qs      = Cohort.objects.filter(is_active=True).select_related("programme")
         if prog_id:
             qs = qs.filter(programme_id=prog_id)
-        return ok([
-             {
+
+        # Pre-fetch the latest enrolment per cohort (any term, any status)
+        # so completed cohorts whose enrolment is in a past term are still found.
+        enrolment_map: dict[str, CohortEnrolment] = {}
+        for e in (
+            CohortEnrolment.objects
+            .filter(cohort__in=qs)
+            .select_related("cohort")
+            .order_by("cohort_id", "-created_at")
+            .distinct("cohort_id")
+        ):
+            enrolment_map[str(e.cohort_id)] = e
+
+        result = []
+        for c in qs.order_by("-start_year", "programme"):
+            enrolment = enrolment_map.get(str(c.id))
+            result.append({
                 "id":                    str(c.id),
                 "name":                  c.name,
                 "programme":             c.programme.name,
@@ -504,21 +657,24 @@ class CohortListView(APIView):
                 "current_term":          c.current_term,
                 "computed_current_term": c.computed_current_term,
                 "term_is_synced":        c.term_is_synced,
+                "total_terms":           c.programme.total_terms,
                 "student_count":         c.student_count,
                 "start_year":            c.start_year,
                 "start_month":           c.start_month,
                 "is_active":             c.is_active,
                 "progress":              c.progress_summary,
-            }
-            for c in qs.order_by("-start_year", "programme")
-        ])
+                "enrolment_id":     str(enrolment.id) if enrolment else None,
+                "enrolment_status": enrolment.status if enrolment else None,
+                "programme_term":   enrolment.programme_term if enrolment else c.current_term,
+                "is_enrolled":      enrolment is not None and enrolment.status == CohortEnrolment.ACTIVE,
+            })
+        return ok(result)
 
     def post(self, request):
-        """Create a cohort."""
         data = request.data
         try:
             programme = get_object_or_404(Programme, id=data["programme_id"])
-            cohort = Cohort.objects.create(
+            cohort    = Cohort.objects.create(
                 programme=programme,
                 name=data["name"],
                 start_year=int(data["start_year"]),
@@ -526,27 +682,38 @@ class CohortListView(APIView):
                 current_term=int(data.get("current_term", 1)),
                 student_count=int(data.get("student_count", 0)),
             )
+            # Auto-enrol in the current college term so current_term
+            # is immediately synced via the post_save signal.
+            inst         = _institution(request)
+            current_term = Term.objects.filter(
+                institution=inst, is_current=True
+            ).first()
+            if current_term:
+                CohortEnrolment.objects.create(
+                    cohort=cohort,
+                    college_term=current_term,
+                    programme_term=cohort.computed_current_term,
+                    status=CohortEnrolment.ACTIVE,
+                )
             return ok({"id": str(cohort.id), "name": cohort.name}, 201)
         except KeyError as e:
             return err(f"Missing field: {e}")
         except Exception as e:
             return err(str(e), traceback.format_exc(), 500)
 
-
 class CohortProgressView(APIView):
     """GET /api/cohorts/<id>/progress/?term=<term_id>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, cohort_id):
-        cohort = get_object_or_404(Cohort, id=cohort_id)
-        term   = _term_from_request(request)
+        cohort    = get_object_or_404(Cohort, id=cohort_id)
+        term      = _term_from_request(request)
+        enrolment = cohort.active_enrolment(college_term=term) if term else cohort.active_enrolment()
 
-        # All curriculum units for this programme
         all_units = CurriculumUnit.objects.filter(
             programme=cohort.programme, is_active=True
         ).order_by("term_number", "position")
 
-        # Progress records
         records = {
             str(pr.curriculum_unit_id): pr
             for pr in ProgressRecord.objects.filter(cohort=cohort)
@@ -556,31 +723,23 @@ class CohortProgressView(APIView):
         for u in all_units:
             pr = records.get(str(u.id))
             units_by_term.setdefault(u.term_number, []).append({
-                "unit_id":    str(u.id),
-                "code":       u.code,
-                "name":       u.name,
-                "credit_hours": u.credit_hours,
-                "unit_type":  u.get_unit_type_display(),
-                "status":     pr.status if pr else ProgressRecord.NOT_STARTED,
-                "score":      float(pr.score) if pr and pr.score else None,
-                "started_at":    str(pr.started_at) if pr and pr.started_at else None,
-                "completed_at":  str(pr.completed_at) if pr and pr.completed_at else None,
+                "unit_id":         str(u.id),
+                "code":            u.code,
+                "name":            u.name,
+                "credit_hours":    u.credit_hours,
+                "unit_type":       u.get_unit_type_display(),
+                "status":          pr.status if pr else ProgressRecord.NOT_STARTED,
+                "score":           float(pr.score) if pr and pr.score else None,
+                "started_at":      str(pr.started_at) if pr and pr.started_at else None,
+                "completed_at":    str(pr.completed_at) if pr and pr.completed_at else None,
                 "is_current_term": u.term_number == cohort.current_term,
             })
 
-        ct = cohort.current_term
+        ct       = cohort.current_term
+        covered  = {tn: u for tn, u in units_by_term.items() if tn < ct}
+        current  = {tn: u for tn, u in units_by_term.items() if tn == ct}
+        upcoming = {tn: u for tn, u in units_by_term.items() if tn == ct + 1}
 
-        covered  = {
-            tn: units for tn, units in units_by_term.items() if tn < ct
-        }
-        current  = {
-            tn: units for tn, units in units_by_term.items() if tn == ct
-        }
-        upcoming = {
-            tn: units for tn, units in units_by_term.items() if tn == ct + 1
-        }
-
-        # REPLACE WITH:
         return ok({
             "cohort_id":             str(cohort.id),
             "cohort_name":           cohort.name,
@@ -589,6 +748,7 @@ class CohortProgressView(APIView):
             "computed_current_term": cohort.computed_current_term,
             "term_is_synced":        cohort.term_is_synced,
             "total_terms":           cohort.programme.total_terms,
+            "enrolment":             _enrolment_dict(enrolment) if enrolment else None,
             "summary":               cohort.progress_summary,
             "terms":                 units_by_term,
             "covered":               covered,
@@ -596,8 +756,9 @@ class CohortProgressView(APIView):
             "upcoming":              upcoming,
         })
 
+
 class AdvanceCohortView(APIView):
-    """POST /api/cohorts/<id>/advance/ ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â move cohort to next term."""
+    """POST /api/cohorts/<id>/advance/ — move a single cohort to its next term."""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, cohort_id):
@@ -615,31 +776,31 @@ class AdvanceCohortView(APIView):
 
 
 class UpdateProgressView(APIView):
-    """
-    POST /api/cohorts/<id>/progress/update/
-    Body: { "unit_id": "...", "status": "COMPLETED", "score": 72.5 }
-    """
+    """POST /api/cohorts/<id>/progress/update/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, cohort_id):
-        cohort = get_object_or_404(Cohort, id=cohort_id)
-        unit_id = request.data.get("unit_id")
+        cohort     = get_object_or_404(Cohort, id=cohort_id)
+        unit_id    = request.data.get("unit_id")
         new_status = request.data.get("status")
-        score = request.data.get("score")
+        score      = request.data.get("score")
 
         if not unit_id or not new_status:
             return err("unit_id and status are required")
-        if new_status not in {ProgressRecord.NOT_STARTED, ProgressRecord.IN_PROGRESS,
-                               ProgressRecord.COMPLETED, ProgressRecord.DEFERRED}:
+        if new_status not in {
+            ProgressRecord.NOT_STARTED, ProgressRecord.IN_PROGRESS,
+            ProgressRecord.COMPLETED, ProgressRecord.DEFERRED,
+        }:
             return err(f"Invalid status: {new_status}")
 
-        unit = get_object_or_404(CurriculumUnit, id=unit_id, programme=cohort.programme)
-        term = _term_from_request(request)
+        unit      = get_object_or_404(CurriculumUnit, id=unit_id, programme=cohort.programme)
+        term      = _term_from_request(request)
+        enrolment = cohort.active_enrolment(college_term=term) if term else cohort.active_enrolment()
 
-        pr, created = ProgressRecord.objects.get_or_create(
+        pr, _ = ProgressRecord.objects.get_or_create(
             cohort=cohort,
             curriculum_unit=unit,
-            defaults={"term": term},
+            defaults={"term": term, "enrolment": enrolment},
         )
         pr.status = new_status
         if score is not None:
@@ -648,6 +809,8 @@ class UpdateProgressView(APIView):
             pr.started_at = date.today()
         if new_status == ProgressRecord.COMPLETED and not pr.completed_at:
             pr.completed_at = date.today()
+        if pr.enrolment is None and enrolment:
+            pr.enrolment = enrolment
         pr.save()
 
         return ok({
@@ -659,264 +822,390 @@ class UpdateProgressView(APIView):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# STEP 1 — Add this to timetable/views.py
-# Append the entire class below the existing UpdateProgressView class.
-# Also add to the endpoint map comment at the top:
-#   POST /api/term/advance-all/   AdvanceAllCohortsView
+# CohortEnrolment CRUD
 # ─────────────────────────────────────────────────────────────────────────────
 
+class CohortEnrolmentListView(APIView):
+    """
+    GET  /api/enrolments/?term=<id>&status=ACTIVE&cohort=<id>
+    POST /api/enrolments/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        term      = _term_from_request(request)
+        status    = request.query_params.get("status", "")
+        cohort_id = request.query_params.get("cohort")
+
+        qs = CohortEnrolment.objects.select_related(
+            "cohort__programme", "college_term"
+        )
+        if term:
+            qs = qs.filter(college_term=term)
+        if status:
+            qs = qs.filter(status=status)
+        if cohort_id:
+            qs = qs.filter(cohort_id=cohort_id)
+
+        return ok([_enrolment_dict(e) for e in qs.order_by("cohort__name")])
+
+    def post(self, request):
+        data = request.data
+        try:
+            cohort = get_object_or_404(Cohort, id=data["cohort_id"])
+            term   = get_object_or_404(Term,   id=data["term_id"])
+
+            enrolment, created = CohortEnrolment.objects.get_or_create(
+                cohort=cohort,
+                college_term=term,
+                defaults={
+                    "programme_term": int(data["programme_term"]),
+                    "status":         data.get("status", CohortEnrolment.ACTIVE),
+                    "notes":          data.get("notes", ""),
+                },
+            )
+            if not created:
+                return err(
+                    f"{cohort.name} already has an enrolment for {term.name}",
+                    status_code=409,
+                )
+
+            AuditLog.objects.create(
+                action="PROGRESS",
+                performed_by=request.user,
+                term=term,
+                description=(
+                    f"Enrolment created: {cohort.name} → T{enrolment.programme_term} "
+                    f"in {term.name}"
+                ),
+            )
+            return ok(_enrolment_dict(enrolment), 201)
+
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), traceback.format_exc(), 500)
+
+
+class CohortEnrolmentDetailView(APIView):
+    """
+    GET    /api/enrolments/<id>/
+    PUT    /api/enrolments/<id>/
+    DELETE /api/enrolments/<id>/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        e = get_object_or_404(
+            CohortEnrolment.objects.select_related("cohort__programme", "college_term"),
+            id=pk,
+        )
+        return ok(_enrolment_dict(e))
+
+    def put(self, request, pk):
+        e    = get_object_or_404(CohortEnrolment, id=pk)
+        data = request.data
+        old_status = e.status
+
+        for field in ("status", "notes", "programme_term"):
+            if field in data:
+                setattr(e, field, data[field])
+        e.save()
+
+        AuditLog.objects.create(
+            action="PROGRESS",
+            performed_by=request.user,
+            term=e.college_term,
+            description=(
+                f"Enrolment updated: {e.cohort.name} in {e.college_term.name} — "
+                f"status {old_status} → {e.status}"
+            ),
+        )
+        return ok(_enrolment_dict(e))
+
+    def delete(self, request, pk):
+        e    = get_object_or_404(CohortEnrolment, id=pk)
+        name = f"{e.cohort.name} in {e.college_term.name}"
+        e.delete()
+        return ok({"deleted": True, "enrolment": name})
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# AdvanceAllCohortsView
+# ─────────────────────────────────────────────────────────────────────────────
 
 class AdvanceAllCohortsView(APIView):
     """
     POST /api/term/advance-all/
-    Two-phase bulk cohort advancement.
+    GET  /api/term/advance-all/?term=<id>   (preview alias)
 
-    Phase: "preview"
-    ----------------
-    Body:  { "term_id": "<uuid>", "phase": "preview" }
-    Returns a preview of which units will be marked COMPLETED for every
-    active cohort whose current_term has units scheduled in this term.
-    The caller (AdvanceTermModal) shows checkboxes so the user can
-    uncheck any unit they do NOT want auto-marked as complete.
+    Two-phase flow
+    --------------
+    phase=preview  → returns what will happen (no writes)
+    phase=confirm  → executes the move atomically
 
-    Response:
-    {
-      "ok": true,
-      "data": {
-        "cohorts": [
-          {
-            "cohort_id": "...",
-            "cohort_name": "CND JAN 26",
-            "from_term": 1,
-            "to_term": 2,
-            "can_advance": true,          // false if already at max term
-            "units_to_complete": [
-              { "unit_id": "...", "code": "CND1104", "name": "...", "mark_complete": true }
-            ]
-          }
-        ]
+    POST body (preview):
+      { "phase": "preview", "term_id": "<uuid>" }
+
+    POST body (confirm):
+      {
+        "phase":     "confirm",
+        "term_id":   "<uuid>",
+        "overrides": { "<unit_id>": false }
       }
-    }
-
-    Phase: "confirm"
-    ----------------
-    Body:
-    {
-      "term_id": "<uuid>",
-      "phase": "confirm",
-      "overrides": {
-        "<unit_id>": false   // set false to skip marking that unit complete
-      }
-    }
-    Actions performed (all atomic):
-      1. For each active cohort not yet at max term:
-         a. Write ProgressRecord(status=COMPLETED) for units not overridden
-         b. Call cohort.advance_term()
-      2. Write one AuditLog entry.
-
-    Response:
-    {
-      "ok": true,
-      "data": {
-        "cohorts_advanced": 4,
-        "units_completed": 18,
-        "skipped_units": 2
-      }
-    }
     """
-
     permission_classes = [IsAuthenticated]
 
-    # ── helpers ──────────────────────────────────────────────────────────────
-
-    def _active_advanceable_cohorts(self):
-        """Return cohorts that are active and not yet in their final term."""
-        return (
-            Cohort.objects.filter(is_active=True)
-            .select_related("programme")
-            .filter(current_term__lt=F("programme__total_terms"))
-        )
-
-    def _units_for_cohort(self, cohort: Cohort, term) -> list[dict]:
-        """
-        Return CurriculumUnits for cohort.current_term that are scheduled
-        (DRAFT or PUBLISHED) in this term — these are the ones we offer to
-        mark COMPLETED.
-        """
-        scheduled_unit_ids = (
-            ScheduledUnit.objects.filter(
-                term=term,
-                cohort=cohort,
-                status__in=["DRAFT", "PUBLISHED"],
-            )
-            .values_list("curriculum_unit_id", flat=True)
-            .distinct()
-        )
-
-        units = CurriculumUnit.objects.filter(
-            id__in=scheduled_unit_ids,
-            programme=cohort.programme,
-            term_number=cohort.current_term,
-            is_active=True,
-        ).order_by("position")
-
-        return [
-            {
-                "unit_id":       str(u.id),
-                "code":          u.code,
-                "name":          u.name,
-                "credit_hours":  u.credit_hours,
-                "mark_complete": True,   # default: check all
-            }
-            for u in units
-        ]
-
-    # ── GET — lightweight preview without a body (for initial load) ───────────
-
     def get(self, request):
-        """
-        GET /api/term/advance-all/?term=<id>
-        Convenience alias for phase=preview (avoids preflight in some clients).
-        """
         return self._preview(request)
-
-    # ── POST — preview or confirm ─────────────────────────────────────────────
 
     def post(self, request):
         phase = request.data.get("phase", "preview")
         if phase == "preview":
             return self._preview(request)
-        elif phase == "confirm":
+        if phase == "confirm":
             return self._confirm(request)
-        else:
-            return err(f"Unknown phase '{phase}'. Use 'preview' or 'confirm'.")
+        return err(f"Unknown phase '{phase}'. Use 'preview' or 'confirm'.")
 
-    # ── Preview phase ─────────────────────────────────────────────────────────
+    # ── Internal helpers ──────────────────────────────────────────────────────
 
-    def _preview(self, request):
+    def _resolve(self, request) -> tuple[Term | None, Term | None]:
         term = _term_from_request(request)
+        if not term:
+            return None, None
+        next_term = self._next_term(term)
+        return term, next_term
+
+    def _next_term(self, term: Term) -> Term | None:
+        if not (term.college_year and term.college_semester):
+            return None
+        next_year, next_sem = CollegeCalendar.next_semester(
+            term.college_year, term.college_semester
+        )
+        return Term.objects.filter(
+            institution=term.institution,
+            college_year=next_year,
+            college_semester=next_sem,
+        ).first()
+
+    def _active_enrolments(self, term: Term) -> list[CohortEnrolment]:
+        return list(
+            CohortEnrolment.objects.filter(
+                college_term=term,
+                status=CohortEnrolment.ACTIVE,
+            ).select_related("cohort__programme").order_by("cohort__name")
+        )
+
+    def _new_intakes(self, term: Term, next_term: Term | None) -> list[Cohort]:
+        """Cohorts with no enrolment in current or next term — new intakes."""
+        if not next_term:
+            return []
+        already_enrolled_ids = set(
+            CohortEnrolment.objects.filter(
+                college_term__in=[term, next_term]
+            ).values_list("cohort_id", flat=True)
+        )
+        return list(
+            Cohort.objects.filter(is_active=True)
+            .exclude(id__in=already_enrolled_ids)
+            .select_related("programme")
+            .order_by("name")
+        )
+
+    # ── Preview ───────────────────────────────────────────────────────────────
+
+    def _preview(self, request) -> Response:
+        term, next_term = self._resolve(request)
         if not term:
             return err("Provide term_id or set a current term", status_code=404)
 
-        cohorts = self._active_advanceable_cohorts()
-        result  = []
+        active_enrolments = self._active_enrolments(term)
+        new_intakes       = self._new_intakes(term, next_term)
 
-        for cohort in cohorts:
-            units = self._units_for_cohort(cohort, term)
-            result.append({
-                "cohort_id":         str(cohort.id),
-                "cohort_name":       cohort.name,
-                "programme":         cohort.programme.name,
-                "from_term":         cohort.current_term,
-                "to_term":           cohort.current_term + 1,
-                "can_advance":       cohort.current_term < cohort.programme.total_terms,
+        advancing  = []
+        graduating = []
+
+        for enrolment in active_enrolments:
+            units = enrolment.unit_preview()
+            entry = {
+                "enrolment_id":      str(enrolment.id),
+                "cohort_id":         str(enrolment.cohort_id),
+                "cohort_name":       enrolment.cohort.name,
+                "programme":         enrolment.cohort.programme.name,
+                "programme_code":    enrolment.cohort.programme.code,
+                "from_term":         enrolment.programme_term,
+                "to_term":           enrolment.programme_term + 1,
+                "is_graduating":     enrolment.is_graduating,
+                "student_count":     enrolment.cohort.student_count,
                 "units_to_complete": units,
-            })
+            }
+            advancing.append(entry)
+            if enrolment.is_graduating:
+                graduating.append({
+                    "cohort_id":   str(enrolment.cohort_id),
+                    "cohort_name": enrolment.cohort.name,
+                    "programme":   enrolment.cohort.programme.name,
+                })
 
         return ok({
-            "term_id":   str(term.id),
-            "term_name": term.name,
-            "cohorts":   result,
-            "total_cohorts": len(result),
+            "current_term":            _term_dict(term),
+            "next_term":               _term_dict(next_term) if next_term else None,
+            "next_term_exists":        next_term is not None,
+            "advancing_cohorts":       advancing,
+            "new_intakes": [
+                {
+                    "cohort_id":    str(c.id),
+                    "cohort_name":  c.name,
+                    "programme":    c.programme.name,
+                    "student_count": c.student_count,
+                }
+                for c in new_intakes
+            ],
+            "graduating_cohorts":       graduating,
+            "total_cohorts_advancing":  len(advancing),
+            "total_new_intakes":        len(new_intakes),
         })
 
-    # ── Confirm phase ─────────────────────────────────────────────────────────
+    # ── Confirm ───────────────────────────────────────────────────────────────
 
-    def _confirm(self, request):
-        term = _term_from_request(request)
+    def _confirm(self, request) -> Response:
+        term, next_term = self._resolve(request)
         if not term:
             return err("Provide term_id or set a current term", status_code=404)
 
-        # overrides: { "<unit_id>": false } means "do NOT mark complete"
-        overrides: dict = request.data.get("overrides", {})
-
-        cohorts_advanced = 0
-        units_completed  = 0
-        skipped_units    = 0
-        log_lines        = []
+        overrides: dict      = request.data.get("overrides", {})
+        cohorts_advanced     = 0
+        units_completed      = 0
+        skipped_units        = 0
+        log_lines: list[str] = []
 
         try:
             with transaction.atomic():
-                for cohort in self._active_advanceable_cohorts():
-                    units = self._units_for_cohort(cohort, term)
-                    if not units:
-                        # Still advance even with no scheduled units
-                        cohort.advance_term()
-                        cohorts_advanced += 1
-                        log_lines.append(
-                            f"{cohort.name}: advanced (no units to complete)"
-                        )
-                        continue
+                active_enrolments = self._active_enrolments(term)
 
-                    completed_here = 0
-                    skipped_here   = 0
+                for enrolment in active_enrolments:
+                    cohort    = enrolment.cohort
+                    units     = enrolment.unit_preview()
+                    completed = skipped = 0
 
+                    # 1. Mark units complete in ProgressRecord
                     for u in units:
                         uid = u["unit_id"]
-                        # If the override is explicitly False, skip
-                        if overrides.get(uid) is False or overrides.get(uid) == False:
-                            skipped_here  += 1
+                        if overrides.get(uid) is False:
                             skipped_units += 1
+                            skipped       += 1
+                            continue
+                        if not u["mark_complete"]:
+                            skipped_units += 1
+                            skipped       += 1
                             continue
 
                         pr, _ = ProgressRecord.objects.get_or_create(
                             cohort=cohort,
                             curriculum_unit_id=uid,
-                            defaults={"term": term},
+                            defaults={"term": term, "enrolment": enrolment},
                         )
+                        if pr.enrolment_id is None:
+                            pr.enrolment = enrolment
                         pr.status       = ProgressRecord.COMPLETED
                         pr.completed_at = date.today()
                         if not pr.started_at:
                             pr.started_at = date.today()
                         pr.save(update_fields=[
-                            "status", "completed_at", "started_at", "updated_at"
+                            "status", "completed_at", "started_at",
+                            "enrolment", "updated_at",
                         ])
-                        completed_here += 1
+                        completed       += 1
                         units_completed += 1
 
-                    cohort.advance_term()
-                    cohorts_advanced += 1
-                    log_lines.append(
-                        f"{cohort.name}: term {cohort.current_term - 1} → "
-                        f"{cohort.current_term}, "
-                        f"{completed_here} completed, {skipped_here} skipped"
-                    )
+                    # 2. Close current enrolment
+                    enrolment.status = CohortEnrolment.COMPLETED
+                    enrolment.save(update_fields=["status", "updated_at"])
 
-        except Exception as e:
-            import traceback as tb
-            return err("Advance failed", tb.format_exc(), 500)
+                    # 3. Create next enrolment (or mark graduated)
+                    if next_term:
+                        next_prog_term = enrolment.programme_term + 1
+                        if next_prog_term <= cohort.programme.total_terms:
+                            CohortEnrolment.objects.create(
+                                cohort=cohort,
+                                college_term=next_term,
+                                programme_term=next_prog_term,
+                                status=CohortEnrolment.ACTIVE,
+                            )
+                            cohorts_advanced += 1
+                            log_lines.append(
+                                f"{cohort.name}: T{enrolment.programme_term} → "
+                                f"T{next_prog_term} "
+                                f"({completed} completed, {skipped} skipped)"
+                            )
+                        else:
+                            CohortEnrolment.objects.create(
+                                cohort=cohort,
+                                college_term=next_term,
+                                programme_term=enrolment.programme_term,
+                                status=CohortEnrolment.COMPLETED,
+                                notes="Graduated",
+                            )
+                            log_lines.append(
+                                f"{cohort.name}: GRADUATED after T{enrolment.programme_term}"
+                            )
+
+                # 4. Enrol new intakes for next term at programme_term = 1
+                if next_term:
+                    for cohort in self._new_intakes(term, next_term):
+                        CohortEnrolment.objects.get_or_create(
+                            cohort=cohort,
+                            college_term=next_term,
+                            defaults={
+                                "programme_term": 1,
+                                "status": CohortEnrolment.ACTIVE,
+                            },
+                        )
+                        log_lines.append(
+                            f"{cohort.name}: NEW INTAKE → T1 in {next_term.name}"
+                        )
+
+                # 5. Activate the next term
+                if next_term:
+                    Term.objects.filter(
+                        institution=term.institution, is_current=True
+                    ).exclude(pk=next_term.pk).update(is_current=False)
+                    next_term.is_current = True
+                    next_term.save(update_fields=["is_current", "updated_at"])
+
+        except Exception:
+            return err("Advance failed", traceback.format_exc(), 500)
 
         AuditLog.objects.create(
             action="PROGRESS",
             performed_by=request.user,
             term=term,
             description=(
-                f"Bulk term advancement: {cohorts_advanced} cohorts advanced, "
+                f"Semester advance: {cohorts_advanced} cohorts advanced, "
                 f"{units_completed} units completed, {skipped_units} skipped."
             ),
             payload={
-                "cohorts_advanced": cohorts_advanced,
-                "units_completed":  units_completed,
-                "skipped_units":    skipped_units,
-                "detail":           log_lines,
+                "cohorts_advanced":    cohorts_advanced,
+                "units_completed":     units_completed,
+                "skipped_units":       skipped_units,
+                "next_term_id":        str(next_term.id) if next_term else None,
+                "next_term_activated": next_term is not None,
+                "detail":              log_lines,
             },
         )
 
         return ok({
-            "cohorts_advanced": cohorts_advanced,
-            "units_completed":  units_completed,
-            "skipped_units":    skipped_units,
-            "detail":           log_lines,
+            "cohorts_advanced":    cohorts_advanced,
+            "units_completed":     units_completed,
+            "skipped_units":       skipped_units,
+            "new_term_is_current": next_term is not None,
+            "next_term":           _term_dict(next_term) if next_term else None,
+            "detail":              log_lines,
         })
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-# Constraints
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
-
 # ─────────────────────────────────────────────────────────────────────────────
-# ADD THIS CLASS to timetable/views.py
-# Place it BEFORE ConstraintDetailView
+# Constraints
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ConstraintListView(APIView):
@@ -926,22 +1215,15 @@ class ConstraintListView(APIView):
         unit_id    = request.query_params.get("unit")
         cohort_id  = request.query_params.get("cohort")
         trainer_id = request.query_params.get("trainer")
-
-        qs = Constraint.objects.select_related(
-            "curriculum_unit", "cohort", "trainer", "room"
-        )
+        qs = Constraint.objects.select_related("curriculum_unit", "cohort", "trainer", "room")
         if unit_id:
             qs = qs.filter(curriculum_unit_id=unit_id)
         if cohort_id:
             qs = qs.filter(cohort_id=cohort_id)
         if trainer_id:
             qs = qs.filter(trainer_id=trainer_id)
-
         from .serializers import ConstraintSerializer
-        data = ConstraintSerializer(
-            qs.order_by("-is_hard", "scope"), many=True
-        ).data
-        return ok(data)
+        return ok(ConstraintSerializer(qs.order_by("-is_hard", "scope"), many=True).data)
 
     def post(self, request):
         from .serializers import ConstraintSerializer
@@ -950,7 +1232,7 @@ class ConstraintListView(APIView):
             c = ser.save()
             return ok({"id": str(c.id)}, 201)
         return err(str(ser.errors), status_code=400)
-    
+
 
 class ConstraintDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -975,11 +1257,11 @@ class ConstraintDetailView(APIView):
         return Response(status=204)
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Trainer Availability
+# ─────────────────────────────────────────────────────────────────────────────
+
 class TrainerAvailabilityView(APIView):
-    """
-    GET  /api/trainers/<id>/availability/?term=<id>
-    POST /api/trainers/<id>/availability/
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, trainer_id):
@@ -1018,69 +1300,12 @@ class TrainerAvailabilityView(APIView):
         return ok({"id": str(rule.id), "created": created}, 201 if created else 200)
 
 
-"""
-ADD THIS TO timetable/views.py  — paste before GenerateView
-Also add to timetable/urls.py:
-    path("timetable/validate/", views.ValidateView.as_view()),
-"""
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Pre-generation Validation
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ValidateView(APIView):
-    """
-    GET /api/timetable/validate/?term=<uuid>
-
-    Runs a fast pre-generation data check and returns structured warnings.
-    The frontend calls this when the user clicks Generate, shows any issues
-    in a modal, and lets the user decide to fix first or generate anyway.
-
-    Response shape:
-    {
-      "ok": true,
-      "data": {
-        "blocking": [          ← MUST fix before generating (no trainer assigned)
-          {
-            "type": "NO_TRAINER",
-            "cohort": "CND JAN 26",
-            "unit_code": "CND1104",
-            "unit_name": "Food Science",
-            "message": "No qualified trainer assigned"
-          }
-        ],
-        "warnings": [          ← SHOULD fix but can generate anyway
-          {
-            "type": "SINGLE_TRAINER",
-            "trainer_name": "Fiona Kwamboka",
-            "units_count": 14,
-            "max_periods": 20,
-            "message": "Only trainer for 3 units — may exhaust mid-schedule"
-          },
-          {
-            "type": "TRAINER_OVERLOAD",
-            "trainer_name": "Mary Kaganjo",
-            "sessions_needed": 22,
-            "max_periods": 20,
-            "message": "Required sessions exceed max_periods_per_week"
-          },
-          {
-            "type": "NO_ROOM",
-            "cohort": "DHN MAY 25",
-            "unit_code": "DHN3105",
-            "message": "No room with sufficient capacity for 45 students"
-          }
-        ],
-        "can_generate": true,   ← false only if blocking items exist
-        "summary": {
-          "blocking_count": 0,
-          "warning_count": 3,
-          "cohorts_checked": 13,
-          "units_checked": 89
-        }
-      }
-    }
-    """
+    """GET /api/timetable/validate/?term=<uuid>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -1088,93 +1313,66 @@ class ValidateView(APIView):
         if not term:
             return err("Provide term_id or set a current term", status_code=404)
 
-        inst = term.institution
+        inst     = term.institution
         blocking = []
-        warnings  = []
+        warnings = []
 
-        # ── Load all data once ────────────────────────────────────────────────
         cohorts = list(
             Cohort.objects.filter(
-                programme__department__institution=inst,
-                is_active=True,
+                programme__department__institution=inst, is_active=True
             ).select_related("programme")
         )
-
         all_trainers = list(
-            Trainer.objects.filter(institution=inst, is_active=True)
-            .select_related("department")
+            Trainer.objects.filter(institution=inst, is_active=True).select_related("department")
         )
-
-        rooms = list(
-            Room.objects.filter(institution=inst, is_active=True)
-        )
-
-        periods = list(
-            Period.objects.filter(institution=inst, is_break=False)
-        )
-
-        days = list(inst.days_of_week)
+        rooms   = list(Room.objects.filter(institution=inst, is_active=True))
+        periods = list(Period.objects.filter(institution=inst, is_break=False))
+        days    = list(inst.days_of_week)
         total_slots = len(days) * len(periods)
 
-        # Trainer sessions already committed (from existing DRAFTs)
-        trainer_draft_load: dict[str, int] = {}
-        for t in all_trainers:
-            trainer_draft_load[str(t.id)] = 0
-
-        from collections import defaultdict
-        units_per_trainer: dict[str, list] = defaultdict(list)  # trainer_id → [(cohort, unit)]
-
-        cohorts_checked = 0
-        units_checked   = 0
+        units_per_trainer: dict[str, list] = defaultdict(list)
+        cohorts_checked = units_checked = 0
 
         for cohort in cohorts:
-            units = list(
+            # Use enrolment-based programme_term if available
+            enrolment  = cohort.active_enrolment(college_term=term)
+            prog_term  = enrolment.programme_term if enrolment else cohort.current_term
+            units      = list(
                 CurriculumUnit.objects.filter(
                     programme=cohort.programme,
-                    term_number=cohort.current_term,
+                    term_number=prog_term,
                     is_active=True,
                 ).prefetch_related("qualified_trainers")
             )
-
             cohorts_checked += 1
             units_checked   += len(units)
 
-            # Sessions needed for this cohort
             sessions_needed = sum(u.periods_per_week for u in units)
-
-            # Check cohort has enough free slots
             if sessions_needed > total_slots:
                 warnings.append({
-                    "type":    "SLOT_SHORTAGE",
-                    "cohort":  cohort.name,
-                    "needed":  sessions_needed,
+                    "type":      "SLOT_SHORTAGE",
+                    "cohort":    cohort.name,
+                    "needed":    sessions_needed,
                     "available": total_slots,
-                    "message": f"Needs {sessions_needed} sessions but only {total_slots} slots available in the week",
+                    "message":   f"Needs {sessions_needed} sessions but only {total_slots} slots available",
                 })
 
             for unit in units:
                 outsourced = getattr(unit, "is_outsourced", False)
-
-                # Check room capacity
                 if not outsourced and cohort.student_count > 0:
-                    suitable_rooms = [r for r in rooms if r.capacity >= cohort.student_count]
-                    if not suitable_rooms:
+                    if not any(r.capacity >= cohort.student_count for r in rooms):
                         warnings.append({
-                            "type":       "NO_SUITABLE_ROOM",
-                            "cohort":     cohort.name,
-                            "unit_code":  unit.code,
-                            "unit_name":  unit.name,
-                            "students":   cohort.student_count,
+                            "type":              "NO_SUITABLE_ROOM",
+                            "cohort":            cohort.name,
+                            "unit_code":         unit.code,
+                            "unit_name":         unit.name,
+                            "students":          cohort.student_count,
                             "max_room_capacity": max((r.capacity for r in rooms), default=0),
-                            "message":    f"No room with capacity ≥ {cohort.student_count} students",
+                            "message":           f"No room with capacity ≥ {cohort.student_count} students",
                         })
-
                 if outsourced:
-                    continue  # Outsourced units need no trainer — skip trainer checks
-
+                    continue
                 qualified = list(unit.qualified_trainers.filter(is_active=True))
-
-                # Check 1: No trainer at all
                 if not qualified:
                     blocking.append({
                         "type":      "NO_TRAINER",
@@ -1184,21 +1382,11 @@ class ValidateView(APIView):
                         "message":   "No qualified trainer assigned — unit cannot be scheduled",
                     })
                     continue
-
-                # Check 2: Single trainer bottleneck
                 if len(qualified) == 1:
-                    t = qualified[0]
-                    tid = str(t.id)
-                    units_per_trainer[tid].append((cohort.name, unit.code))
+                    units_per_trainer[str(qualified[0].id)].append((cohort.name, unit.code))
 
-                # Track load
-                for t in qualified:
-                    trainer_draft_load[str(t.id)] += unit.periods_per_week
-
-        # ── Check 3: Trainer overload (sessions across ALL units > max) ───────
         for t in all_trainers:
-            tid = str(t.id)
-            # Sum of periods_per_week for ALL units this trainer qualifies for
+            tid    = str(t.id)
             needed = sum(
                 u.periods_per_week
                 for u in CurriculumUnit.objects.filter(
@@ -1212,20 +1400,16 @@ class ValidateView(APIView):
             )
             if needed > t.max_periods_per_week:
                 warnings.append({
-                    "type":           "TRAINER_OVERLOAD",
-                    "trainer_name":   f"{t.first_name} {t.last_name}",
-                    "trainer_id":     tid,
+                    "type":            "TRAINER_OVERLOAD",
+                    "trainer_name":    f"{t.first_name} {t.last_name}",
+                    "trainer_id":      tid,
                     "sessions_needed": needed,
-                    "max_periods":    t.max_periods_per_week,
-                    "message":        (
-                        f"{t.first_name} {t.last_name} is qualified for {needed} sessions "
-                        f"but max is {t.max_periods_per_week}/week — some units may be unplaceable"
+                    "max_periods":     t.max_periods_per_week,
+                    "message":         (
+                        f"{t.first_name} {t.last_name} qualified for {needed} sessions "
+                        f"but max is {t.max_periods_per_week}/week"
                     ),
                 })
-
-        # ── Check 4: Single-trainer bottleneck warnings ───────────────────────
-        for t in all_trainers:
-            tid = str(t.id)
             sole_units = units_per_trainer.get(tid, [])
             if len(sole_units) >= 3:
                 warnings.append({
@@ -1235,17 +1419,15 @@ class ValidateView(APIView):
                     "sole_units":   sole_units,
                     "units_count":  len(sole_units),
                     "message":      (
-                        f"{t.first_name} {t.last_name} is the only trainer for {len(sole_units)} units "
-                        f"— if their week fills up, those units will be left short"
+                        f"{t.first_name} {t.last_name} is the only trainer "
+                        f"for {len(sole_units)} units"
                     ),
                 })
 
-        can_generate = len(blocking) == 0
-
         return ok({
-            "blocking":  blocking,
-            "warnings":  warnings,
-            "can_generate": can_generate,
+            "blocking":     blocking,
+            "warnings":     warnings,
+            "can_generate": len(blocking) == 0,
             "summary": {
                 "blocking_count":  len(blocking),
                 "warning_count":   len(warnings),
@@ -1255,32 +1437,24 @@ class ValidateView(APIView):
         })
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Timetable generation
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class GenerateView(APIView):
-    """
-    POST /api/timetable/generate/
-    Body: { "term_id": "..." }
-
-    Clears DRAFT entries, runs the engine, returns summary.
-    Does NOT publish.
-    """
+    """POST /api/timetable/generate/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         term = _term_from_request(request)
         if not term:
             return err("Provide term_id or set a current term")
-
         try:
             Conflict.objects.filter(term=term).delete()
             engine = TimetableEngine(term)
             result = engine.run(delete_existing_drafts=True)
-        except Exception as e:
+        except Exception:
             return err("Generation failed", traceback.format_exc(), 500)
-
         AuditLog.objects.create(
             action="GENERATE",
             performed_by=request.user,
@@ -1292,23 +1466,14 @@ class GenerateView(APIView):
 
 
 class PublishView(APIView):
-    """
-    POST /api/timetable/publish/
-    Body: { "term_id": "...", "force": false }
-
-    Promotes DRAFT ÃƒÂ¢Ã¢â‚¬Â Ã¢â‚¬â„¢ PUBLISHED in a single atomic UPDATE.
-    Deduplicates drafts first to avoid DB constraint violations.
-    """
+    """POST /api/timetable/publish/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         term  = _term_from_request(request)
         force = bool(request.data.get("force", False))
-
         if not term:
             return err("Provide term_id or set a current term")
-
-        # Check unresolved HIGH conflicts
         pending_high = Conflict.objects.filter(
             term=term, severity="HIGH", resolution_status="PENDING"
         ).count()
@@ -1316,24 +1481,19 @@ class PublishView(APIView):
             return Response(
                 {
                     "ok": False,
-                    "error": f"{pending_high} unresolved HIGH conflicts. "
-                             "Resolve them or pass force=true.",
+                    "error": f"{pending_high} unresolved HIGH conflicts. Resolve them or pass force=true.",
                     "pending_conflicts": pending_high,
                 },
                 status=409,
             )
-
         draft_count = ScheduledUnit.objects.filter(term=term, status="DRAFT").count()
         if not draft_count:
             return err("No drafts found. Run /generate first.")
-
         try:
             with transaction.atomic():
-                # Step 1: remove duplicate drafts (same cohort/trainer/room ÃƒÆ’Ã¢â‚¬â€ day ÃƒÆ’Ã¢â‚¬â€ period)
                 published_count = self._dedup_and_publish(term)
-        except Exception as e:
+        except Exception:
             return err("Publish failed", traceback.format_exc(), 500)
-
         AuditLog.objects.create(
             action="PUBLISH",
             performed_by=request.user,
@@ -1344,11 +1504,7 @@ class PublishView(APIView):
         return ok({"published": published_count, "term": term.name})
 
     def _dedup_and_publish(self, term: Term) -> int:
-        # Delete old PUBLISHED rows (they will be replaced)
         ScheduledUnit.objects.filter(term=term, status="PUBLISHED").delete()
-
-                # Dedup NON-combined drafts only: keep lowest pk per (cohort/trainer/room x day x period)
-        # Combined sessions legitimately share trainer/room slots across cohorts - skip them
         for field in ("cohort_id", "trainer_id", "room_id"):
             rows = list(
                 ScheduledUnit.objects.filter(term=term, status="DRAFT", is_combined=False)
@@ -1365,8 +1521,6 @@ class PublishView(APIView):
                     seen.add(key)
             if to_delete:
                 ScheduledUnit.objects.filter(id__in=to_delete).delete()
-
-        # Promote
         now = timezone.now()
         return ScheduledUnit.objects.filter(term=term, status="DRAFT").update(
             status="PUBLISHED", published_at=now
@@ -1391,109 +1545,81 @@ class DeleteDraftsView(APIView):
         return ok({"deleted": count})
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Timetable reading
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class MasterTimetableView(APIView):
-    """
-    GET /api/timetable/master/?term=<id>&status=PUBLISHED
-
-    Returns a grid:
-    {
-      "grid": {
-        "MON": {
-          "<period_id>": [ { ...entry }, ... ]
-        }
-      }
-    }
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         term   = _term_from_request(request)
         target = request.query_params.get("status", "PUBLISHED")
-
         if not term:
             return err("No current term. Provide term_id.", status_code=404)
-
         inst    = term.institution
         days    = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-
         entries = (
             ScheduledUnit.objects.filter(term=term, status=target)
-            .select_related(
-                "curriculum_unit", "cohort", "trainer", "room", "period"
-            )
+            .select_related("curriculum_unit", "cohort", "trainer", "room", "period")
             .order_by("day", "period__order", "cohort")
         )
-
         grid: dict = {day: {str(p.id): [] for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid and pid in grid[su.day]:
                 grid[su.day][pid].append(_scheduled_unit_dict(su))
-
         return ok({
-            "term":          term.name,
-            "term_id":       str(term.id),
-            "status":        target,
-            "days":          days,
-            "periods":       [_period_dict(p) for p in periods],
+            "term":           term.name,
+            "term_id":        str(term.id),
+            "status":         target,
+            "days":           days,
+            "periods":        [_period_dict(p) for p in periods],
             "teaching_weeks": term.teaching_weeks,
-            "grid":          grid,
-            # Stats
-            "total_entries": sum(
-                len(v) for day in grid.values() for v in day.values()
-            ),
+            "grid":           grid,
+            "total_entries":  sum(len(v) for day in grid.values() for v in day.values()),
         })
 
 
 class CohortTimetableView(APIView):
-    """GET /api/timetable/cohort/<id>/?term=<id>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, cohort_id):
-        cohort = get_object_or_404(Cohort, id=cohort_id)
-        term   = _term_from_request(request)
+        cohort  = get_object_or_404(Cohort, id=cohort_id)
+        term    = _term_from_request(request)
         if not term:
             return err("No current term", status_code=404)
-
         inst    = term.institution
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
         days    = list(inst.days_of_week)
-
         entries = (
             ScheduledUnit.objects.filter(term=term, cohort=cohort, status__in=["DRAFT", "PUBLISHED"])
             .select_related("curriculum_unit", "trainer", "room", "period")
             .order_by("day", "period__order")
         )
-
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
-
         return ok({
-            "cohort":         cohort.name,
-            "cohort_id":      str(cohort.id),
-            "programme":      cohort.programme.name,
-            "current_term":   cohort.current_term,
-            "student_count":  cohort.student_count,
-            "term":           term.name,
-            "term_id":        str(term.id),
-            "days":           days,
-            "periods":        [_period_dict(p) for p in periods],
-            "grid":           grid,
+            "cohort":          cohort.name,
+            "cohort_id":       str(cohort.id),
+            "programme":       cohort.programme.name,
+            "current_term":    cohort.current_term,
+            "student_count":   cohort.student_count,
+            "term":            term.name,
+            "term_id":         str(term.id),
+            "days":            days,
+            "periods":         [_period_dict(p) for p in periods],
+            "grid":            grid,
             "classes_per_week": entries.count(),
-            "progress":       cohort.progress_summary,
+            "progress":        cohort.progress_summary,
         })
 
 
 class TrainerTimetableView(APIView):
-    """GET /api/timetable/trainer/<id>/?term=<id>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, trainer_id):
@@ -1501,17 +1627,14 @@ class TrainerTimetableView(APIView):
         term    = _term_from_request(request)
         if not term:
             return err("No current term", status_code=404)
-
         inst    = term.institution
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
         days    = list(inst.days_of_week)
-
         entries = (
             ScheduledUnit.objects.filter(term=term, trainer=trainer, status__in=["DRAFT", "PUBLISHED"])
             .select_related("curriculum_unit", "cohort", "room", "period")
             .order_by("day", "period__order")
         )
-
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         total_periods = 0
         for su in entries:
@@ -1519,34 +1642,28 @@ class TrainerTimetableView(APIView):
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
                 total_periods += 1
-
         return ok({
-            "trainer":         trainer.full_name,
-            "trainer_id":      str(trainer.id),
-            "staff_id":        trainer.staff_id,
-            "department":      trainer.department.name,
-            "employment_type": trainer.get_employment_type_display(),
+            "trainer":              trainer.full_name,
+            "trainer_id":           str(trainer.id),
+            "staff_id":             trainer.staff_id,
+            "department":           trainer.department.name,
+            "employment_type":      trainer.get_employment_type_display(),
             "max_periods_per_week": trainer.max_periods_per_week,
-            "term":            term.name,
-            "term_id":         str(term.id),
-            "days":            days,
-            "periods":         [_period_dict(p) for p in periods],
-            "grid":            grid,
-            "periods_this_week": total_periods,
-            "capacity_remaining": max(0, trainer.max_periods_per_week - total_periods),
+            "term":                 term.name,
+            "term_id":              str(term.id),
+            "days":                 days,
+            "periods":              [_period_dict(p) for p in periods],
+            "grid":                 grid,
+            "periods_this_week":    total_periods,
+            "capacity_remaining":   max(0, trainer.max_periods_per_week - total_periods),
         })
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Manual entry edits
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class ScheduledUnitDetailView(APIView):
-    """
-    GET  /api/timetable/entry/<id>/
-    PUT  /api/timetable/entry/<id>/   ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â reassign trainer/room/day/period
-    DEL  /api/timetable/entry/<id>/
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, entry_id):
@@ -1562,7 +1679,6 @@ class ScheduledUnitDetailView(APIView):
         su   = get_object_or_404(ScheduledUnit, id=entry_id)
         data = request.data
         old  = _scheduled_unit_dict(su)
-
         if "trainer_id" in data:
             su.trainer = get_object_or_404(Trainer, id=data["trainer_id"])
         if "room_id" in data:
@@ -1573,12 +1689,10 @@ class ScheduledUnitDetailView(APIView):
             su.period = get_object_or_404(Period, id=data["period_id"])
         if "notes" in data:
             su.notes = data["notes"]
-
         try:
             su.save()
         except Exception as e:
             return err(str(e), status_code=400)
-
         AuditLog.objects.create(
             action="EDIT",
             performed_by=request.user,
@@ -1594,59 +1708,55 @@ class ScheduledUnitDetailView(APIView):
         return ok({"deleted": True})
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Conflicts
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class ConflictListView(APIView):
-    """GET /api/conflicts/?term=<id>&status=PENDING"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        term      = _term_from_request(request)
+        term       = _term_from_request(request)
         res_status = request.query_params.get("status", "")
-
-        qs_base = Conflict.objects.filter(term=term)
+        qs         = Conflict.objects.filter(term=term)
         if res_status:
-            qs_base = qs_base.filter(resolution_status=res_status)
-        qs = qs_base.order_by(
+            qs = qs.filter(resolution_status=res_status)
+        qs = qs.select_related("cohort", "trainer", "room", "curriculum_unit").order_by(
             "-severity", "-created_at"
         )
         return ok([
             {
-                "id":               str(c.id),
-                "term":             str(c.term_id),
-                "conflict_type":    c.conflict_type,
-                "severity":         c.severity,
-                "description":      c.description,
-                "cohort":           str(c.cohort_id) if c.cohort_id else None,
-                "cohort_name":      c.cohort.name if c.cohort_id else None,
-                "trainer":          str(c.trainer_id) if c.trainer_id else None,
-                "trainer_name":     c.trainer.short_name if c.trainer_id else None,
-                "room":             str(c.room_id) if c.room_id else None,
-                "room_code":        c.room.code if c.room_id else None,
-                "curriculum_unit":  str(c.curriculum_unit_id) if c.curriculum_unit_id else None,
-                "unit_code":        c.curriculum_unit.code if c.curriculum_unit_id else None,
+                "id":                str(c.id),
+                "term":              str(c.term_id),
+                "conflict_type":     c.conflict_type,
+                "severity":          c.severity,
+                "description":       c.description,
+                "cohort":            str(c.cohort_id) if c.cohort_id else None,
+                "cohort_name":       c.cohort.name if c.cohort_id else None,
+                "trainer":           str(c.trainer_id) if c.trainer_id else None,
+                "trainer_name":      c.trainer.short_name if c.trainer_id else None,
+                "room":              str(c.room_id) if c.room_id else None,
+                "room_code":         c.room.code if c.room_id else None,
+                "curriculum_unit":   str(c.curriculum_unit_id) if c.curriculum_unit_id else None,
+                "unit_code":         c.curriculum_unit.code if c.curriculum_unit_id else None,
                 "resolution_status": c.resolution_status,
-                "resolved_by":      None,
-                "resolved_at":      None,
-                "resolution_note":  c.resolution_note if hasattr(c, "resolution_note") else "",
-                "involved_entries": [],
-                "created_at":       c.created_at.isoformat(),
+                "resolved_by":       None,
+                "resolved_at":       None,
+                "resolution_note":   c.resolution_note if hasattr(c, "resolution_note") else "",
+                "involved_entries":  [],
+                "created_at":        c.created_at.isoformat(),
             }
-            for c in qs.select_related("cohort", "trainer", "room", "curriculum_unit")
+            for c in qs
         ])
 
 
 class ResolveConflictView(APIView):
-    """POST /api/conflicts/<id>/resolve/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, conflict_id):
         conflict = get_object_or_404(Conflict, id=conflict_id)
         note     = request.data.get("note", "")
         method   = request.data.get("method", "RESOLVED")
-
         conflict.resolve(note=note, resolved_by=request.user, method=method)
         AuditLog.objects.create(
             action="RESOLVE",
@@ -1657,12 +1767,15 @@ class ResolveConflictView(APIView):
         return ok({"resolved": True, "conflict_id": str(conflict.id)})
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Exports
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 def _html_table(title, subtitle, days, periods, grid, caption="") -> str:
-    head_cells = "".join(f"<th>{p.label}<br><small>{p.start_time:%H:%M}ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“{p.end_time:%H:%M}</small></th>" for p in periods)
+    head_cells = "".join(
+        f"<th>{p.label}<br><small>{p.start_time:%H:%M}–{p.end_time:%H:%M}</small></th>"
+        for p in periods
+    )
     rows = ""
     for day in days:
         cells = ""
@@ -1674,8 +1787,8 @@ def _html_table(title, subtitle, days, periods, grid, caption="") -> str:
                     content = "".join(
                         f"<div class='entry'>"
                         f"<strong>{e['unit_code']}</strong> {e['unit_name']}<br>"
-                        f"<span>{e['trainer']}</span><br>"
-                        f"<em>{e['room']} ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {e['cohort']}</em>"
+                        f"<span>{e.get('trainer_name','')}</span><br>"
+                        f"<em>{e.get('room_code','')} · {e.get('cohort_name','')}</em>"
                         f"</div>"
                         for e in items
                     )
@@ -1684,13 +1797,13 @@ def _html_table(title, subtitle, days, periods, grid, caption="") -> str:
                     content = (
                         f"<div class='entry'>"
                         f"<strong>{e['unit_code']}</strong> {e['unit_name']}<br>"
-                        f"<span>{e['trainer']}</span><br>"
-                        f"<em>{e['room']}</em>"
+                        f"<span>{e.get('trainer_name','')}</span><br>"
+                        f"<em>{e.get('room_code','')}</em>"
                         f"</div>"
                     )
                 cells += f"<td>{content}</td>"
             else:
-                cells += "<td class='empty'>ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â</td>"
+                cells += "<td class='empty'>–</td>"
         rows += f"<tr><td class='day'>{day}</td>{cells}</tr>"
 
     return f"""<!DOCTYPE html>
@@ -1727,35 +1840,30 @@ def _html_table(title, subtitle, days, periods, grid, caption="") -> str:
 
 
 class ExportMasterView(APIView):
-    """GET /api/export/master/?term=<id>&fmt=html"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         term = _term_from_request(request)
         if not term:
             return err("No term found", status_code=404)
-
         inst    = term.institution
         days    = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-
         entries = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").select_related(
             "curriculum_unit", "cohort", "trainer", "room", "period"
         )
-
         grid: dict = {day: {str(p.id): [] for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid and pid in grid[su.day]:
                 grid[su.day][pid].append(_scheduled_unit_dict(su))
-
         html = _html_table(
-            title=f"Master Timetable ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {term.name}",
+            title=f"Master Timetable – {term.name}",
             subtitle=inst.name,
             days=days,
             periods=periods,
             grid=grid,
-            caption=f"Weekly recurring template Ãƒâ€šÃ‚Â· {term.teaching_weeks} teaching weeks",
+            caption=f"Weekly recurring template · {term.teaching_weeks} teaching weeks",
         )
         resp = HttpResponse(html, content_type="text/html")
         resp["Content-Disposition"] = f'inline; filename="master_{term.name}.html"'
@@ -1763,7 +1871,6 @@ class ExportMasterView(APIView):
 
 
 class ExportTrainerView(APIView):
-    """GET /api/export/trainer/<id>/?term=<id>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, trainer_id):
@@ -1771,24 +1878,20 @@ class ExportTrainerView(APIView):
         term    = _term_from_request(request)
         if not term:
             return err("No term found", status_code=404)
-
         inst    = term.institution
         days    = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-
         entries = ScheduledUnit.objects.filter(
             term=term, trainer=trainer, status="PUBLISHED"
         ).select_related("curriculum_unit", "cohort", "room", "period")
-
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
-
         html = _html_table(
-            title=f"Timetable ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {trainer.full_name}",
-            subtitle=f"{trainer.department.name} Ãƒâ€šÃ‚Â· {term.name}",
+            title=f"Timetable – {trainer.full_name}",
+            subtitle=f"{trainer.department.name} · {term.name}",
             days=days,
             periods=periods,
             grid=grid,
@@ -1799,7 +1902,6 @@ class ExportTrainerView(APIView):
 
 
 class ExportCohortView(APIView):
-    """GET /api/export/cohort/<id>/?term=<id>"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, cohort_id):
@@ -1807,24 +1909,20 @@ class ExportCohortView(APIView):
         term    = _term_from_request(request)
         if not term:
             return err("No term found", status_code=404)
-
         inst    = term.institution
         days    = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-
         entries = ScheduledUnit.objects.filter(
             term=term, cohort=cohort, status="PUBLISHED"
         ).select_related("curriculum_unit", "trainer", "room", "period")
-
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
-
         html = _html_table(
-            title=f"Timetable ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â {cohort.name}",
-            subtitle=f"{cohort.programme.name} Ãƒâ€šÃ‚Â· {term.name}",
+            title=f"Timetable – {cohort.name}",
+            subtitle=f"{cohort.programme.name} · {term.name}",
             days=days,
             periods=periods,
             grid=grid,
@@ -1834,9 +1932,9 @@ class ExportCohortView(APIView):
         return resp
 
 
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 # Dashboard
-# ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬
+# ─────────────────────────────────────────────────────────────────────────────
 
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
@@ -1845,25 +1943,23 @@ class DashboardView(APIView):
         inst = _institution(request)
         term = _term_from_request(request)
 
-        # Base counts ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â all in a few queries
         stats = {
-            "institution":   inst.name if inst else "",
-            "trainers":      Trainer.objects.filter(institution=inst, is_active=True).count(),
-            "rooms":         Room.objects.filter(institution=inst, is_active=True).count(),
-            "cohorts":       Cohort.objects.filter(
-                                 programme__department__institution=inst, is_active=True
-                             ).count(),
-            "programmes":    Programme.objects.filter(
-                                 department__institution=inst, is_active=True
-                             ).count(),
+            "institution": inst.name if inst else "",
+            "trainers":    Trainer.objects.filter(institution=inst, is_active=True).count(),
+            "rooms":       Room.objects.filter(institution=inst, is_active=True).count(),
+            "cohorts":     Cohort.objects.filter(
+                               programme__department__institution=inst, is_active=True
+                           ).count(),
+            "programmes":  Programme.objects.filter(
+                               department__institution=inst, is_active=True
+                           ).count(),
         }
 
         if term:
-            base_qs = ScheduledUnit.objects.filter(term=term)
+            base_qs     = ScheduledUnit.objects.filter(term=term)
             pub_count   = base_qs.filter(status="PUBLISHED").count()
             draft_count = base_qs.filter(status="DRAFT").count()
 
-            # Conflict counts
             conflict_counts = dict(
                 Conflict.objects.filter(term=term)
                 .values_list("resolution_status")
@@ -1871,7 +1967,6 @@ class DashboardView(APIView):
                 .order_by()
             )
 
-            # Trainer workload (ONE query via annotation ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â no N+1)
             trainer_load = list(
                 Trainer.objects.filter(institution=inst, is_active=True)
                 .annotate(
@@ -1888,14 +1983,14 @@ class DashboardView(APIView):
             )
 
             stats["term"] = {
-                "id":             str(term.id),
-                "name":           term.name,
-                "teaching_weeks": term.teaching_weeks,
-                "current_week":   term.week_number,
+                "id":              str(term.id),
+                "name":            term.name,
+                "teaching_weeks":  term.teaching_weeks,
+                "current_week":    term.week_number,
                 "weeks_remaining": term.weeks_remaining,
-                "published":      pub_count,
-                "drafts":         draft_count,
-                "conflicts":      {
+                "published":       pub_count,
+                "drafts":          draft_count,
+                "conflicts": {
                     "pending":  conflict_counts.get("PENDING", 0),
                     "resolved": conflict_counts.get("RESOLVED", 0),
                     "total":    sum(conflict_counts.values()),
@@ -1914,14 +2009,12 @@ class DashboardView(APIView):
                 }
                 for t in trainer_load
             ]
-
-            # Recent audit entries
             stats["recent_activity"] = [
                 {
-                    "action":    a.get_action_display(),
-                    "by":        a.performed_by.username if a.performed_by else "System",
-                    "at":        a.timestamp.strftime("%Y-%m-%d %H:%M"),
-                    "note":      a.description[:80],
+                    "action": a.get_action_display(),
+                    "by":     a.performed_by.username if a.performed_by else "System",
+                    "at":     a.timestamp.strftime("%Y-%m-%d %H:%M"),
+                    "note":   a.description[:80],
                 }
                 for a in AuditLog.objects.filter(term=term).order_by("-timestamp")[:8]
             ]
@@ -1932,28 +2025,24 @@ class DashboardView(APIView):
 
 
 class TrainerDashboardView(APIView):
-    """Personal dashboard for logged-in trainer."""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         if not hasattr(request.user, "trainer_profile"):
             return err("User is not linked to a trainer profile", status_code=403)
-
         trainer = request.user.trainer_profile
         term    = _term_from_request(request)
         if not term:
             return err("No current term", status_code=404)
-
         inst    = term.institution
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
         days    = list(inst.days_of_week)
-
         entries = list(
-            ScheduledUnit.objects.filter(term=term, trainer=trainer, status__in=["DRAFT", "PUBLISHED"])
-            .select_related("curriculum_unit", "cohort", "room", "period")
+            ScheduledUnit.objects.filter(
+                term=term, trainer=trainer, status__in=["DRAFT", "PUBLISHED"]
+            ).select_related("curriculum_unit", "cohort", "room", "period")
             .order_by("day", "period__order")
         )
-
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
@@ -1964,7 +2053,6 @@ class TrainerDashboardView(APIView):
                     "cohort":    su.cohort.name,
                     "room":      su.room.code,
                 }
-
         return ok({
             "trainer": {
                 "id":              str(trainer.id),
@@ -1973,24 +2061,25 @@ class TrainerDashboardView(APIView):
                 "department":      trainer.department.name,
                 "employment_type": trainer.get_employment_type_display(),
             },
-            "term":              term.name,
-            "teaching_weeks":    term.teaching_weeks,
-            "current_week":      term.week_number,
-            "classes_this_week": len(entries),
-            "periods_scheduled": len(entries),
-            "max_periods":       trainer.max_periods_per_week,
+            "term":               term.name,
+            "teaching_weeks":     term.teaching_weeks,
+            "current_week":       term.week_number,
+            "classes_this_week":  len(entries),
+            "periods_scheduled":  len(entries),
+            "max_periods":        trainer.max_periods_per_week,
             "capacity_remaining": max(0, trainer.max_periods_per_week - len(entries)),
-            "days":              days,
-            "periods":           [_period_dict(p) for p in periods],
-            "grid":              grid,
-            "qualified_units":   CurriculumUnit.objects.filter(
+            "days":               days,
+            "periods":            [_period_dict(p) for p in periods],
+            "grid":               grid,
+            "qualified_units":    CurriculumUnit.objects.filter(
                 qualified_trainers=trainer, is_active=True
             ).count(),
         })
 
-# -------------------------------------------------------------------------
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Auth
-# -------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 
 class MeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2010,9 +2099,9 @@ class MeView(APIView):
         })
 
 
-# -----------------------------------------------------------------------------
-# Curriculum Unit Detail  +  Trainer assignment
-# -----------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
+# Curriculum Unit detail + trainer assignment
+# ─────────────────────────────────────────────────────────────────────────────
 
 class CurriculumUnitDetailView(APIView):
     permission_classes = [IsAuthenticated]
@@ -2021,16 +2110,22 @@ class CurriculumUnitDetailView(APIView):
         u = get_object_or_404(CurriculumUnit, id=unit_id)
         return ok({
             **_unit_dict(u),
-            'qualified_trainers': [
-                {'id': str(ut.trainer.id), 'name': ut.trainer.short_name, 'trainer_type': ut.trainer_type, 'label': ut.label}
-                for ut in u.unit_trainers.select_related('trainer').all()
+            "qualified_trainers": [
+                {
+                    "id":           str(ut.trainer.id),
+                    "name":         ut.trainer.short_name,
+                    "trainer_type": ut.trainer_type,
+                    "label":        ut.label,
+                }
+                for ut in u.unit_trainers.select_related("trainer").all()
             ],
         })
 
     def put(self, request, unit_id):
-        u = get_object_or_404(CurriculumUnit, id=unit_id)
+        u    = get_object_or_404(CurriculumUnit, id=unit_id)
         data = request.data
-        for field in ('code','name','term_number','periods_per_week','credit_hours','unit_type','notes','is_outsourced'):
+        for field in ("code", "name", "term_number", "periods_per_week",
+                      "credit_hours", "unit_type", "notes", "is_outsourced"):
             if field in data:
                 setattr(u, field, data[field])
         u.save()
@@ -2042,59 +2137,71 @@ class CurriculumUnitTrainersView(APIView):
 
     def get(self, request, unit_id):
         u = get_object_or_404(CurriculumUnit, id=unit_id)
-        return ok([{'id': str(ut.trainer.id), 'name': ut.trainer.short_name, 'trainer_type': ut.trainer_type, 'label': ut.label} for ut in u.unit_trainers.select_related('trainer').all()])
+        return ok([
+            {
+                "id":           str(ut.trainer.id),
+                "name":         ut.trainer.short_name,
+                "trainer_type": ut.trainer_type,
+                "label":        ut.label,
+            }
+            for ut in u.unit_trainers.select_related("trainer").all()
+        ])
 
     def post(self, request, unit_id):
-        u = get_object_or_404(CurriculumUnit, id=unit_id)
-        trainer_id = request.data.get('trainer_id')
-        ttype = request.data.get('trainer_type', 'INTERNAL')
-        label = request.data.get('label', '')
+        u          = get_object_or_404(CurriculumUnit, id=unit_id)
+        trainer_id = request.data.get("trainer_id")
+        ttype      = request.data.get("trainer_type", "INTERNAL")
+        label      = request.data.get("label", "")
         if not trainer_id:
-            return err('trainer_id required')
+            return err("trainer_id required")
         trainer = get_object_or_404(Trainer, id=trainer_id)
-        ut, created = CurriculumUnitTrainer.objects.get_or_create(curriculum_unit=u, trainer=trainer, defaults={'trainer_type': ttype, 'label': label})
+        ut, created = CurriculumUnitTrainer.objects.get_or_create(
+            curriculum_unit=u, trainer=trainer,
+            defaults={"trainer_type": ttype, "label": label},
+        )
         if not created:
             ut.trainer_type = ttype
-            ut.label = label
+            ut.label        = label
             ut.save()
-        return ok({'id': str(trainer.id), 'name': trainer.short_name, 'trainer_type': ut.trainer_type, 'label': ut.label})
+        return ok({
+            "id":           str(trainer.id),
+            "name":         trainer.short_name,
+            "trainer_type": ut.trainer_type,
+            "label":        ut.label,
+        })
 
     def delete(self, request, unit_id):
-        u = get_object_or_404(CurriculumUnit, id=unit_id)
-        trainer_id = request.data.get('trainer_id')
+        u          = get_object_or_404(CurriculumUnit, id=unit_id)
+        trainer_id = request.data.get("trainer_id")
         if not trainer_id:
-            return err('trainer_id required')
-        CurriculumUnitTrainer.objects.filter(curriculum_unit=u, trainer_id=trainer_id).delete()
-        return ok({'deleted': True})
+            return err("trainer_id required")
+        CurriculumUnitTrainer.objects.filter(
+            curriculum_unit=u, trainer_id=trainer_id
+        ).delete()
+        return ok({"deleted": True})
 
 
-
-
-
-
-
-
-# -----------------------------------------------------------------------------
+# ─────────────────────────────────────────────────────────────────────────────
 # Detail views (GET / PUT / DELETE by ID)
-# -----------------------------------------------------------------------------
-
-# (removed stale placeholder)
+# ─────────────────────────────────────────────────────────────────────────────
 
 class DepartmentDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         d = get_object_or_404(Department, id=pk)
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
+        return ok({"id": str(d.id), "code": d.code, "name": d.name,
+                   "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
 
     def put(self, request, pk):
-        d = get_object_or_404(Department, id=pk)
+        d    = get_object_or_404(Department, id=pk)
         data = request.data
         for field in ("code", "name", "hod", "is_active"):
             if field in data:
                 setattr(d, field, data[field])
         d.save()
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
+        return ok({"id": str(d.id), "code": d.code, "name": d.name,
+                   "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
 
     def delete(self, request, pk):
         d = get_object_or_404(Department, id=pk)
@@ -2116,7 +2223,7 @@ class ProgrammeDetailView(APIView):
         })
 
     def put(self, request, pk):
-        p = get_object_or_404(Programme, id=pk)
+        p    = get_object_or_404(Programme, id=pk)
         data = request.data
         for field in ("code", "name", "level", "total_terms", "sharing_group", "is_active"):
             if field in data:
@@ -2145,7 +2252,7 @@ class RoomDetailView(APIView):
         })
 
     def put(self, request, pk):
-        r = get_object_or_404(Room, id=pk)
+        r    = get_object_or_404(Room, id=pk)
         data = request.data
         for field in ("code", "name", "room_type", "capacity", "building", "features", "is_active"):
             if field in data:
@@ -2168,7 +2275,7 @@ class TrainerDetailView(APIView):
         return ok(_trainer_dict(t))
 
     def put(self, request, pk):
-        t = get_object_or_404(Trainer, id=pk)
+        t    = get_object_or_404(Trainer, id=pk)
         data = request.data
         for field in ("staff_id", "full_name", "short_name", "email",
                       "employment_type", "max_periods_per_week", "is_active"):
@@ -2194,23 +2301,27 @@ class CohortDetailView(APIView):
         return ok({
             "id": str(c.id), "name": c.name,
             "programme": c.programme.name, "programme_id": str(c.programme_id),
-            "current_term": c.current_term, "student_count": c.student_count,
+            "current_term": c.current_term,
+            "computed_current_term": c.computed_current_term,
+            "term_is_synced": c.term_is_synced,
+            "student_count": c.student_count,
             "start_year": c.start_year, "start_month": c.start_month,
+            "is_active": c.is_active,
         })
 
     def put(self, request, pk):
-        c = get_object_or_404(Cohort, id=pk)
+        c    = get_object_or_404(Cohort, id=pk)
         data = request.data
-        for field in ("name", "current_term", "student_count", "start_year", "start_month", "is_active"):
+        for field in ("name", "student_count", "start_year", "start_month", "is_active"):
             if field in data:
                 setattr(c, field, data[field])
+        # current_term is managed via enrolments — do not allow direct edits
         c.save()
         return ok({"id": str(c.id), "name": c.name})
 
     def delete(self, request, pk):
         c = get_object_or_404(Cohort, id=pk)
-        c.is_active = False
-        c.save(update_fields=["is_active"])
+        c.delete()
         return ok({"deleted": True})
 
 
@@ -2222,7 +2333,7 @@ class PeriodDetailView(APIView):
         return ok(_period_dict(p))
 
     def put(self, request, pk):
-        p = get_object_or_404(Period, id=pk)
+        p    = get_object_or_404(Period, id=pk)
         data = request.data
         for field in ("label", "start_time", "end_time", "order", "is_break"):
             if field in data:
@@ -2241,219 +2352,18 @@ class TermDetailView(APIView):
 
     def get(self, request, pk):
         t = get_object_or_404(Term, id=pk)
-        return ok({
-            "id": str(t.id), "name": t.name,
-            "start_date": str(t.start_date), "end_date": str(t.end_date),
-            "teaching_weeks": t.teaching_weeks, "is_current": t.is_current,
-        })
+        return ok(_term_dict(t))
 
     def put(self, request, pk):
-        t = get_object_or_404(Term, id=pk)
+        t    = get_object_or_404(Term, id=pk)
         data = request.data
         for field in ("name", "start_date", "end_date", "teaching_weeks", "is_current"):
             if field in data:
                 setattr(t, field, data[field])
         t.save()
-        return ok({"id": str(t.id), "name": t.name})
+        return ok(_term_dict(t))
 
     def delete(self, request, pk):
         t = get_object_or_404(Term, id=pk)
         t.delete()
         return ok({"deleted": True})
-
-
-
-
-
-
-# -----------------------------------------------------------------------------
-# POST for TrainerListView (patch into class via append pattern)
-# Add trainer creation support
-# -----------------------------------------------------------------------------
-# (Trainer POST is handled inside TrainerListView below via monkey-patch approach
-#  â€” instead we append a post() method to the class body above manually or use
-#  the detail view pattern. Simpler: override the class here.)
-
-# -----------------------------------------------------------------------------
-# Detail views â€” GET / PUT / DELETE  by UUID pk
-# -----------------------------------------------------------------------------
-
-class DepartmentDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        d = get_object_or_404(Department, id=pk)
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
-
-    def put(self, request, pk):
-        d = get_object_or_404(Department, id=pk)
-        for field in ("code", "name", "hod", "is_active"):
-            if field in request.data:
-                setattr(d, field, request.data[field])
-        d.save()
-        return ok({"id": str(d.id), "code": d.code, "name": d.name, "hod": d.hod, "institution_id": str(d.institution_id), "is_active": d.is_active})
-
-    def delete(self, request, pk):
-        d = get_object_or_404(Department, id=pk)
-        d.is_active = False
-        d.save(update_fields=["is_active"])
-        return ok({"deleted": True})
-
-
-class ProgrammeDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        p = get_object_or_404(Programme.objects.select_related("department"), id=pk)
-        return ok({
-            "id": str(p.id), "code": p.code, "name": p.name,
-            "level": p.get_level_display(), "department": p.department.name,
-            "department_id": str(p.department_id),
-            "total_terms": p.total_terms, "sharing_group": p.sharing_group,
-        })
-
-    def put(self, request, pk):
-        p = get_object_or_404(Programme, id=pk)
-        for field in ("code", "name", "level", "total_terms", "sharing_group", "is_active"):
-            if field in request.data:
-                setattr(p, field, request.data[field])
-        if "department_id" in request.data:
-            p.department = get_object_or_404(Department, id=request.data["department_id"])
-        p.save()
-        return ok({"id": str(p.id), "code": p.code, "name": p.name})
-
-    def delete(self, request, pk):
-        p = get_object_or_404(Programme, id=pk)
-        p.is_active = False
-        p.save(update_fields=["is_active"])
-        return ok({"deleted": True})
-
-
-class RoomDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        r = get_object_or_404(Room, id=pk)
-        return ok({
-            "id": str(r.id), "code": r.code, "name": r.name,
-            "room_type": r.get_room_type_display(), "capacity": r.capacity,
-            "building": r.building, "features": r.features,
-        })
-
-    def put(self, request, pk):
-        r = get_object_or_404(Room, id=pk)
-        for field in ("code", "name", "room_type", "capacity", "building", "features", "is_active"):
-            if field in request.data:
-                setattr(r, field, request.data[field])
-        r.save()
-        return ok({"id": str(r.id), "code": r.code, "name": r.name})
-
-    def delete(self, request, pk):
-        r = get_object_or_404(Room, id=pk)
-        r.is_active = False
-        r.save(update_fields=["is_active"])
-        return ok({"deleted": True})
-
-
-class TrainerDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        t = get_object_or_404(Trainer.objects.select_related("department"), id=pk)
-        return ok(_trainer_dict(t))
-
-    def put(self, request, pk):
-        t = get_object_or_404(Trainer, id=pk)
-        data = request.data
-        for field in ("staff_id", "first_name", "last_name", "title", "email",
-                      "phone", "employment_type", "max_periods_per_week",
-                      "available_days", "is_active"):
-            if field in data:
-                setattr(t, field, data[field])
-        if "department_id" in data:
-            t.department = get_object_or_404(Department, id=data["department_id"])
-        try:
-            t.save()
-        except Exception as e:
-            return err(str(e), status_code=400)
-        return ok(_trainer_dict(t))
-
-    def delete(self, request, pk):
-        t = get_object_or_404(Trainer, id=pk)
-        t.is_active = False
-        t.save(update_fields=["is_active"])
-        return ok({"deleted": True})
-
-
-class CohortDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        c = get_object_or_404(Cohort.objects.select_related("programme"), id=pk)
-        return ok({
-            "id": str(c.id), "name": c.name,
-            "programme": c.programme.name, "programme_id": str(c.programme_id),
-            "current_term": c.current_term, "student_count": c.student_count,
-            "start_year": c.start_year, "start_month": c.start_month,
-        })
-
-    def put(self, request, pk):
-        c = get_object_or_404(Cohort, id=pk)
-        for field in ("name", "current_term", "student_count", "start_year", "start_month", "is_active"):
-            if field in request.data:
-                setattr(c, field, request.data[field])
-        c.save()
-        return ok({"id": str(c.id), "name": c.name})
-
-    def delete(self, request, pk):
-        c = get_object_or_404(Cohort, id=pk)
-        c.is_active = False
-        c.save(update_fields=["is_active"])
-        return ok({"deleted": True})
-
-
-class PeriodDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        p = get_object_or_404(Period, id=pk)
-        return ok(_period_dict(p))
-
-    def put(self, request, pk):
-        p = get_object_or_404(Period, id=pk)
-        for field in ("label", "start_time", "end_time", "order", "is_break"):
-            if field in request.data:
-                setattr(p, field, request.data[field])
-        p.save()
-        return ok(_period_dict(p))
-
-    def delete(self, request, pk):
-        p = get_object_or_404(Period, id=pk)
-        p.delete()
-        return ok({"deleted": True})
-
-
-class TermDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, pk):
-        t = get_object_or_404(Term, id=pk)
-        return ok({
-            "id": str(t.id), "name": t.name,
-            "start_date": str(t.start_date), "end_date": str(t.end_date),
-            "teaching_weeks": t.teaching_weeks, "is_current": t.is_current,
-        })
-
-    def put(self, request, pk):
-        t = get_object_or_404(Term, id=pk)
-        for field in ("name", "start_date", "end_date", "teaching_weeks", "is_current"):
-            if field in request.data:
-                setattr(t, field, request.data[field])
-        t.save()
-        return ok({"id": str(t.id), "name": t.name})
-
-    def delete(self, request, pk):
-        t = get_object_or_404(Term, id=pk)
-        t.delete()
-        return ok({"deleted": True})
-
