@@ -265,6 +265,60 @@ class CurriculumUnitTrainer(TimeStampedModel):
         return (
             f"{self.curriculum_unit.code} - "
             f"{self.trainer.short_name} ({self.trainer_type})"
+            
+        )
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TermTrainerAssignment
+# Paste this block into timetable/models.py, after the Constraint model and
+# before ScheduledUnit.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TermTrainerAssignment(TimeStampedModel):
+    """
+    Records which trainer will teach a specific curriculum unit
+    for a specific cohort in a specific term.
+    """
+
+    term            = models.ForeignKey(
+        "Term",
+        on_delete=models.CASCADE,
+        related_name="trainer_assignments",
+    )
+    cohort          = models.ForeignKey(
+        "Cohort",
+        on_delete=models.CASCADE,
+        related_name="trainer_assignments",
+    )
+    curriculum_unit = models.ForeignKey(
+        "CurriculumUnit",
+        on_delete=models.CASCADE,
+        related_name="term_assignments",
+    )
+    trainer         = models.ForeignKey(
+        "Trainer",
+        on_delete=models.CASCADE,
+        related_name="term_assignments",
+    )
+    notes           = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ["term", "cohort", "curriculum_unit"]
+        constraints = [
+            UniqueConstraint(
+                fields=["term", "cohort", "curriculum_unit"],
+                name="uniq_term_cohort_unit_assignment",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["term", "trainer"], name="timetable_tta_term_trainer_idx"),
+            models.Index(fields=["term", "cohort"],  name="timetable_tta_term_cohort_idx"),
+        ]
+
+    def __str__(self):
+        return (
+            f"{self.trainer.short_name} → {self.curriculum_unit.code} "
+            f"({self.cohort.name}, {self.term.name})"
         )
 
 
