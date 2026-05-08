@@ -214,6 +214,16 @@ class CurriculumUnit(TimeStampedModel):
         related_name="qualified_units",
         through="CurriculumUnitTrainer",
     )
+    SESSION_PATTERN_CHOICES = [
+        ("SPLIT", "Split — one session per day across multiple days"),
+        ("BLOCK", "Block — consecutive periods on the same day"),
+    ]
+    session_pattern    = models.CharField(
+        max_length=5,
+        choices=SESSION_PATTERN_CHOICES,
+        default="SPLIT",
+        help_text="SPLIT = one session per day; BLOCK = consecutive double period",
+    )
     is_outsourced      = models.BooleanField(
         default=False,
         help_text="Unit is taught by an external/outsourced trainer",
