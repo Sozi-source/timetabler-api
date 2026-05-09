@@ -1603,10 +1603,13 @@ class MasterTimetableView(APIView):
             pid = str(su.period_id)
             if su.day in grid and pid in grid[su.day]:
                 grid[su.day][pid].append(_scheduled_unit_dict(su))
+        has_published = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").exists()
+        has_draft     = ScheduledUnit.objects.filter(term=term, status="DRAFT").exists()
+        actual_status = "PUBLISHED" if has_published else ("DRAFT" if has_draft else "DRAFT")
         return ok({
             "term":           term.name,
             "term_id":        str(term.id),
-            "status":         target,
+            "status":         actual_status,
             "days":           days,
             "periods":        [_period_dict(p) for p in periods],
             "teaching_weeks": term.teaching_weeks,
