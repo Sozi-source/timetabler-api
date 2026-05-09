@@ -2570,3 +2570,4 @@ class TermTrainerAssignmentBulkView(APIView):
             "updated": updated_count,
             "errors":  errors,
         })
+
