@@ -11,11 +11,11 @@ urlpatterns = [
     #AI Views
     path("ai/chat/", ai_views.AIChatView.as_view()),
 
-    # ── Auth ─────────────────────────────────────────────────────────────────
+    # -- Auth -----------------------------------------------------------------
     path("auth/login/",                 obtain_auth_token),
     path("auth/me/",                    views.MeView.as_view()),
 
-    # ── Institution / Setup ──────────────────────────────────────────────────
+    # -- Institution / Setup --------------------------------------------------
     path("institution/",                views.InstitutionView.as_view()),
     path("departments/",                views.DepartmentListView.as_view()),
     path("departments/<uuid:pk>/",       views.DepartmentDetailView.as_view()),
@@ -34,7 +34,7 @@ urlpatterns = [
     path("terms/",                      views.TermListView.as_view()),
     path("terms/<uuid:pk>/",             views.TermDetailView.as_view()),
 
-    # ── Trainer availability ─────────────────────────────────────────────────
+    # -- Trainer availability -------------------------------------------------
     path("trainers/<uuid:trainer_id>/availability/", views.TrainerAvailabilityView.as_view()),
 
     # Term trainer assignments
@@ -43,51 +43,51 @@ urlpatterns = [
     path("term-assignments/bulk/",      views.TermTrainerAssignmentBulkView.as_view()),
     path("term-assignments/<uuid:pk>/", views.TermTrainerAssignmentDetailView.as_view()),
 
-    # ── Cohorts & Progression ────────────────────────────────────────────────
+    # -- Cohorts & Progression ------------------------------------------------
     path("cohorts/",                    views.CohortListView.as_view()),
     path("cohorts/<uuid:pk>/",           views.CohortDetailView.as_view()),
     path("cohorts/<uuid:cohort_id>/progress/",        views.CohortProgressView.as_view()),
     path("cohorts/<uuid:cohort_id>/advance/",         views.AdvanceCohortView.as_view()),
     path("cohorts/<uuid:cohort_id>/progress/update/", views.UpdateProgressView.as_view()),
 
-    # ── Enrolments ───────────────────────────────────────────────────────────  ← NEW
+    # -- Enrolments -----------------------------------------------------------  ? NEW
     path("enrolments/",                  views.CohortEnrolmentListView.as_view()),
     path("enrolments/<uuid:pk>/",         views.CohortEnrolmentDetailView.as_view()),
 
     path("calendar/",              views.CollegeCalendarView.as_view()),
     path("term/advance-all/",      views.AdvanceAllCohortsView.as_view()),
 
-    # ── Constraints ──────────────────────────────────────────────────────────
+    # -- Constraints ----------------------------------------------------------
     path("constraints/",                views.ConstraintListView.as_view()),
     path("constraints/<uuid:constraint_id>/", views.ConstraintDetailView.as_view()),
 
     # Validate timetable against constraints
     path("timetable/validate/", views.ValidateView.as_view()),
     
-    # ── Timetable generation ─────────────────────────────────────────────────
+    # -- Timetable generation -------------------------------------------------
     path("timetable/generate/",         views.GenerateView.as_view()),
     path("timetable/publish/",          views.PublishView.as_view()),
-    path("timetable/revert/",           views.RevertToDraftView.as_view()),
     path("timetable/drafts/",           views.DeleteDraftsView.as_view()),
+    path("timetable/revert/", views.RevertToDraftView.as_view(), name="timetable-revert"),
 
-    # ── Timetable reading ────────────────────────────────────────────────────
+    # -- Timetable reading ----------------------------------------------------
     path("timetable/master/",           views.MasterTimetableView.as_view()),
     path("timetable/cohort/<uuid:cohort_id>/",   views.CohortTimetableView.as_view()),
     path("timetable/trainer/<uuid:trainer_id>/", views.TrainerTimetableView.as_view()),
 
-    # ── Individual entry edit ────────────────────────────────────────────────
+    # -- Individual entry edit ------------------------------------------------
     path("timetable/entry/<uuid:entry_id>/", views.ScheduledUnitDetailView.as_view()),
 
-    # ── Conflicts ────────────────────────────────────────────────────────────
+    # -- Conflicts ------------------------------------------------------------
     path("conflicts/",                  views.ConflictListView.as_view()),
     path("conflicts/<uuid:conflict_id>/resolve/", views.ResolveConflictView.as_view()),
 
-    # ── Exports ──────────────────────────────────────────────────────────────
+    # -- Exports --------------------------------------------------------------
     path("export/master/",              views.ExportMasterView.as_view()),
     path("export/trainer/<uuid:trainer_id>/", views.ExportTrainerView.as_view()),
     path("export/cohort/<uuid:cohort_id>/",   views.ExportCohortView.as_view()),
 
-    # ── Dashboards ───────────────────────────────────────────────────────────
+    # -- Dashboards -----------------------------------------------------------
     path("dashboard/",                  views.DashboardView.as_view()),
     path("dashboard/trainer/",          views.TrainerDashboardView.as_view()),
 ]

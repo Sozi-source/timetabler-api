@@ -1587,14 +1587,16 @@ class MasterTimetableView(APIView):
 
     def get(self, request):
         term   = _term_from_request(request)
-        target = request.query_params.get("status", "PUBLISHED")
         if not term:
             return err("No current term. Provide term_id.", status_code=404)
         inst    = term.institution
         days    = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
+        has_published = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").exists()
+        has_draft     = ScheduledUnit.objects.filter(term=term, status="DRAFT").exists()
+        actual_status = "PUBLISHED" if has_published else ("DRAFT" if has_draft else "DRAFT")
         entries = (
-            ScheduledUnit.objects.filter(term=term, status=target)
+            ScheduledUnit.objects.filter(term=term, status=actual_status)
             .select_related("curriculum_unit", "cohort", "trainer", "room", "period")
             .order_by("day", "period__order", "cohort")
         )
@@ -1603,9 +1605,6 @@ class MasterTimetableView(APIView):
             pid = str(su.period_id)
             if su.day in grid and pid in grid[su.day]:
                 grid[su.day][pid].append(_scheduled_unit_dict(su))
-        has_published = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").exists()
-        has_draft     = ScheduledUnit.objects.filter(term=term, status="DRAFT").exists()
-        actual_status = "PUBLISHED" if has_published else ("DRAFT" if has_draft else "DRAFT")
         return ok({
             "term":           term.name,
             "term_id":        str(term.id),

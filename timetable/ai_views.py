@@ -6,7 +6,7 @@ Proxy view for Groq AI chat — keeps API key server-side.
 Add to timetable/urls.py:
     path("ai/chat/", ai_views.AIChatView.as_view()),
 
-Add to .env:
+Add to Render environment variables:
     GROQ_API_KEY=gsk_...
 """
 
@@ -16,14 +16,29 @@ import traceback
 import requests
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import (
     Cohort, Conflict, Institution, Period, Room,
     ScheduledUnit, Term, Trainer,
 )
-from .views import err, ok
 
+
+# ── Response helpers ───────────────────────────────────────────────────────
+# Defined locally so we're not dependent on views.ok / views.err signature.
+
+def _ok(data, status=200):
+    return Response({"ok": True, "data": data}, status=status)
+
+def _err(message, detail=None, status=400):
+    payload = {"ok": False, "error": message}
+    if detail:
+        payload["detail"] = detail
+    return Response(payload, status=status)
+
+
+# ── Context builder ────────────────────────────────────────────────────────
 
 def _build_timetable_context(term: Term, institution: Institution) -> dict:
     """Gather live timetable state to inject into the AI system prompt."""
@@ -32,8 +47,8 @@ def _build_timetable_context(term: Term, institution: Institution) -> dict:
         resolution_status="PENDING",
     ).select_related("cohort", "trainer", "curriculum_unit")
 
-    sessions = ScheduledUnit.objects.filter(term=term).count()
-    draft_count = ScheduledUnit.objects.filter(term=term, status="DRAFT").count()
+    sessions        = ScheduledUnit.objects.filter(term=term).count()
+    draft_count     = ScheduledUnit.objects.filter(term=term, status="DRAFT").count()
     published_count = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").count()
 
     trainers = list(
@@ -57,19 +72,19 @@ def _build_timetable_context(term: Term, institution: Institution) -> dict:
             "type": c.conflict_type,
             "severity": c.severity,
             "description": c.description,
-            "unit_code": c.curriculum_unit.code if c.curriculum_unit else None,
-            "cohort_name": c.cohort.name if c.cohort else None,
+            "unit_code":    c.curriculum_unit.code if c.curriculum_unit else None,
+            "cohort_name":  c.cohort.name if c.cohort else None,
             "trainer_name": f"{c.trainer.first_name} {c.trainer.last_name}" if c.trainer else None,
         })
 
     return {
-        "term_name": term.name,
-        "total_sessions": sessions,
-        "draft_sessions": draft_count,
+        "term_name":         term.name,
+        "total_sessions":    sessions,
+        "draft_sessions":    draft_count,
         "published_sessions": published_count,
         "pending_conflicts": conflicts_data,
-        "trainers": trainers,
-        "rooms": rooms,
+        "trainers":          trainers,
+        "rooms":             rooms,
         "periods": [
             {**p, "start_time": str(p["start_time"]), "end_time": str(p["end_time"])}
             for p in periods
@@ -77,17 +92,19 @@ def _build_timetable_context(term: Term, institution: Institution) -> dict:
     }
 
 
+# ── System prompt ──────────────────────────────────────────────────────────
+
 def _build_system_prompt(ctx: dict) -> str:
     conflicts = ctx["pending_conflicts"]
-    trainers = ctx["trainers"]
-    rooms = ctx["rooms"]
-    periods = ctx["periods"]
+    trainers  = ctx["trainers"]
+    rooms     = ctx["rooms"]
+    periods   = ctx["periods"]
 
     conflict_text = "None — timetable is clean." if not conflicts else "\n".join(
         (
             f"  {i+1}. [{c['severity']}] {c['type']}: {c['description']}"
-            + (f" | Unit: {c['unit_code']}" if c['unit_code'] else '')
-            + (f" | Cohort: {c['cohort_name']}" if c['cohort_name'] else '')
+            + (f" | Unit: {c['unit_code']}"      if c['unit_code']    else '')
+            + (f" | Cohort: {c['cohort_name']}"  if c['cohort_name']  else '')
             + (f" | Trainer: {c['trainer_name']}" if c['trainer_name'] else '')
             + f" | ID: {c['id']}"
         )
@@ -148,6 +165,8 @@ Only include <actions> when a clear executable step exists. Do not include it fo
 Always be direct, specific, and reference real names and IDs from the context above."""
 
 
+# ── View ───────────────────────────────────────────────────────────────────
+
 class AIChatView(APIView):
     """
     POST /api/ai/chat/
@@ -157,19 +176,26 @@ class AIChatView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        # ── Guard: API key ─────────────────────────────────────────────────
         groq_api_key = getattr(settings, "GROQ_API_KEY", None)
         if not groq_api_key:
-            return err("GROQ_API_KEY not configured in settings.", status=500)
+            return _err(
+                "GROQ_API_KEY is not configured on the server. "
+                "Add it to your Render environment variables.",
+                status=500,
+            )
 
         messages = request.data.get("messages", [])
         term_id  = request.data.get("term_id", "")
 
         if not messages:
-            return err("messages is required")
+            return _err("messages is required.", status=400)
 
-        # Resolve term and institution
+        # ── Resolve term & build context ───────────────────────────────────
         try:
             institution = Institution.objects.first()
+            if not institution:
+                return _err("No institution configured.", status=500)
 
             if term_id:
                 term = Term.objects.get(id=term_id)
@@ -179,27 +205,34 @@ class AIChatView(APIView):
                 ).first()
 
             if not term:
-                return err("No active term found.")
+                return _err(
+                    "No active term found. Please set a current term in the admin.",
+                    status=400,
+                )
 
-            ctx = _build_timetable_context(term, institution)
+            ctx           = _build_timetable_context(term, institution)
             system_prompt = _build_system_prompt(ctx)
 
         except Term.DoesNotExist:
-            return err("Term not found.")
+            return _err("Term not found.", status=404)
         except Exception:
-            return err("Failed to build timetable context.", traceback.format_exc(), 500)
+            return _err(
+                "Failed to build timetable context.",
+                detail=traceback.format_exc(),
+                status=500,
+            )
 
-        # Call Groq
+        # ── Call Groq ──────────────────────────────────────────────────────
         try:
             groq_response = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={
                     "Authorization": f"Bearer {groq_api_key}",
-                    "Content-Type": "application/json",
+                    "Content-Type":  "application/json",
                 },
                 json={
-                    "model": "llama-3.3-70b-versatile",
-                    "max_tokens": 1024,
+                    "model":       "llama-3.3-70b-versatile",
+                    "max_tokens":  1024,
                     "temperature": 0.3,
                     "messages": [
                         {"role": "system", "content": system_prompt},
@@ -213,21 +246,30 @@ class AIChatView(APIView):
                 timeout=30,
             )
             groq_response.raise_for_status()
-            result = groq_response.json()
+            result  = groq_response.json()
             content = result["choices"][0]["message"]["content"]
-            return ok({"content": content, "context": {
-                "pending_conflicts": len(ctx["pending_conflicts"]),
-                "term_name": ctx["term_name"],
-            }})
+            return _ok({
+                "content": content,
+                "context": {
+                    "pending_conflicts": len(ctx["pending_conflicts"]),
+                    "term_name":         ctx["term_name"],
+                },
+            })
 
         except requests.exceptions.Timeout:
-            return err("Groq API timed out. Please try again.", status=504)
-        except requests.exceptions.HTTPError as e:
+            return _err("Groq API timed out. Please try again.", status=504)
+
+        except requests.exceptions.HTTPError:
             detail = ""
             try:
-                detail = groq_response.json().get("error", {}).get("message", str(e))
+                detail = groq_response.json().get("error", {}).get("message", str(groq_response.text))
             except Exception:
-                detail = str(e)
-            return err(f"Groq API error: {detail}", status=502)
+                detail = str(groq_response.text)
+            return _err(f"Groq API error: {detail}", status=502)
+
         except Exception:
-            return err("Failed to call Groq API.", traceback.format_exc(), 500)
+            return _err(
+                "Failed to call Groq API.",
+                detail=traceback.format_exc(),
+                status=500,
+            )

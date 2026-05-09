@@ -119,7 +119,7 @@ class CurriculumUnitReadSerializer(serializers.ModelSerializer):
         fields = [
             "id", "programme_code", "term_number", "position", "code",
             "name", "unit_type", "credit_hours", "periods_per_week",
-            "is_active", "notes", "qualified_trainers",
+            "session_pattern", "is_active", "notes", "qualified_trainers",
         ]
 
     def get_qualified_trainers(self, obj):
@@ -140,7 +140,7 @@ class CurriculumUnitWriteSerializer(serializers.ModelSerializer):
         fields = [
             "programme_id", "term_number", "position", "code",
             "name", "unit_type", "credit_hours", "periods_per_week",
-            "is_active", "notes", "qualified_trainers",
+            "session_pattern", "is_active", "notes", "qualified_trainers",
         ]
 
     def validate_programme_id(self, value):
@@ -398,24 +398,31 @@ class ProgressRecordWriteSerializer(serializers.Serializer):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class ConstraintSerializer(serializers.ModelSerializer):
+    unit_name = serializers.SerializerMethodField()
+    unit_code = serializers.SerializerMethodField()
+
     class Meta:
         model  = Constraint
         fields = [
             "id", "scope", "rule", "is_hard",
             "curriculum_unit", "trainer", "room", "cohort",
+            "unit_name", "unit_code",
             "parameters", "is_active", "notes",
         ]
-        read_only_fields = ["id"]
+        read_only_fields = ["id", "unit_name", "unit_code"]
+
+    def get_unit_name(self, obj) -> str | None:
+        return obj.curriculum_unit.name if obj.curriculum_unit_id else None
+
+    def get_unit_code(self, obj) -> str | None:
+        return obj.curriculum_unit.code if obj.curriculum_unit_id else None
 
     def validate(self, data):
-        # At least one entity reference is required
         entity_fields = ["curriculum_unit", "trainer", "room", "cohort"]
         if not any(data.get(f) for f in entity_fields):
             raise serializers.ValidationError(
                 "At least one of curriculum_unit, trainer, room, or cohort must be set."
             )
-
-        # Validate parameter keys per rule
         rule   = data.get("rule")
         params = data.get("parameters", {})
         required_params = {
@@ -426,14 +433,13 @@ class ConstraintSerializer(serializers.ModelSerializer):
             "AVOID_PERIOD":   ["period_id"],
             "MAX_PER_DAY":    ["max"],
         }
-        needed = required_params.get(rule, [])
+        needed  = required_params.get(rule, [])
         missing = [k for k in needed if k not in params]
         if missing:
             raise serializers.ValidationError(
                 {"parameters": f"Rule '{rule}' requires parameter(s): {', '.join(missing)}"}
             )
         return data
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ScheduledUnit
@@ -550,7 +556,7 @@ class PublishSerializer(serializers.Serializer):
 
 # ─────────────────────────────────────────────────────────────────────────────
 # AuditLog (read-only)
-# ─────────────────────────────────────────────────────────────────────────────
+# ────────────────────────────constra─────────────────────────────────────────────────
 
 class AuditLogSerializer(serializers.ModelSerializer):
     action       = serializers.CharField(source="get_action_display")
