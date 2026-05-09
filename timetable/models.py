@@ -1308,6 +1308,7 @@ class AuditLog(models.Model):
     ACTION_CHOICES = [
         ("GENERATE", "Timetable Generated"),
         ("PUBLISH",  "Timetable Published"),
+        ("REVERT",   "Timetable Reverted to Draft"),
         ("DELETE",   "Timetable Deleted"),
         ("EDIT",     "Entry Edited"),
         ("CANCEL",   "Entry Cancelled"),

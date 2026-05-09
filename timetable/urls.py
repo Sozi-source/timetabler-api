@@ -1,4 +1,4 @@
-﻿"""
+"""
 timetable/urls.py
 """
 from . import ai_views
@@ -26,7 +26,7 @@ urlpatterns = [
     path('curriculum/<uuid:unit_id>/',          views.CurriculumUnitDetailView.as_view()),
     path('curriculum/<uuid:unit_id>/trainers/', views.CurriculumUnitTrainersView.as_view()),
     path("periods/",                    views.PeriodListView.as_view()),
-    path("periods/<int:pk>/",            views.PeriodDetailView.as_view()),
+    path("periods/<uuid:pk>/", views.PeriodDetailView.as_view()),
     path("rooms/",                      views.RoomListView.as_view()),
     path("rooms/<uuid:pk>/",             views.RoomDetailView.as_view()),
     path("trainers/",                   views.TrainerListView.as_view()),
@@ -37,6 +37,12 @@ urlpatterns = [
     # ── Trainer availability ─────────────────────────────────────────────────
     path("trainers/<uuid:trainer_id>/availability/", views.TrainerAvailabilityView.as_view()),
 
+    # Term trainer assignments
+    path("term-assignments/",           views.TermTrainerAssignmentListView.as_view()),
+    path("term-assignments/by-unit/",   views.TermTrainerAssignmentByUnitView.as_view()),
+    path("term-assignments/bulk/",      views.TermTrainerAssignmentBulkView.as_view()),
+    path("term-assignments/<uuid:pk>/", views.TermTrainerAssignmentDetailView.as_view()),
+
     # ── Cohorts & Progression ────────────────────────────────────────────────
     path("cohorts/",                    views.CohortListView.as_view()),
     path("cohorts/<uuid:pk>/",           views.CohortDetailView.as_view()),
@@ -44,7 +50,12 @@ urlpatterns = [
     path("cohorts/<uuid:cohort_id>/advance/",         views.AdvanceCohortView.as_view()),
     path("cohorts/<uuid:cohort_id>/progress/update/", views.UpdateProgressView.as_view()),
 
-    path("term/advance-all/", views.AdvanceAllCohortsView.as_view()),
+    # ── Enrolments ───────────────────────────────────────────────────────────  ← NEW
+    path("enrolments/",                  views.CohortEnrolmentListView.as_view()),
+    path("enrolments/<uuid:pk>/",         views.CohortEnrolmentDetailView.as_view()),
+
+    path("calendar/",              views.CollegeCalendarView.as_view()),
+    path("term/advance-all/",      views.AdvanceAllCohortsView.as_view()),
 
     # ── Constraints ──────────────────────────────────────────────────────────
     path("constraints/",                views.ConstraintListView.as_view()),
@@ -56,6 +67,7 @@ urlpatterns = [
     # ── Timetable generation ─────────────────────────────────────────────────
     path("timetable/generate/",         views.GenerateView.as_view()),
     path("timetable/publish/",          views.PublishView.as_view()),
+    path("timetable/revert/",           views.RevertToDraftView.as_view()),
     path("timetable/drafts/",           views.DeleteDraftsView.as_view()),
 
     # ── Timetable reading ────────────────────────────────────────────────────
@@ -79,7 +91,3 @@ urlpatterns = [
     path("dashboard/",                  views.DashboardView.as_view()),
     path("dashboard/trainer/",          views.TrainerDashboardView.as_view()),
 ]
-
-
-
-

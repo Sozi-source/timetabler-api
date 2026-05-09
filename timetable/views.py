@@ -1,4 +1,4 @@
-﻿"""
+"""
 timetable/views.py
 ==================
 Clean, flat REST API.  Every endpoint returns a predictable shape:
@@ -1526,6 +1526,38 @@ class PublishView(APIView):
         return ScheduledUnit.objects.filter(term=term, status="DRAFT").update(
             status="PUBLISHED", published_at=now
         )
+class RevertToDraftView(APIView):
+    """POST /api/timetable/revert/"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        term = _term_from_request(request)
+        if not term:
+            return err("No current term. Provide term_id.", status_code=404)
+
+        published_count = ScheduledUnit.objects.filter(
+            term=term, status="PUBLISHED"
+        ).count()
+
+        if not published_count:
+            return err("No published entries found for this term.")
+
+        try:
+            with transaction.atomic():
+                reverted = ScheduledUnit.objects.filter(
+                    term=term, status="PUBLISHED"
+                ).update(status="DRAFT", published_at=None)
+        except Exception:
+            return err("Revert failed", traceback.format_exc(), 500)
+
+        AuditLog.objects.create(
+            action="REVERT",
+            performed_by=request.user,
+            term=term,
+            description=f"Reverted {reverted} entries to draft for {term.name}",
+            payload={"reverted": reverted},
+        )
+        return ok({"reverted": reverted, "term": term.name})
 
 
 class DeleteDraftsView(APIView):
