@@ -85,8 +85,10 @@ from .models import (
     CurriculumUnit, CurriculumUnitTrainer,
     CollegeCalendar, Department, Institution, Period, Programme,
     ProgressRecord, Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
+    TermTrainerAssignment,
 )
 from .scheduler import TimetableEngine
+from .serializers import ConstraintSerializer
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -198,6 +200,7 @@ def _unit_dict(u: CurriculumUnit) -> dict:
         "term_number":      u.term_number,
         "credit_hours":     u.credit_hours,
         "periods_per_week": u.periods_per_week,
+        "session_pattern":  u.session_pattern,
         "unit_type":        u.get_unit_type_display(),
         "is_double":        u.periods_per_week >= 2,
         "is_outsourced":    u.is_outsourced,
@@ -1222,11 +1225,9 @@ class ConstraintListView(APIView):
             qs = qs.filter(cohort_id=cohort_id)
         if trainer_id:
             qs = qs.filter(trainer_id=trainer_id)
-        from .serializers import ConstraintSerializer
         return ok(ConstraintSerializer(qs.order_by("-is_hard", "scope"), many=True).data)
 
     def post(self, request):
-        from .serializers import ConstraintSerializer
         ser = ConstraintSerializer(data=request.data)
         if ser.is_valid():
             c = ser.save()
@@ -2367,3 +2368,170 @@ class TermDetailView(APIView):
         t = get_object_or_404(Term, id=pk)
         t.delete()
         return ok({"deleted": True})
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Term Trainer Assignments
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _tta_dict(a):
+    return {
+        "id":                   str(a.id),
+        "term_id":              str(a.term_id),
+        "cohort_id":            str(a.cohort_id),
+        "cohort_name":          a.cohort.name if a.cohort_id else None,
+        "curriculum_unit_id":   str(a.curriculum_unit_id),
+        "curriculum_unit_code": a.curriculum_unit.code if a.curriculum_unit_id else None,
+        "trainer_id":           str(a.trainer_id),
+        "trainer_name":         a.trainer.short_name if a.trainer_id else None,
+        "notes":                a.notes,
+    }
+
+
+class TermTrainerAssignmentListView(APIView):
+    """
+    GET  /api/term-assignments/?term=<id>
+    POST /api/term-assignments/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        term       = _term_from_request(request)
+        cohort_id  = request.query_params.get("cohort")
+        trainer_id = request.query_params.get("trainer")
+        unit_id    = request.query_params.get("unit")
+
+        qs = TermTrainerAssignment.objects.select_related(
+            "term", "cohort", "curriculum_unit", "trainer"
+        )
+        if term:
+            qs = qs.filter(term=term)
+        if cohort_id:
+            qs = qs.filter(cohort_id=cohort_id)
+        if trainer_id:
+            qs = qs.filter(trainer_id=trainer_id)
+        if unit_id:
+            qs = qs.filter(curriculum_unit_id=unit_id)
+
+        return ok([_tta_dict(a) for a in qs.order_by("cohort__name")])
+
+    def post(self, request):
+        data = request.data
+        try:
+            term    = get_object_or_404(Term,           id=data["term_id"])
+            cohort  = get_object_or_404(Cohort,         id=data["cohort_id"])
+            unit    = get_object_or_404(CurriculumUnit, id=data["curriculum_unit_id"])
+            trainer = get_object_or_404(Trainer,        id=data["trainer_id"])
+            assignment, created = TermTrainerAssignment.objects.update_or_create(
+                term=term, cohort=cohort, curriculum_unit=unit,
+                defaults={"trainer": trainer, "notes": data.get("notes", "")},
+            )
+            return ok(_tta_dict(assignment), 201 if created else 200)
+        except KeyError as e:
+            return err(f"Missing field: {e}")
+        except Exception as e:
+            return err(str(e), status_code=500)
+
+
+class TermTrainerAssignmentDetailView(APIView):
+    """
+    GET    /api/term-assignments/<id>/
+    PUT    /api/term-assignments/<id>/
+    DELETE /api/term-assignments/<id>/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        a = get_object_or_404(
+            TermTrainerAssignment.objects.select_related("term", "cohort", "curriculum_unit", "trainer"),
+            id=pk,
+        )
+        return ok(_tta_dict(a))
+
+    def put(self, request, pk):
+        a    = get_object_or_404(TermTrainerAssignment, id=pk)
+        data = request.data
+        if "trainer_id" in data:
+            a.trainer = get_object_or_404(Trainer, id=data["trainer_id"])
+        if "notes" in data:
+            a.notes = data["notes"]
+        a.save()
+        a = TermTrainerAssignment.objects.select_related(
+            "term", "cohort", "curriculum_unit", "trainer"
+        ).get(pk=pk)
+        return ok(_tta_dict(a))
+
+    def delete(self, request, pk):
+        a = get_object_or_404(TermTrainerAssignment, id=pk)
+        a.delete()
+        return ok({"deleted": True})
+
+
+class TermTrainerAssignmentByUnitView(APIView):
+    """
+    GET /api/term-assignments/by-unit/?term=<id>&unit=<id>&cohort=<id>
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        term_id   = request.query_params.get("term")
+        unit_id   = request.query_params.get("unit")
+        cohort_id = request.query_params.get("cohort")
+        if not (term_id and unit_id and cohort_id):
+            return err("term, unit, and cohort query params are required")
+        unit = get_object_or_404(CurriculumUnit, id=unit_id)
+        assignment = TermTrainerAssignment.objects.select_related(
+            "term", "cohort", "curriculum_unit", "trainer"
+        ).filter(term_id=term_id, cohort_id=cohort_id, curriculum_unit_id=unit_id).first()
+        qualified = [
+            {"id": str(ut.trainer.id), "name": ut.trainer.short_name}
+            for ut in unit.unit_trainers.select_related("trainer").filter(trainer__is_active=True)
+        ]
+        return ok({
+            "assignment":          _tta_dict(assignment) if assignment else None,
+            "assigned_trainer_id": str(assignment.trainer_id) if assignment else None,
+            "qualified_trainers":  qualified,
+        })
+
+
+class TermTrainerAssignmentBulkView(APIView):
+    """
+    POST /api/term-assignments/bulk/
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data        = request.data
+        term_id     = data.get("term_id")
+        assignments = data.get("assignments", [])
+        if not term_id:
+            return err("term_id required")
+        if not assignments:
+            return err("assignments list required")
+        term = get_object_or_404(Term, id=term_id)
+        created_count = 0
+        updated_count = 0
+        errors        = []
+        with transaction.atomic():
+            for item in assignments:
+                try:
+                    cohort  = Cohort.objects.filter(id=item.get("cohort_id")).first()
+                    unit    = CurriculumUnit.objects.filter(id=item.get("curriculum_unit_id")).first()
+                    trainer = Trainer.objects.filter(id=item.get("trainer_id")).first()
+                    if not (cohort and unit and trainer):
+                        errors.append({"item": item, "error": "cohort/unit/trainer not found"})
+                        continue
+                    _, created = TermTrainerAssignment.objects.update_or_create(
+                        term=term, cohort=cohort, curriculum_unit=unit,
+                        defaults={"trainer": trainer, "notes": item.get("notes", "")},
+                    )
+                    if created:
+                        created_count += 1
+                    else:
+                        updated_count += 1
+                except Exception as e:
+                    errors.append({"item": item, "error": str(e)})
+        return ok({
+            "created": created_count,
+            "updated": updated_count,
+            "errors":  errors,
+        })
