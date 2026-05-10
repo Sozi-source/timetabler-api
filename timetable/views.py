@@ -1,4 +1,4 @@
-"""
+﻿"""
 timetable/views.py
 ==================
 Clean, flat REST API.  Every endpoint returns a predictable shape:
@@ -43,6 +43,7 @@ DEL  /api/constraints/<id>/                     ConstraintDetailView
 ── Timetable generation ─────────────────────────────────────────────────────
 POST /api/timetable/generate/                   GenerateView
 POST /api/timetable/publish/                    PublishView
+POST /api/timetable/revert/                     RevertToDraftView
 DEL  /api/timetable/drafts/                     DeleteDraftsView
 
 ── Timetable reading ────────────────────────────────────────────────────────
@@ -55,9 +56,9 @@ GET  /api/conflicts/?term=<id>                  ConflictListView
 POST /api/conflicts/<id>/resolve/               ResolveConflictView
 
 ── Exports ──────────────────────────────────────────────────────────────────
-GET  /api/export/master/?term=<id>&fmt=html     ExportMasterView
-GET  /api/export/trainer/<id>/?term=<id>        ExportTrainerView
-GET  /api/export/cohort/<id>/?term=<id>         ExportCohortView
+GET  /api/export/master/?term=<id>&fmt=html|xlsx|pdf|docx    ExportMasterView
+GET  /api/export/trainer/<id>/?term=<id>&fmt=...             ExportTrainerView
+GET  /api/export/cohort/<id>/?term=<id>&fmt=...              ExportCohortView
 
 ── Dashboard ────────────────────────────────────────────────────────────────
 GET  /api/dashboard/                            DashboardView
@@ -89,6 +90,10 @@ from .models import (
 )
 from .scheduler import TimetableEngine
 from .serializers import ConstraintSerializer
+
+# Export helpers — install reportlab>=4.0 and python-docx>=1.1
+from .export_helpers import build_pdf_timetable, build_docx_timetable
+from .excel_exports import _make_workbook, _xlsx_response
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -637,8 +642,6 @@ class CohortListView(APIView):
         if prog_id:
             qs = qs.filter(programme_id=prog_id)
 
-        # Pre-fetch the latest enrolment per cohort (any term, any status)
-        # so completed cohorts whose enrolment is in a past term are still found.
         enrolment_map: dict[str, CohortEnrolment] = {}
         for e in (
             CohortEnrolment.objects
@@ -685,8 +688,6 @@ class CohortListView(APIView):
                 current_term=int(data.get("current_term", 1)),
                 student_count=int(data.get("student_count", 0)),
             )
-            # Auto-enrol in the current college term so current_term
-            # is immediately synced via the post_save signal.
             inst         = _institution(request)
             current_term = Term.objects.filter(
                 institution=inst, is_current=True
@@ -703,6 +704,7 @@ class CohortListView(APIView):
             return err(f"Missing field: {e}")
         except Exception as e:
             return err(str(e), traceback.format_exc(), 500)
+
 
 class CohortProgressView(APIView):
     """GET /api/cohorts/<id>/progress/?term=<term_id>"""
@@ -761,7 +763,7 @@ class CohortProgressView(APIView):
 
 
 class AdvanceCohortView(APIView):
-    """POST /api/cohorts/<id>/advance/ — move a single cohort to its next term."""
+    """POST /api/cohorts/<id>/advance/"""
     permission_classes = [IsAuthenticated]
 
     def post(self, request, cohort_id):
@@ -829,10 +831,6 @@ class UpdateProgressView(APIView):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class CohortEnrolmentListView(APIView):
-    """
-    GET  /api/enrolments/?term=<id>&status=ACTIVE&cohort=<id>
-    POST /api/enrolments/
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -840,9 +838,7 @@ class CohortEnrolmentListView(APIView):
         status    = request.query_params.get("status", "")
         cohort_id = request.query_params.get("cohort")
 
-        qs = CohortEnrolment.objects.select_related(
-            "cohort__programme", "college_term"
-        )
+        qs = CohortEnrolment.objects.select_related("cohort__programme", "college_term")
         if term:
             qs = qs.filter(college_term=term)
         if status:
@@ -872,7 +868,6 @@ class CohortEnrolmentListView(APIView):
                     f"{cohort.name} already has an enrolment for {term.name}",
                     status_code=409,
                 )
-
             AuditLog.objects.create(
                 action="PROGRESS",
                 performed_by=request.user,
@@ -883,7 +878,6 @@ class CohortEnrolmentListView(APIView):
                 ),
             )
             return ok(_enrolment_dict(enrolment), 201)
-
         except KeyError as e:
             return err(f"Missing field: {e}")
         except Exception as e:
@@ -891,11 +885,6 @@ class CohortEnrolmentListView(APIView):
 
 
 class CohortEnrolmentDetailView(APIView):
-    """
-    GET    /api/enrolments/<id>/
-    PUT    /api/enrolments/<id>/
-    DELETE /api/enrolments/<id>/
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
@@ -909,12 +898,10 @@ class CohortEnrolmentDetailView(APIView):
         e    = get_object_or_404(CohortEnrolment, id=pk)
         data = request.data
         old_status = e.status
-
         for field in ("status", "notes", "programme_term"):
             if field in data:
                 setattr(e, field, data[field])
         e.save()
-
         AuditLog.objects.create(
             action="PROGRESS",
             performed_by=request.user,
@@ -938,25 +925,6 @@ class CohortEnrolmentDetailView(APIView):
 # ─────────────────────────────────────────────────────────────────────────────
 
 class AdvanceAllCohortsView(APIView):
-    """
-    POST /api/term/advance-all/
-    GET  /api/term/advance-all/?term=<id>   (preview alias)
-
-    Two-phase flow
-    --------------
-    phase=preview  → returns what will happen (no writes)
-    phase=confirm  → executes the move atomically
-
-    POST body (preview):
-      { "phase": "preview", "term_id": "<uuid>" }
-
-    POST body (confirm):
-      {
-        "phase":     "confirm",
-        "term_id":   "<uuid>",
-        "overrides": { "<unit_id>": false }
-      }
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -970,14 +938,11 @@ class AdvanceAllCohortsView(APIView):
             return self._confirm(request)
         return err(f"Unknown phase '{phase}'. Use 'preview' or 'confirm'.")
 
-    # ── Internal helpers ──────────────────────────────────────────────────────
-
     def _resolve(self, request) -> tuple[Term | None, Term | None]:
         term = _term_from_request(request)
         if not term:
             return None, None
-        next_term = self._next_term(term)
-        return term, next_term
+        return term, self._next_term(term)
 
     def _next_term(self, term: Term) -> Term | None:
         if not (term.college_year and term.college_semester):
@@ -994,13 +959,11 @@ class AdvanceAllCohortsView(APIView):
     def _active_enrolments(self, term: Term) -> list[CohortEnrolment]:
         return list(
             CohortEnrolment.objects.filter(
-                college_term=term,
-                status=CohortEnrolment.ACTIVE,
+                college_term=term, status=CohortEnrolment.ACTIVE,
             ).select_related("cohort__programme").order_by("cohort__name")
         )
 
     def _new_intakes(self, term: Term, next_term: Term | None) -> list[Cohort]:
-        """Cohorts with no enrolment in current or next term — new intakes."""
         if not next_term:
             return []
         already_enrolled_ids = set(
@@ -1015,8 +978,6 @@ class AdvanceAllCohortsView(APIView):
             .order_by("name")
         )
 
-    # ── Preview ───────────────────────────────────────────────────────────────
-
     def _preview(self, request) -> Response:
         term, next_term = self._resolve(request)
         if not term:
@@ -1024,8 +985,7 @@ class AdvanceAllCohortsView(APIView):
 
         active_enrolments = self._active_enrolments(term)
         new_intakes       = self._new_intakes(term, next_term)
-
-        advancing  = []
+        advancing = []
         graduating = []
 
         for enrolment in active_enrolments:
@@ -1051,10 +1011,10 @@ class AdvanceAllCohortsView(APIView):
                 })
 
         return ok({
-            "current_term":            _term_dict(term),
-            "next_term":               _term_dict(next_term) if next_term else None,
-            "next_term_exists":        next_term is not None,
-            "advancing_cohorts":       advancing,
+            "current_term":           _term_dict(term),
+            "next_term":              _term_dict(next_term) if next_term else None,
+            "next_term_exists":       next_term is not None,
+            "advancing_cohorts":      advancing,
             "new_intakes": [
                 {
                     "cohort_id":    str(c.id),
@@ -1064,12 +1024,10 @@ class AdvanceAllCohortsView(APIView):
                 }
                 for c in new_intakes
             ],
-            "graduating_cohorts":       graduating,
-            "total_cohorts_advancing":  len(advancing),
-            "total_new_intakes":        len(new_intakes),
+            "graduating_cohorts":      graduating,
+            "total_cohorts_advancing": len(advancing),
+            "total_new_intakes":       len(new_intakes),
         })
-
-    # ── Confirm ───────────────────────────────────────────────────────────────
 
     def _confirm(self, request) -> Response:
         term, next_term = self._resolve(request)
@@ -1084,25 +1042,17 @@ class AdvanceAllCohortsView(APIView):
 
         try:
             with transaction.atomic():
-                active_enrolments = self._active_enrolments(term)
-
-                for enrolment in active_enrolments:
+                for enrolment in self._active_enrolments(term):
                     cohort    = enrolment.cohort
                     units     = enrolment.unit_preview()
                     completed = skipped = 0
 
-                    # 1. Mark units complete in ProgressRecord
                     for u in units:
                         uid = u["unit_id"]
-                        if overrides.get(uid) is False:
+                        if overrides.get(uid) is False or not u["mark_complete"]:
                             skipped_units += 1
                             skipped       += 1
                             continue
-                        if not u["mark_complete"]:
-                            skipped_units += 1
-                            skipped       += 1
-                            continue
-
                         pr, _ = ProgressRecord.objects.get_or_create(
                             cohort=cohort,
                             curriculum_unit_id=uid,
@@ -1115,17 +1065,14 @@ class AdvanceAllCohortsView(APIView):
                         if not pr.started_at:
                             pr.started_at = date.today()
                         pr.save(update_fields=[
-                            "status", "completed_at", "started_at",
-                            "enrolment", "updated_at",
+                            "status", "completed_at", "started_at", "enrolment", "updated_at",
                         ])
                         completed       += 1
                         units_completed += 1
 
-                    # 2. Close current enrolment
                     enrolment.status = CohortEnrolment.COMPLETED
                     enrolment.save(update_fields=["status", "updated_at"])
 
-                    # 3. Create next enrolment (or mark graduated)
                     if next_term:
                         next_prog_term = enrolment.programme_term + 1
                         if next_prog_term <= cohort.programme.total_terms:
@@ -1137,8 +1084,7 @@ class AdvanceAllCohortsView(APIView):
                             )
                             cohorts_advanced += 1
                             log_lines.append(
-                                f"{cohort.name}: T{enrolment.programme_term} → "
-                                f"T{next_prog_term} "
+                                f"{cohort.name}: T{enrolment.programme_term} → T{next_prog_term} "
                                 f"({completed} completed, {skipped} skipped)"
                             )
                         else:
@@ -1153,23 +1099,15 @@ class AdvanceAllCohortsView(APIView):
                                 f"{cohort.name}: GRADUATED after T{enrolment.programme_term}"
                             )
 
-                # 4. Enrol new intakes for next term at programme_term = 1
                 if next_term:
                     for cohort in self._new_intakes(term, next_term):
                         CohortEnrolment.objects.get_or_create(
                             cohort=cohort,
                             college_term=next_term,
-                            defaults={
-                                "programme_term": 1,
-                                "status": CohortEnrolment.ACTIVE,
-                            },
+                            defaults={"programme_term": 1, "status": CohortEnrolment.ACTIVE},
                         )
-                        log_lines.append(
-                            f"{cohort.name}: NEW INTAKE → T1 in {next_term.name}"
-                        )
+                        log_lines.append(f"{cohort.name}: NEW INTAKE → T1 in {next_term.name}")
 
-                # 5. Activate the next term
-                if next_term:
                     Term.objects.filter(
                         institution=term.institution, is_current=True
                     ).exclude(pk=next_term.pk).update(is_current=False)
@@ -1196,7 +1134,6 @@ class AdvanceAllCohortsView(APIView):
                 "detail":              log_lines,
             },
         )
-
         return ok({
             "cohorts_advanced":    cohorts_advanced,
             "units_completed":     units_completed,
@@ -1241,12 +1178,12 @@ class ConstraintDetailView(APIView):
     def put(self, request, constraint_id):
         c    = get_object_or_404(Constraint, id=constraint_id)
         data = request.data
-        c.scope          = data.get("scope",      c.scope)
-        c.rule           = data.get("rule",       c.rule)
-        c.is_hard        = bool(data.get("is_hard",   c.is_hard))
-        c.parameters     = data.get("parameters", c.parameters)
-        c.notes          = data.get("notes",      c.notes)
-        c.is_active      = bool(data.get("is_active", c.is_active))
+        c.scope              = data.get("scope",           c.scope)
+        c.rule               = data.get("rule",            c.rule)
+        c.is_hard            = bool(data.get("is_hard",    c.is_hard))
+        c.parameters         = data.get("parameters",      c.parameters)
+        c.notes              = data.get("notes",           c.notes)
+        c.is_active          = bool(data.get("is_active",  c.is_active))
         c.cohort_id          = data.get("cohort",          c.cohort_id)
         c.curriculum_unit_id = data.get("curriculum_unit", c.curriculum_unit_id)
         c.save()
@@ -1318,44 +1255,31 @@ class ValidateView(APIView):
         blocking = []
         warnings = []
 
-        cohorts = list(
-            Cohort.objects.filter(
-                programme__department__institution=inst, is_active=True
-            ).select_related("programme")
-        )
-        all_trainers = list(
-            Trainer.objects.filter(institution=inst, is_active=True).select_related("department")
-        )
-        rooms   = list(Room.objects.filter(institution=inst, is_active=True))
-        periods = list(Period.objects.filter(institution=inst, is_break=False))
-        days    = list(inst.days_of_week)
-        total_slots = len(days) * len(periods)
+        cohorts      = list(Cohort.objects.filter(programme__department__institution=inst, is_active=True).select_related("programme"))
+        all_trainers = list(Trainer.objects.filter(institution=inst, is_active=True).select_related("department"))
+        rooms        = list(Room.objects.filter(institution=inst, is_active=True))
+        periods      = list(Period.objects.filter(institution=inst, is_break=False))
+        days         = list(inst.days_of_week)
+        total_slots  = len(days) * len(periods)
 
         units_per_trainer: dict[str, list] = defaultdict(list)
         cohorts_checked = units_checked = 0
 
         for cohort in cohorts:
-            # Use enrolment-based programme_term if available
             enrolment  = cohort.active_enrolment(college_term=term)
             prog_term  = enrolment.programme_term if enrolment else cohort.current_term
-            units      = list(
-                CurriculumUnit.objects.filter(
-                    programme=cohort.programme,
-                    term_number=prog_term,
-                    is_active=True,
-                ).prefetch_related("qualified_trainers")
-            )
+            units      = list(CurriculumUnit.objects.filter(
+                programme=cohort.programme, term_number=prog_term, is_active=True,
+            ).prefetch_related("qualified_trainers"))
             cohorts_checked += 1
             units_checked   += len(units)
 
             sessions_needed = sum(u.periods_per_week for u in units)
             if sessions_needed > total_slots:
                 warnings.append({
-                    "type":      "SLOT_SHORTAGE",
-                    "cohort":    cohort.name,
-                    "needed":    sessions_needed,
-                    "available": total_slots,
-                    "message":   f"Needs {sessions_needed} sessions but only {total_slots} slots available",
+                    "type": "SLOT_SHORTAGE", "cohort": cohort.name,
+                    "needed": sessions_needed, "available": total_slots,
+                    "message": f"Needs {sessions_needed} sessions but only {total_slots} slots available",
                 })
 
             for unit in units:
@@ -1363,24 +1287,20 @@ class ValidateView(APIView):
                 if not outsourced and cohort.student_count > 0:
                     if not any(r.capacity >= cohort.student_count for r in rooms):
                         warnings.append({
-                            "type":              "NO_SUITABLE_ROOM",
-                            "cohort":            cohort.name,
-                            "unit_code":         unit.code,
-                            "unit_name":         unit.name,
-                            "students":          cohort.student_count,
+                            "type": "NO_SUITABLE_ROOM", "cohort": cohort.name,
+                            "unit_code": unit.code, "unit_name": unit.name,
+                            "students": cohort.student_count,
                             "max_room_capacity": max((r.capacity for r in rooms), default=0),
-                            "message":           f"No room with capacity ≥ {cohort.student_count} students",
+                            "message": f"No room with capacity ≥ {cohort.student_count} students",
                         })
                 if outsourced:
                     continue
                 qualified = list(unit.qualified_trainers.filter(is_active=True))
                 if not qualified:
                     blocking.append({
-                        "type":      "NO_TRAINER",
-                        "cohort":    cohort.name,
-                        "unit_code": unit.code,
-                        "unit_name": unit.name,
-                        "message":   "No qualified trainer assigned — unit cannot be scheduled",
+                        "type": "NO_TRAINER", "cohort": cohort.name,
+                        "unit_code": unit.code, "unit_name": unit.name,
+                        "message": "No qualified trainer assigned — unit cannot be scheduled",
                     })
                     continue
                 if len(qualified) == 1:
@@ -1393,20 +1313,15 @@ class ValidateView(APIView):
                 for u in CurriculumUnit.objects.filter(
                     qualified_trainers=t,
                     programme__department__institution=inst,
-                    is_active=True,
-                    is_outsourced=False,
-                ).filter(
-                    programme__cohorts__current_term__isnull=False
-                ).distinct()
+                    is_active=True, is_outsourced=False,
+                ).filter(programme__cohorts__current_term__isnull=False).distinct()
             )
             if needed > t.max_periods_per_week:
                 warnings.append({
-                    "type":            "TRAINER_OVERLOAD",
-                    "trainer_name":    f"{t.first_name} {t.last_name}",
-                    "trainer_id":      tid,
-                    "sessions_needed": needed,
-                    "max_periods":     t.max_periods_per_week,
-                    "message":         (
+                    "type": "TRAINER_OVERLOAD",
+                    "trainer_name": f"{t.first_name} {t.last_name}", "trainer_id": tid,
+                    "sessions_needed": needed, "max_periods": t.max_periods_per_week,
+                    "message": (
                         f"{t.first_name} {t.last_name} qualified for {needed} sessions "
                         f"but max is {t.max_periods_per_week}/week"
                     ),
@@ -1414,26 +1329,21 @@ class ValidateView(APIView):
             sole_units = units_per_trainer.get(tid, [])
             if len(sole_units) >= 3:
                 warnings.append({
-                    "type":         "SINGLE_TRAINER_BOTTLENECK",
-                    "trainer_name": f"{t.first_name} {t.last_name}",
-                    "trainer_id":   tid,
-                    "sole_units":   sole_units,
-                    "units_count":  len(sole_units),
-                    "message":      (
+                    "type": "SINGLE_TRAINER_BOTTLENECK",
+                    "trainer_name": f"{t.first_name} {t.last_name}", "trainer_id": tid,
+                    "sole_units": sole_units, "units_count": len(sole_units),
+                    "message": (
                         f"{t.first_name} {t.last_name} is the only trainer "
                         f"for {len(sole_units)} units"
                     ),
                 })
 
         return ok({
-            "blocking":     blocking,
-            "warnings":     warnings,
+            "blocking": blocking, "warnings": warnings,
             "can_generate": len(blocking) == 0,
             "summary": {
-                "blocking_count":  len(blocking),
-                "warning_count":   len(warnings),
-                "cohorts_checked": cohorts_checked,
-                "units_checked":   units_checked,
+                "blocking_count": len(blocking), "warning_count": len(warnings),
+                "cohorts_checked": cohorts_checked, "units_checked": units_checked,
             },
         })
 
@@ -1457,9 +1367,7 @@ class GenerateView(APIView):
         except Exception:
             return err("Generation failed", traceback.format_exc(), 500)
         AuditLog.objects.create(
-            action="GENERATE",
-            performed_by=request.user,
-            term=term,
+            action="GENERATE", performed_by=request.user, term=term,
             description=f"Timetable generated for {term.name}",
             payload=result.summary(),
         )
@@ -1496,9 +1404,7 @@ class PublishView(APIView):
         except Exception:
             return err("Publish failed", traceback.format_exc(), 500)
         AuditLog.objects.create(
-            action="PUBLISH",
-            performed_by=request.user,
-            term=term,
+            action="PUBLISH", performed_by=request.user, term=term,
             description=f"Published {published_count} entries for {term.name}",
             payload={"published": published_count, "force": force},
         )
@@ -1526,6 +1432,8 @@ class PublishView(APIView):
         return ScheduledUnit.objects.filter(term=term, status="DRAFT").update(
             status="PUBLISHED", published_at=now
         )
+
+
 class RevertToDraftView(APIView):
     """POST /api/timetable/revert/"""
     permission_classes = [IsAuthenticated]
@@ -1534,14 +1442,9 @@ class RevertToDraftView(APIView):
         term = _term_from_request(request)
         if not term:
             return err("No current term. Provide term_id.", status_code=404)
-
-        published_count = ScheduledUnit.objects.filter(
-            term=term, status="PUBLISHED"
-        ).count()
-
+        published_count = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").count()
         if not published_count:
             return err("No published entries found for this term.")
-
         try:
             with transaction.atomic():
                 reverted = ScheduledUnit.objects.filter(
@@ -1549,11 +1452,8 @@ class RevertToDraftView(APIView):
                 ).update(status="DRAFT", published_at=None)
         except Exception:
             return err("Revert failed", traceback.format_exc(), 500)
-
         AuditLog.objects.create(
-            action="REVERT",
-            performed_by=request.user,
-            term=term,
+            action="REVERT", performed_by=request.user, term=term,
             description=f"Reverted {reverted} entries to draft for {term.name}",
             payload={"reverted": reverted},
         )
@@ -1570,9 +1470,7 @@ class DeleteDraftsView(APIView):
             return err("Provide term_id")
         count, _ = ScheduledUnit.objects.filter(term=term, status="DRAFT").delete()
         AuditLog.objects.create(
-            action="DELETE",
-            performed_by=request.user,
-            term=term,
+            action="DELETE", performed_by=request.user, term=term,
             description=f"Deleted {count} draft entries for {term.name}",
         )
         return ok({"deleted": count})
@@ -1586,7 +1484,7 @@ class MasterTimetableView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        term   = _term_from_request(request)
+        term = _term_from_request(request)
         if not term:
             return err("No current term. Provide term_id.", status_code=404)
         inst    = term.institution
@@ -1639,18 +1537,18 @@ class CohortTimetableView(APIView):
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
         return ok({
-            "cohort":          cohort.name,
-            "cohort_id":       str(cohort.id),
-            "programme":       cohort.programme.name,
-            "current_term":    cohort.current_term,
-            "student_count":   cohort.student_count,
-            "term":            term.name,
-            "term_id":         str(term.id),
-            "days":            days,
-            "periods":         [_period_dict(p) for p in periods],
-            "grid":            grid,
+            "cohort":           cohort.name,
+            "cohort_id":        str(cohort.id),
+            "programme":        cohort.programme.name,
+            "current_term":     cohort.current_term,
+            "student_count":    cohort.student_count,
+            "term":             term.name,
+            "term_id":          str(term.id),
+            "days":             days,
+            "periods":          [_period_dict(p) for p in periods],
+            "grid":             grid,
             "classes_per_week": entries.count(),
-            "progress":        cohort.progress_summary,
+            "progress":         cohort.progress_summary,
         })
 
 
@@ -1703,9 +1601,7 @@ class ScheduledUnitDetailView(APIView):
 
     def get(self, request, entry_id):
         su = get_object_or_404(
-            ScheduledUnit.objects.select_related(
-                "curriculum_unit", "cohort", "trainer", "room", "period"
-            ),
+            ScheduledUnit.objects.select_related("curriculum_unit", "cohort", "trainer", "room", "period"),
             id=entry_id,
         )
         return ok(_scheduled_unit_dict(su))
@@ -1729,9 +1625,7 @@ class ScheduledUnitDetailView(APIView):
         except Exception as e:
             return err(str(e), status_code=400)
         AuditLog.objects.create(
-            action="EDIT",
-            performed_by=request.user,
-            term=su.term,
+            action="EDIT", performed_by=request.user, term=su.term,
             description=f"Edited entry {su.id}",
             payload={"before": old, "after": _scheduled_unit_dict(su)},
         )
@@ -1794,9 +1688,7 @@ class ResolveConflictView(APIView):
         method   = request.data.get("method", "RESOLVED")
         conflict.resolve(note=note, resolved_by=request.user, method=method)
         AuditLog.objects.create(
-            action="RESOLVE",
-            performed_by=request.user,
-            term=conflict.term,
+            action="RESOLVE", performed_by=request.user, term=conflict.term,
             description=f"Conflict {conflict.id} resolved: {note}",
         )
         return ok({"resolved": True, "conflict_id": str(conflict.id)})
@@ -1805,8 +1697,17 @@ class ResolveConflictView(APIView):
 # ─────────────────────────────────────────────────────────────────────────────
 # Exports
 # ─────────────────────────────────────────────────────────────────────────────
+#
+# All three views accept ?fmt=html|xlsx|pdf|docx  (default: html)
+#
+# html  → opens inline in browser   (Content-Disposition: inline)
+# xlsx  → Excel download            (Content-Disposition: attachment)
+# pdf   → PDF download              (Content-Disposition: attachment)
+# docx  → Word download             (Content-Disposition: attachment)
+# ─────────────────────────────────────────────────────────────────────────────
 
 def _html_table(title, subtitle, days, periods, grid, caption="") -> str:
+    """Render a timetable as a standalone HTML page (Period model instances expected)."""
     head_cells = "".join(
         f"<th>{p.label}<br><small>{p.start_time:%H:%M}–{p.end_time:%H:%M}</small></th>"
         for p in periods
@@ -1874,38 +1775,123 @@ def _html_table(title, subtitle, days, periods, grid, caption="") -> str:
 </html>"""
 
 
+def _periods_to_dicts(periods: list) -> list[dict]:
+    """Convert Period model instances → plain dicts for xlsx/pdf/docx builders."""
+    return [
+        {
+            "id":    str(p.id),
+            "label": p.label,
+            "start": str(p.start_time),
+            "end":   str(p.end_time),
+        }
+        for p in periods
+    ]
+
+
+def _dispatch_export(
+    fmt: str,
+    title: str,
+    subtitle: str,
+    days: list[str],
+    periods: list,          # Period model instances
+    grid: dict,
+    is_master: bool,
+    filename_stem: str,
+) -> HttpResponse:
+    """Route to the correct builder and return an HttpResponse."""
+    fmt = (fmt or "html").lower()
+    if fmt not in ("html", "xlsx", "pdf", "docx"):
+        fmt = "html"
+
+    # ── HTML ─────────────────────────────────────────────────────────────────
+    if fmt == "html":
+        html = _html_table(title=title, subtitle=subtitle, days=days,
+                           periods=periods, grid=grid)
+        resp = HttpResponse(html, content_type="text/html")
+        resp["Content-Disposition"] = f'inline; filename="{filename_stem}.html"'
+        return resp
+
+    period_dicts = _periods_to_dicts(periods)
+
+    # ── XLSX ─────────────────────────────────────────────────────────────────
+    if fmt == "xlsx":
+        data = _make_workbook([{
+            "sheet_name": title[:31],
+            "title":      title,
+            "subtitle":   subtitle,
+            "days":       days,
+            "periods":    period_dicts,
+            "grid":       grid,
+            "is_master":  is_master,
+        }])
+        return _xlsx_response(data, f"{filename_stem}.xlsx")
+
+    # ── PDF ──────────────────────────────────────────────────────────────────
+    if fmt == "pdf":
+        data = build_pdf_timetable(
+            title=title, subtitle=subtitle, days=days,
+            periods=period_dicts, grid=grid, is_master=is_master,
+        )
+        resp = HttpResponse(data, content_type="application/pdf")
+        resp["Content-Disposition"] = f'attachment; filename="{filename_stem}.pdf"'
+        return resp
+
+    # ── DOCX ─────────────────────────────────────────────────────────────────
+    data = build_docx_timetable(
+        title=title, subtitle=subtitle, days=days,
+        periods=period_dicts, grid=grid, is_master=is_master,
+    )
+    resp = HttpResponse(
+        data,
+        content_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
+    resp["Content-Disposition"] = f'attachment; filename="{filename_stem}.docx"'
+    return resp
+
+
 class ExportMasterView(APIView):
+    """GET /api/export/master/?term=<id>&fmt=html|xlsx|pdf|docx"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         term = _term_from_request(request)
         if not term:
             return err("No term found", status_code=404)
-        inst    = term.institution
-        days    = list(inst.days_of_week)
+
+        fmt  = request.query_params.get("fmt", "html")
+        inst = term.institution
+        days = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-        entries = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").select_related(
-            "curriculum_unit", "cohort", "trainer", "room", "period"
+
+        has_published = ScheduledUnit.objects.filter(term=term, status="PUBLISHED").exists()
+        status_filter = "PUBLISHED" if has_published else "DRAFT"
+
+        entries = (
+            ScheduledUnit.objects
+            .filter(term=term, status=status_filter)
+            .select_related("curriculum_unit", "cohort", "trainer", "room", "period")
+            .order_by("day", "period__order", "cohort")
         )
         grid: dict = {day: {str(p.id): [] for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid and pid in grid[su.day]:
                 grid[su.day][pid].append(_scheduled_unit_dict(su))
-        html = _html_table(
-            title=f"Master Timetable – {term.name}",
-            subtitle=inst.name,
-            days=days,
-            periods=periods,
-            grid=grid,
-            caption=f"Weekly recurring template · {term.teaching_weeks} teaching weeks",
+
+        return _dispatch_export(
+            fmt           = fmt,
+            title         = f"Master Timetable – {term.name}",
+            subtitle      = f"{inst.name}  ·  {term.teaching_weeks} teaching weeks  ·  {status_filter}",
+            days          = days,
+            periods       = periods,
+            grid          = grid,
+            is_master     = True,
+            filename_stem = f"master_{term.name}",
         )
-        resp = HttpResponse(html, content_type="text/html")
-        resp["Content-Disposition"] = f'inline; filename="master_{term.name}.html"'
-        return resp
 
 
 class ExportTrainerView(APIView):
+    """GET /api/export/trainer/<uuid>/?term=<id>&fmt=html|xlsx|pdf|docx"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, trainer_id):
@@ -1913,58 +1899,75 @@ class ExportTrainerView(APIView):
         term    = _term_from_request(request)
         if not term:
             return err("No term found", status_code=404)
-        inst    = term.institution
-        days    = list(inst.days_of_week)
+
+        fmt  = request.query_params.get("fmt", "html")
+        inst = term.institution
+        days = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-        entries = ScheduledUnit.objects.filter(
-            term=term, trainer=trainer, status="PUBLISHED"
-        ).select_related("curriculum_unit", "cohort", "room", "period")
+
+        entries = (
+            ScheduledUnit.objects
+            .filter(term=term, trainer=trainer, status__in=["DRAFT", "PUBLISHED"])
+            .select_related("curriculum_unit", "cohort", "room", "period")
+            .order_by("day", "period__order")
+        )
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
-        html = _html_table(
-            title=f"Timetable – {trainer.full_name}",
-            subtitle=f"{trainer.department.name} · {term.name}",
-            days=days,
-            periods=periods,
-            grid=grid,
+
+        safe_name = "".join(c for c in trainer.full_name if c.isalnum() or c in " _-")
+        return _dispatch_export(
+            fmt           = fmt,
+            title         = f"Timetable – {trainer.full_name}",
+            subtitle      = f"{trainer.department.name}  ·  {term.name}",
+            days          = days,
+            periods       = periods,
+            grid          = grid,
+            is_master     = False,
+            filename_stem = f"timetable_{safe_name}_{term.name}",
         )
-        resp = HttpResponse(html, content_type="text/html")
-        resp["Content-Disposition"] = f'inline; filename="trainer_{trainer.staff_id}.html"'
-        return resp
 
 
 class ExportCohortView(APIView):
+    """GET /api/export/cohort/<uuid>/?term=<id>&fmt=html|xlsx|pdf|docx"""
     permission_classes = [IsAuthenticated]
 
     def get(self, request, cohort_id):
-        cohort  = get_object_or_404(Cohort, id=cohort_id)
-        term    = _term_from_request(request)
+        cohort = get_object_or_404(Cohort, id=cohort_id)
+        term   = _term_from_request(request)
         if not term:
             return err("No term found", status_code=404)
-        inst    = term.institution
-        days    = list(inst.days_of_week)
+
+        fmt  = request.query_params.get("fmt", "html")
+        inst = term.institution
+        days = list(inst.days_of_week)
         periods = list(Period.objects.filter(institution=inst, is_break=False).order_by("order"))
-        entries = ScheduledUnit.objects.filter(
-            term=term, cohort=cohort, status="PUBLISHED"
-        ).select_related("curriculum_unit", "trainer", "room", "period")
+
+        entries = (
+            ScheduledUnit.objects
+            .filter(term=term, cohort=cohort, status__in=["DRAFT", "PUBLISHED"])
+            .select_related("curriculum_unit", "trainer", "room", "period")
+            .order_by("day", "period__order")
+        )
         grid: dict = {day: {str(p.id): None for p in periods} for day in days}
         for su in entries:
             pid = str(su.period_id)
             if su.day in grid:
                 grid[su.day][pid] = _scheduled_unit_dict(su)
-        html = _html_table(
-            title=f"Timetable – {cohort.name}",
-            subtitle=f"{cohort.programme.name} · {term.name}",
-            days=days,
-            periods=periods,
-            grid=grid,
+
+        safe_name = "".join(c for c in cohort.name if c.isalnum() or c in " _-")
+        return _dispatch_export(
+            fmt           = fmt,
+            title         = f"Timetable – {cohort.name}",
+            subtitle      = f"{cohort.programme.name}  ·  {term.name}",
+            days          = days,
+            periods       = periods,
+            grid          = grid,
+            is_master     = False,
+            filename_stem = f"timetable_{safe_name}_{term.name}",
         )
-        resp = HttpResponse(html, content_type="text/html")
-        resp["Content-Disposition"] = f'inline; filename="cohort_{cohort.name}.html"'
-        return resp
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -1982,12 +1985,8 @@ class DashboardView(APIView):
             "institution": inst.name if inst else "",
             "trainers":    Trainer.objects.filter(institution=inst, is_active=True).count(),
             "rooms":       Room.objects.filter(institution=inst, is_active=True).count(),
-            "cohorts":     Cohort.objects.filter(
-                               programme__department__institution=inst, is_active=True
-                           ).count(),
-            "programmes":  Programme.objects.filter(
-                               department__institution=inst, is_active=True
-                           ).count(),
+            "cohorts":     Cohort.objects.filter(programme__department__institution=inst, is_active=True).count(),
+            "programmes":  Programme.objects.filter(department__institution=inst, is_active=True).count(),
         }
 
         if term:
@@ -2001,7 +2000,6 @@ class DashboardView(APIView):
                 .annotate(n=Count("id"))
                 .order_by()
             )
-
             trainer_load = list(
                 Trainer.objects.filter(institution=inst, is_active=True)
                 .annotate(
@@ -2350,7 +2348,6 @@ class CohortDetailView(APIView):
         for field in ("name", "student_count", "start_year", "start_month", "is_active"):
             if field in data:
                 setattr(c, field, data[field])
-        # current_term is managed via enrolments — do not allow direct edits
         c.save()
         return ok({"id": str(c.id), "name": c.name})
 
@@ -2403,6 +2400,7 @@ class TermDetailView(APIView):
         t.delete()
         return ok({"deleted": True})
 
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Term Trainer Assignments
 # ─────────────────────────────────────────────────────────────────────────────
@@ -2422,10 +2420,6 @@ def _tta_dict(a):
 
 
 class TermTrainerAssignmentListView(APIView):
-    """
-    GET  /api/term-assignments/?term=<id>
-    POST /api/term-assignments/
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -2434,9 +2428,7 @@ class TermTrainerAssignmentListView(APIView):
         trainer_id = request.query_params.get("trainer")
         unit_id    = request.query_params.get("unit")
 
-        qs = TermTrainerAssignment.objects.select_related(
-            "term", "cohort", "curriculum_unit", "trainer"
-        )
+        qs = TermTrainerAssignment.objects.select_related("term", "cohort", "curriculum_unit", "trainer")
         if term:
             qs = qs.filter(term=term)
         if cohort_id:
@@ -2445,7 +2437,6 @@ class TermTrainerAssignmentListView(APIView):
             qs = qs.filter(trainer_id=trainer_id)
         if unit_id:
             qs = qs.filter(curriculum_unit_id=unit_id)
-
         return ok([_tta_dict(a) for a in qs.order_by("cohort__name")])
 
     def post(self, request):
@@ -2467,11 +2458,6 @@ class TermTrainerAssignmentListView(APIView):
 
 
 class TermTrainerAssignmentDetailView(APIView):
-    """
-    GET    /api/term-assignments/<id>/
-    PUT    /api/term-assignments/<id>/
-    DELETE /api/term-assignments/<id>/
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
@@ -2501,9 +2487,6 @@ class TermTrainerAssignmentDetailView(APIView):
 
 
 class TermTrainerAssignmentByUnitView(APIView):
-    """
-    GET /api/term-assignments/by-unit/?term=<id>&unit=<id>&cohort=<id>
-    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -2528,9 +2511,6 @@ class TermTrainerAssignmentByUnitView(APIView):
 
 
 class TermTrainerAssignmentBulkView(APIView):
-    """
-    POST /api/term-assignments/bulk/
-    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -2541,7 +2521,7 @@ class TermTrainerAssignmentBulkView(APIView):
             return err("term_id required")
         if not assignments:
             return err("assignments list required")
-        term = get_object_or_404(Term, id=term_id)
+        term          = get_object_or_404(Term, id=term_id)
         created_count = 0
         updated_count = 0
         errors        = []
@@ -2564,9 +2544,4 @@ class TermTrainerAssignmentBulkView(APIView):
                         updated_count += 1
                 except Exception as e:
                     errors.append({"item": item, "error": str(e)})
-        return ok({
-            "created": created_count,
-            "updated": updated_count,
-            "errors":  errors,
-        })
-
+        return ok({"created": created_count, "updated": updated_count, "errors": errors})
