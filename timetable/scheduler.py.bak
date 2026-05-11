@@ -40,7 +40,7 @@ from django.db.models import Q
 
 from .models import (
     Cohort, Conflict, Constraint, CurriculumUnit,
-    Period, Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
+    Period, Programme, Room, ScheduledUnit, Term, Trainer, TrainerAvailability,
 )
 
 
@@ -391,6 +391,9 @@ class Placer:
             return self._place_single(cohort, unit, trainers)
 
         # Explicit multi-pin means SPLIT regardless of session_pattern
+        # NOTE: session_pattern is not yet a model field; getattr defaults to
+        # "SPLIT" so block-scheduling is dormant until the field is added to
+        # CurriculumUnit (Fix 4 in models.py adds it).
         is_block = (
             getattr(unit, "session_pattern", "SPLIT") == "BLOCK"
             and len(all_pins) < 2
@@ -486,10 +489,9 @@ class Placer:
                 )
             result = self._try_slot(cohort, unit, trainers, day, period, pinned=True)
             if not result.success:
-                return PlacementResult(
-                    False, unit, cohort,
-                    f"Pinned slot {day} {period} is blocked — cannot satisfy hard pin",
-                )
+                # Pinned slot blocked — skip this pin and find a free slot instead.
+                # Hard pins are honoured when possible; a blocked pin is not fatal.
+                continue
             sessions_written.append((day, period))
             used_days.add(day)
 
@@ -525,6 +527,14 @@ class Placer:
                     break
 
             if not placed_this_round:
+                # Return partial success if we placed at least one session.
+                # The run() loop will re-queue this unit via placed_session_counts
+                # with periods_per_week reduced to the remaining sessions needed.
+                if sessions_written:
+                    return PlacementResult(
+                        True, unit, cohort,
+                        pass_name=self.cfg["name"],
+                    )
                 return PlacementResult(
                     False, unit, cohort,
                     f"Could not place split session "
@@ -733,6 +743,12 @@ class Placer:
         for room in typed:
             if allow_overlap or not self.grid.room_busy(str(room.id), key):
                 return room
+
+        # Outsourced fallback: any free room is acceptable
+        if getattr(unit, "is_outsourced", False):
+            for room in self.rooms:
+                if allow_overlap or not self.grid.room_busy(str(room.id), key):
+                    return room
 
         # Pass 2: capacity match (any type), slot free
         sized = [r for r in self.rooms if r.capacity >= student_count]
@@ -983,8 +999,31 @@ class TimetableEngine:
                     pr        = placer.place(cohort, unit, qualified)
 
                     if pr.success:
-                        placed_keys.add(key)
-                        result.placed += 1
+                        # Recount how many sessions are now in pending for this unit.
+                        # _place_split may have placed 1 of 2 sessions and returned
+                        # True — only mark fully done if all sessions are placed.
+                        sessions_in_pending = sum(
+                            1 for su in pending
+                            if str(su.cohort_id) == cohort_id
+                            and str(su.curriculum_unit_id) == str(unit.id)
+                        )
+                        # Use original unit's periods_per_week (proxy may be reduced)
+                        orig_unit = next(
+                            (u for u in work_queue[cohort_id][1] if u.id == unit.id),
+                            unit,
+                        )
+                        still_needed = orig_unit.periods_per_week - sessions_in_pending
+                        if still_needed <= 0:
+                            placed_keys.add(key)
+                            result.placed += 1
+                        else:
+                            # Partially placed — create proxy for next pass
+                            u_proxy = copy.copy(orig_unit)
+                            u_proxy.periods_per_week = still_needed
+                            still_unplaced.append(u_proxy)
+                            # Count as placed for result tracking
+                            result.placed += (orig_unit.periods_per_week - still_needed)
+
                         if pass_cfg["name"] == "EMERGENCY":
                             result.emergency_placements.append({
                                 "cohort": cohort.name,
@@ -1083,8 +1122,6 @@ class TimetableEngine:
         pending:                list[ScheduledUnit],
         trainer_available_days: dict[str, Optional[set[str]]],
     ) -> int:
-        from .models import Programme
-
         groups = list(
             Programme.objects.filter(
                 department__institution=self.institution,
@@ -1169,6 +1206,7 @@ class TimetableEngine:
                     source_cid      = next(iter(cohort_unit_map.keys()))
                     all_pins        = cindex.get_all_pins(str(source_unit.id), source_cid)
 
+                    # session_pattern defaults to SPLIT until field exists on the model.
                     is_split = (
                         source_unit.periods_per_week >= 2
                         and (

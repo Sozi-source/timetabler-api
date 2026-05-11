@@ -1,4 +1,4 @@
-﻿"""
+"""
 timetable/views.py
 ==================
 Clean, flat REST API.  Every endpoint returns a predictable shape:
@@ -2545,3 +2545,153 @@ class TermTrainerAssignmentBulkView(APIView):
                 except Exception as e:
                     errors.append({"item": item, "error": str(e)})
         return ok({"created": created_count, "updated": updated_count, "errors": errors})
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Curriculum Export / Import
+# ─────────────────────────────────────────────────────────────────────────────
+
+class CurriculumExportView(APIView):
+    """GET /api/curriculum/export/?programme=<id>"""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        import io, openpyxl
+        from openpyxl.styles import Font, PatternFill, Alignment
+
+        prog_id = request.query_params.get("programme")
+        if not prog_id:
+            return err("programme query param required")
+        programme = get_object_or_404(Programme, id=prog_id)
+        units = CurriculumUnit.objects.filter(
+            programme=programme, is_active=True
+        ).order_by("term_number", "position")
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Curriculum Units"
+
+        headers = ["term_number","position","code","name","unit_type",
+                   "credit_hours","periods_per_week","session_pattern","is_outsourced","notes"]
+        hfill = PatternFill("solid", fgColor="16213E")
+        hfont = Font(bold=True, color="FFFFFF")
+        for col, h in enumerate(headers, 1):
+            c = ws.cell(row=1, column=col, value=h)
+            c.fill = hfill; c.font = hfont
+            c.alignment = Alignment(horizontal="center")
+
+        for col, w in enumerate([14,10,18,42,12,14,18,16,14,30], 1):
+            ws.column_dimensions[ws.cell(row=1, column=col).column_letter].width = w
+
+        for row, u in enumerate(units, 2):
+            ws.cell(row=row, column=1, value=u.term_number)
+            ws.cell(row=row, column=2, value=u.position)
+            ws.cell(row=row, column=3, value=u.code)
+            ws.cell(row=row, column=4, value=u.name)
+            ws.cell(row=row, column=5, value=u.unit_type)
+            ws.cell(row=row, column=6, value=u.credit_hours)
+            ws.cell(row=row, column=7, value=u.periods_per_week)
+            ws.cell(row=row, column=8, value=u.session_pattern)
+            ws.cell(row=row, column=9, value="YES" if u.is_outsourced else "NO")
+            ws.cell(row=row, column=10, value=u.notes)
+
+        ws2 = wb.create_sheet("Instructions")
+        notes = [
+            ["Field","Required","Valid Values"],
+            ["term_number","YES","Integer e.g. 1, 2, 3"],
+            ["position","YES","Integer — sort order within term"],
+            ["code","YES","Unique within programme"],
+            ["name","YES","Full unit name"],
+            ["unit_type","YES","CORE | ELECTIVE | PRACTICAL | PROJECT"],
+            ["credit_hours","YES","Integer e.g. 3"],
+            ["periods_per_week","YES","1 or 2"],
+            ["session_pattern","YES","SPLIT | BLOCK"],
+            ["is_outsourced","NO","YES or NO"],
+            ["notes","NO","Any text"],
+            ["","",""],
+            ["TIP: keep code unchanged to UPDATE; new code = CREATE","",""],
+        ]
+        for r, row_data in enumerate(notes, 1):
+            for c, v in enumerate(row_data, 1):
+                cell = ws2.cell(row=r, column=c, value=v)
+                if r == 1: cell.font = Font(bold=True)
+        ws2.column_dimensions["A"].width = 22
+        ws2.column_dimensions["C"].width = 46
+
+        buf = io.BytesIO()
+        wb.save(buf); buf.seek(0)
+        safe = "".join(c for c in programme.code if c.isalnum() or c in "-_")
+        resp = HttpResponse(buf.read(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        resp["Content-Disposition"] = f'attachment; filename="curriculum_{safe}.xlsx"'
+        return resp
+
+
+class CurriculumImportView(APIView):
+    """POST /api/curriculum/import/  multipart: file=<xlsx>, programme_id=<uuid>"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        import io, openpyxl
+        prog_id = request.data.get("programme_id")
+        file    = request.FILES.get("file")
+        if not prog_id: return err("programme_id required")
+        if not file:    return err("file required")
+        programme = get_object_or_404(Programme, id=prog_id)
+
+        try:
+            wb = openpyxl.load_workbook(filename=io.BytesIO(file.read()), data_only=True)
+            ws = wb["Curriculum Units"]
+        except Exception as e:
+            return err(f"Cannot read file: {e}")
+
+        headers = [cell.value for cell in ws[1]]
+        required = {"term_number","position","code","name","unit_type",
+                    "credit_hours","periods_per_week","session_pattern"}
+        missing = required - set(headers)
+        if missing:
+            return err(f"Missing columns: {', '.join(missing)}")
+
+        col = {h: i for i, h in enumerate(headers)}
+        created_count = updated_count = skipped_count = 0
+        errors = []
+
+        with transaction.atomic():
+            for row_num, row in enumerate(ws.iter_rows(min_row=2, values_only=True), 2):
+                code = str(row[col["code"]] or "").strip()
+                if not code: skipped_count += 1; continue
+                name = str(row[col["name"]] or "").strip()
+                if not name:
+                    errors.append({"row": row_num, "code": code, "error": "name required"}); continue
+                try:
+                    term_number      = int(row[col["term_number"]])
+                    position         = int(row[col["position"]])
+                    credit_hours     = int(row[col["credit_hours"]])
+                    periods_per_week = int(row[col["periods_per_week"]])
+                except (TypeError, ValueError) as e:
+                    errors.append({"row": row_num, "code": code, "error": str(e)}); continue
+
+                unit_type       = str(row[col["unit_type"]]       or "CORE").strip().upper()
+                session_pattern = str(row[col["session_pattern"]] or "SPLIT").strip().upper()
+                is_outsourced   = str(row[col["is_outsourced"]]   or "NO").strip().upper() == "YES"
+                notes           = str(row[col["notes"]]           or "").strip()
+
+                if unit_type not in {"CORE","ELECTIVE","PRACTICAL","PROJECT"}:
+                    errors.append({"row": row_num, "code": code, "error": f"bad unit_type '{unit_type}'"}); continue
+                if session_pattern not in {"SPLIT","BLOCK"}:
+                    errors.append({"row": row_num, "code": code, "error": f"bad session_pattern '{session_pattern}'"}); continue
+
+                try:
+                    _, created = CurriculumUnit.objects.update_or_create(
+                        programme=programme, code=code,
+                        defaults=dict(name=name, term_number=term_number, position=position,
+                                      unit_type=unit_type, credit_hours=credit_hours,
+                                      periods_per_week=periods_per_week, session_pattern=session_pattern,
+                                      is_outsourced=is_outsourced, notes=notes, is_active=True),
+                    )
+                    if created: created_count += 1
+                    else:       updated_count += 1
+                except Exception as e:
+                    errors.append({"row": row_num, "code": code, "error": str(e)})
+
+        return ok({"programme": programme.name, "created": created_count,
+                   "updated": updated_count, "skipped": skipped_count, "errors": errors})

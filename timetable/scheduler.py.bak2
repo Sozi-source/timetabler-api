@@ -925,7 +925,7 @@ class TimetableEngine:
         # ── Step 3: schedule COMBINED sessions (shared classes) ───────────
         combined_placed = self._schedule_combined(
             work_queue, grid, cindex, days, periods, rooms,
-            pending, trainer_available_days, term_assignments,
+            pending, trainer_available_days,
         )
         result.combined_placed = combined_placed
 
@@ -978,7 +978,9 @@ class TimetableEngine:
             viable   = []
             for unit in unit_list:
                 ta_key    = (cohort_id, str(unit.id))
-                qualified = term_assignments.get(ta_key, [])
+                qualified = term_assignments.get(ta_key) or [
+                    t for t in unit.qualified_trainers.all() if t.is_active
+                ]
                 if not qualified and not getattr(unit, "is_outsourced", False):
                     no_trainer_units.append((cohort, unit))
                     placed_keys.add(f"{cohort_id}_{unit.id}")
@@ -1010,7 +1012,9 @@ class TimetableEngine:
                         continue
 
                     ta_key    = (cohort_id, str(unit.id))
-                    qualified = term_assignments.get(ta_key, [])
+                    qualified = term_assignments.get(ta_key) or [
+                        t for t in unit.qualified_trainers.all() if t.is_active
+                    ]
                     pr = placer.place(cohort, unit, qualified)
 
                     if pr.success:
@@ -1136,7 +1140,6 @@ class TimetableEngine:
         rooms:                  list[Room],
         pending:                list[ScheduledUnit],
         trainer_available_days: dict[str, Optional[set[str]]],
-        term_assignments:       dict[tuple[str, str], list[Trainer]] = None,
     ) -> int:
         groups = list(
             Programme.objects.filter(
@@ -1197,28 +1200,20 @@ class TimetableEngine:
                     if combined_key in placed_combined_keys:
                         continue
 
-                    # Resolve trainer from TermTrainerAssignment only.
-                    # Collect assigned trainer ids for each cohort in this group.
-                    assigned_ids = [
-                        term_assignments[(cid, str(cohort_unit_map[cid].id))][0].id
-                        for cid in cohort_unit_map
-                        if (cid, str(cohort_unit_map[cid].id)) in (term_assignments or {})
+                    # Find a trainer common to ALL cohorts' qualified sets
+                    trainer_id_sets = [
+                        {str(t.id) for t in u.qualified_trainers.all()}
+                        for u in cohort_unit_map.values()
                     ]
-                    # All cohorts must share the same assigned trainer to combine.
-                    unique_assigned = list(dict.fromkeys(str(i) for i in assigned_ids))
-                    if len(unique_assigned) == 1:
-                        # All cohorts agree on one trainer — use them.
-                        qualified = list(
-                            Trainer.objects.filter(id=unique_assigned[0], is_active=True)
-                        )
-                    elif len(unique_assigned) > 1:
-                        # Cohorts have different assigned trainers — cannot combine.
-                        # Each cohort will be placed individually in the pass loop.
-                        continue
-                    else:
-                        # No assignments at all — skip combined, handle individually.
-                        continue
+                    common_ids = set.intersection(*trainer_id_sets) if trainer_id_sets else set()
+                    if not common_ids:
+                        # Fall back to source unit's trainers
+                        source_unit = next(iter(cohort_unit_map.values()))
+                        common_ids  = {str(t.id) for t in source_unit.qualified_trainers.all()}
 
+                    qualified = list(
+                        Trainer.objects.filter(id__in=common_ids, is_active=True)
+                    )
                     if not qualified:
                         continue
 

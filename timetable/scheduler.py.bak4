@@ -1570,6 +1570,8 @@ class TimetableEngine:
           4. Double/block sessions are harder than singles.
         """
 
+        _ta_ids = set(term_assignments.keys()) if term_assignments else set()
+
         def difficulty(item: tuple) -> tuple:
             cohort_id, (cohort, units) = item
             if not units:
@@ -1584,7 +1586,7 @@ class TimetableEngine:
             total_sessions = sum(u.periods_per_week for u in units)
 
             trainer_counts = [
-                len([t for t in u.qualified_trainers.all() if t.is_active])
+                1 if (cohort_id, str(u.id)) in _ta_ids else 0
                 for u in units
             ]
             # Weight units with 0 or 1 trainer as most constrained

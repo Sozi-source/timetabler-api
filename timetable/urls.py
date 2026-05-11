@@ -82,6 +82,10 @@ urlpatterns = [
     path("conflicts/",                  views.ConflictListView.as_view()),
     path("conflicts/<uuid:conflict_id>/resolve/", views.ResolveConflictView.as_view()),
 
+    # -- Curriculum export/import
+    path("curriculum/export/",          views.CurriculumExportView.as_view()),
+    path("curriculum/import/",          views.CurriculumImportView.as_view()),
+
     # -- Exports --------------------------------------------------------------
     path("export/master/",              views.ExportMasterView.as_view()),
     path("export/trainer/<uuid:trainer_id>/", views.ExportTrainerView.as_view()),
