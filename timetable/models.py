@@ -879,16 +879,49 @@ class Term(TimeStampedModel):
         super().save(*args, **kwargs)
 
     @property
+    def total_weeks(self) -> int:
+        import math
+        return math.ceil((self.end_date - self.start_date).days / 7)
+
+    @property
     def week_number(self) -> int:
-        today = timezone.now().date()
+        from datetime import date as _date
+        today = _date.today()
         if today < self.start_date:
             return 0
-        elapsed = (today - self.start_date).days // 7 + 1
-        return max(0, min(elapsed, self.teaching_weeks))
+        if today > self.end_date:
+            return self.total_weeks
+        elapsed = (today - self.start_date).days
+        return (elapsed // 7) + 1
 
     @property
     def weeks_remaining(self) -> int:
-        return max(0, self.teaching_weeks - self.week_number)
+        from datetime import date as _date
+        today = _date.today()
+        if today >= self.end_date:
+            return 0
+        return max(0, self.total_weeks - self.week_number)
+    
+    @property
+    def progress_pct(self) -> float:
+        from datetime import date as _date
+        today = _date.today()
+        total_days = (self.end_date - self.start_date).days or 1
+        if today < self.start_date:
+            return 0.0
+        if today >= self.end_date:
+            return 100.0
+        return round((today - self.start_date).days / total_days * 100, 1)
+
+    @property
+    def term_status(self) -> str:
+        from datetime import date as _date
+        today = _date.today()
+        if today < self.start_date:
+            return "upcoming"
+        if today > self.end_date:
+            return "completed"
+        return "active"
 
 
 # ─────────────────────────────────────────────────────────────────────────────

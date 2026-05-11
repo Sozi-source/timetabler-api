@@ -135,6 +135,8 @@ def _institution(request) -> Institution | None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def _term_dict(t: Term) -> dict:
+    today = date.today()
+    total_days = (t.end_date - t.start_date).days or 1
     return {
         "id":               str(t.id),
         "name":             t.name,
@@ -142,10 +144,16 @@ def _term_dict(t: Term) -> dict:
         "end_date":         str(t.end_date),
         "teaching_weeks":   t.teaching_weeks,
         "is_current":       t.is_current,
-        "current_week":     t.week_number,
-        "weeks_remaining":  t.weeks_remaining,
         "college_year":     t.college_year,
         "college_semester": t.college_semester,
+        "total_weeks":      t.total_weeks,
+        "current_week":     t.week_number,
+        "weeks_remaining":  t.weeks_remaining,
+        "progress_pct":     t.progress_pct,
+        "status":           t.term_status,
+        "total_days":       total_days,
+        "days_elapsed":     max(0, min((today - t.start_date).days, total_days)),
+        "days_remaining":   max(0, (t.end_date - today).days),
     }
 
 
@@ -2016,19 +2024,16 @@ class DashboardView(APIView):
             )
 
             stats["term"] = {
-                "id":              str(term.id),
-                "name":            term.name,
-                "teaching_weeks":  term.teaching_weeks,
-                "current_week":    term.week_number,
-                "weeks_remaining": term.weeks_remaining,
-                "published":       pub_count,
-                "drafts":          draft_count,
-                "conflicts": {
-                    "pending":  conflict_counts.get("PENDING", 0),
-                    "resolved": conflict_counts.get("RESOLVED", 0),
-                    "total":    sum(conflict_counts.values()),
-                },
-            }
+            **_term_dict(term),          # ← all accurate fields from the model
+            "published":  pub_count,
+            "drafts":     draft_count,
+            "conflicts": {
+                "pending":  conflict_counts.get("PENDING", 0),
+                "resolved": conflict_counts.get("RESOLVED", 0),
+                "total":    sum(conflict_counts.values()),
+            },
+        }
+        
             stats["trainer_workload"] = [
                 {
                     "id":                str(t.id),
